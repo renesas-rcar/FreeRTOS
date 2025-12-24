@@ -47,6 +47,38 @@ typedef struct{
     uint32_t PLL9_DCR;
 }PLL9Param;
 
+typedef struct
+{
+    uint32_t div_sel;
+    uint32_t v2i_mode;
+    uint32_t vco_low_freq;
+    uint32_t cp_prop_cntrl;
+    uint32_t cp_int_cntrl;
+    uint32_t cp_prop_gs_cntrl;
+    uint32_t cp_int_gs_cntrl;
+    uint64_t upll_prog;
+} PLLParam;
+
+typedef struct
+{
+    uint32_t AcsmWaitDly0;
+    uint32_t AcsmWaitDly1;
+    uint32_t zcalcompstartuptime;
+    uint32_t zcalsampletime;
+    uint32_t zcaloffsetsampletime;
+    uint32_t dwdcdsettletime;
+    uint32_t dwdcdsettletimeDW1;
+    uint32_t dwdcasettletime;
+    uint32_t dwdcasettletimeDW1;
+    uint32_t dwdcdsampletime;
+    uint32_t dwdcdsampletimeDW1;
+    uint32_t acsmpmaborttimeout;
+    uint32_t acsmpmentrytimeout;
+    uint32_t acsmltsmstatetimeout;
+    uint32_t acsmltsmmsgtimeout;
+    uint32_t acsmlinkerrtimeout;
+} FreqDepPrm;
+
 /* PF0_HDMA_CAP */
 #define HDMA_CH_BLOCK_SIZE          (0x800)
 #define HDMA_RW_BLOCK_SIZE          (0x400)

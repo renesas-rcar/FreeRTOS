@@ -40,6 +40,9 @@ static uint32_t mem_read32(uintptr_t addr)
     return *(volatile uint32_t *)addr;
 }
 
+static void set_pll9_0(uint32_t f_Speed);
+static void set_pll9_1(uint32_t f_Speed);
+
 uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
 {
     uintptr_t base;
@@ -809,7 +812,7 @@ static void Ucie_Start_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode, e_ucie_linkspe
     //;  axi0 addres OFF
     mem_write32( ucie_apb_base + 0xE005E8, 0x00000000 );
 
-    uint32_t dvsecLinkControl = ((speed & LINKSPEED_MASK) << LINKSPEED_OFFSET) | 0x00004000;
+    uint32_t dvsecLinkControl = ((speed & LINKSPEED_MASK) << LINKSPEED_OFFSET) | 0x0000400C;
     mem_write32( ucie_axi_base + DVSEC_UNIT_DSP_DVSEC_UCIE_LINK_CONTROL_ADD, dvsecLinkControl);
 
     if(mode == UCIE_MODE_RC){
@@ -845,20 +848,75 @@ static uint32_t Ucie_Wait_FreqChange_Req(e_ucie_ch_t ch)
     return ret;
 }
 
-static uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch)
+static uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed)
 {
     uint32_t ret = 0;
     uint32_t mask, expect;
     uint32_t timeout;
     uint32_t ucie_apb_base;
+    uint32_t ucie_axi_base;
+    uint32_t clock_div;
+
+    PLLParam pllprm[] = {// there are some parameters that have the same value.
+                        {0x296, 0b000, 0b001, 0b0001101, 0b0001000, 0b0101000, 0b1111111, 0x041B600150601009},
+                        {0x29A, 0b100, 0b000, 0b0001011, 0b0000011, 0b0101000, 0b1111111, 0x041B600150601009},
+                        {0x3CE, 0b100, 0b001, 0b0001101, 0b0000101, 0b0101000, 0b1111111, 0x041B600150601009},
+                        {0x3CE, 0b100, 0b000, 0b0001011, 0b0000011, 0b0101000, 0b1111111, 0x041B600150601009}};
+
+    FreqDepPrm freqdepprm={
+        500,
+        4750,
+        500,
+        125,
+        100,
+        50,
+        50,
+        25,
+        25,
+        50,
+        50,
+        2,
+        4,
+        0,
+        0,
+        0
+    };
 
     ucie_apb_base = UCIE_APB_BASE(ch);
-    
+    ucie_axi_base = UCIE_AXI_BASE(ch);
+
     mask	= 0x000002;
     expect	= 0x000000;
     timeout = 4500000; // ~3sec
-    
+
+    mem_write32( ucie_apb_base + 0xE005E8, 0x00004141 );
+
+    if (ch == UCIE_CH0) {
+        set_pll9_0(speed);
+    }
+    else {
+        set_pll9_1(speed);
+    }
+
+    mem_write32(ucie_axi_base + ACSM_ACSMWAITDLY0_ADD, freqdepprm.AcsmWaitDly0 * (speed + 1));
+    mem_write32(ucie_axi_base + ACSM_ACSMWAITDLY1_ADD, freqdepprm.AcsmWaitDly1 * (speed + 1));
+    mem_write32(ucie_axi_base + MMPL_ZCALCTRL0_ADD, (freqdepprm.zcalcompstartuptime * (speed + 1)) | (freqdepprm.zcalsampletime * (speed + 1) << 12) | (freqdepprm.zcaloffsetsampletime * (speed + 1) << 22));
+    mem_write32(ucie_axi_base + DWORD_0_DWDCCCTRL1_ADD, freqdepprm.dwdcdsettletime * (speed + 1));
+    mem_write32(ucie_axi_base + DWORD_1_DWDCCCTRL1_ADD, freqdepprm.dwdcdsettletimeDW1 * (speed + 1));
+    *(volatile uint32_t*)(ucie_axi_base + DWORD_0_DWDCCCTRL1_ADD) |= freqdepprm.dwdcasettletime * (speed + 1) << 8;
+    *(volatile uint32_t*)(ucie_axi_base + DWORD_1_DWDCCCTRL1_ADD) |= freqdepprm.dwdcasettletimeDW1 * (speed + 1) << 8;
+    *(volatile uint32_t*)(ucie_axi_base + DWORD_0_DWDCCCTRL1_ADD) |= freqdepprm.dwdcdsampletime * (speed + 1) << 16;
+    *(volatile uint32_t*)(ucie_axi_base + DWORD_1_DWDCCCTRL1_ADD) |= freqdepprm.dwdcdsampletimeDW1 * (speed + 1) << 16;
+    mem_write32(ucie_axi_base + ACSM_ACSMTIMEOUTCTRL0_ADD, freqdepprm.acsmpmaborttimeout * (speed + 1) | (freqdepprm.acsmpmentrytimeout * (speed + 1) << 8));
+    mem_write32(ucie_axi_base + ACSM_ACSMTIMEOUTCTRL1_ADD, freqdepprm.acsmltsmstatetimeout * (speed + 1) | (freqdepprm.acsmltsmmsgtimeout * (speed + 1) << 9) | (freqdepprm.acsmlinkerrtimeout * (speed + 1) << 18));
+
+    mem_write32(ucie_axi_base + MMPL_PLLCTRL1_ADD, pllprm[speed].div_sel | (pllprm[speed].v2i_mode << 10) | (pllprm[speed].vco_low_freq << 13));
+    mem_write32(ucie_axi_base + MMPL_PLLCTRL0_ADD, (pllprm[speed].cp_prop_cntrl << 8) | (pllprm[speed].cp_int_cntrl) | (pllprm[speed].cp_prop_gs_cntrl << 24) | (pllprm[speed].cp_int_gs_cntrl << 16));
+    mem_write32(ucie_axi_base + MMPL_PLLCTRL3_ADD, pllprm[speed].upll_prog);
+    mem_write32(ucie_axi_base + MMPL_PLLCTRL4_ADD, pllprm[speed].upll_prog >> 32);
+
     mem_write32( ucie_apb_base + 0xE21004, 0x00000001 ); // ack=1 -> req will negate after 1clk cycle
+    mem_read32(ucie_apb_base + 0xE21004);
     while ((mem_read32(ucie_apb_base + 0xE1003C) & mask) != expect) {
         timeout--;
         if (timeout == 0) {
@@ -868,6 +926,7 @@ static uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch)
     }
 
     mem_write32( ucie_apb_base + 0xE21004, 0x00000000 ); // ack=0
+    mem_read32(ucie_apb_base + 0xE21004);
 
     return ret;
 }
@@ -1357,7 +1416,7 @@ e_ucie_linkup_status_t R_UCIE_Setup(e_ucie_ch_t ch, e_ucie_mode_t mode,
     }
 
     /* [Step 4] UCIe Ack FreqChange */
-    Ucie_Ack_FreqChange(ch);
+    Ucie_Ack_FreqChange(ch, speed);
 
     wait_time(0x8000);
     /* [Step 5] UCIe Wait Linkup */
