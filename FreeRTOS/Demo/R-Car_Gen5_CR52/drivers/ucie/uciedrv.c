@@ -51,7 +51,7 @@ static uint32_t mem_read32(uintptr_t addr)
 static void set_pll9_0(uint32_t f_Speed);
 static void set_pll9_1(uint32_t f_Speed);
 
-uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
+uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
 {
     uintptr_t base;
     e_ucie_ch_t ucieCh = cfg->ucie_ch;
@@ -119,7 +119,40 @@ uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
     mem_write32(base + HDMA_LLP_LOW_OFF, 0x00000000);
     mem_write32(base + HDMA_LLP_HIGH_OFF, 0x00000000);
     mem_write32(base + HDMA_CYCLE_OFF, 0x00000000);
+
+    return 0;
+}
+
+uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
+{
+    uintptr_t base;
+    e_ucie_ch_t ucieCh = cfg->ucie_ch;
+    e_ucie_hdma_ch_t dmaCh = cfg->hdma_ch;
+    e_ucie_hdma_mode_t rw = cfg->rw;
     
+    if (ucieCh != UCIE_CH0 && ucieCh != UCIE_CH1) {
+        printf("ERROR: Invalid UCIe channel\n");
+        return 1;
+    }
+
+    if (dmaCh < HDMA_CH0 || dmaCh > HDMA_CH31) {
+        printf("ERROR: Invalid HDMA channel\n");
+        return 1;
+    }
+
+    if (rw != HDMA_WRITE && rw != HDMA_READ) {
+        printf("ERROR: Invalid HDMA transfer mode\n");
+        return 1;
+    }
+
+    base = UCIE_AXI_BASE(ucieCh) + PF0_HDMA_CAP_BASE_ADD + 
+                            (dmaCh * HDMA_CH_BLOCK_SIZE) + (rw * HDMA_RW_BLOCK_SIZE);
+
+    if (mem_read32(base + HDMA_STATUS_OFF) == 0x1) {
+        printf("ERROR: Channel is running\n");
+        return 1;
+    }
+
     mem_write32(base + HDMA_DOORBELL_OFF, 0x00000001);
 
     return 0;

@@ -217,6 +217,13 @@ static void ucie_comm_task(void *pvParameters)
     printf("Start RC HDMA transfer\n");
     
     index = 0;
+    /* Set config for All CH */
+    while (hdma_tbl_wrtest_dt[index].size != 0) {
+        R_UCIE_HDMA_SetConfig(hdma_tbl_wrtest_dt + index);
+        index++;
+    }
+
+    index = 0;
     /* Start All CH Transfer */
     while (hdma_tbl_wrtest_dt[index].size != 0) {
         R_UCIE_HDMA_Start(hdma_tbl_wrtest_dt + index);
@@ -246,10 +253,11 @@ static void ucie_comm_task(void *pvParameters)
             .size = hdma_tbl_wrtest_dt[0].size,
             .flag = 1,
         };
-        
+
         hdma_tbl_wrtest_dt[0].mDestAddr = UCIE_LOOPCHECK_ADDR;
         hdma_tbl_wrtest_dt[0].size = sizeof(st_ucie_trigger_sig_t);
-        
+
+        R_UCIE_HDMA_SetConfig(hdma_tbl_wrtest_dt + 0);
         R_UCIE_HDMA_Start(hdma_tbl_wrtest_dt + 0);
     }
 

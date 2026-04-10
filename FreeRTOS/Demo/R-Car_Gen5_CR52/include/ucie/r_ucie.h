@@ -247,6 +247,17 @@ e_ucie_linkup_status_t R_UCIE_Retry_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode,
 e_ucie_linkup_status_t R_UCIE_Get_Linkup_Status(e_ucie_ch_t ch);
 
 /**
+ * @brief UCIe HDMA set config.
+ *
+ * This function using for set config to HDMA.
+ *
+ * @param[in] cfg Pointer to the instance HMDA config structure.
+ *
+ * @return 0 if success, non-zero if error.
+ */
+uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg);
+
+/**
  * @brief UCIe HDMA start.
  *
  * This function using for start HDMA transfer.
