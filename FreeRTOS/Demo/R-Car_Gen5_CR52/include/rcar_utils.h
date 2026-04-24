@@ -1,170 +1,237 @@
 /*
  * Copyright (c) 2025 Renesas Electronics Corporation
- *
  * SPDX-License-Identifier: MIT
- *
  */
-
-#ifndef __RCAR_UTILS_H__
-#define __RCAR_UTILS_H__
 
 /**
- * @defgroup UTILS_Module RCAR UTILS Module
- * @{
- * @brief This module provides common RCAR UTILS function. 
+ * @file rcar_utils.h
+ * @brief Common utility APIs for memory, timer, cache, and CPU information
+ *
+ * This header provides utility functions commonly used across
+ * R-Car-based software components, including:
+ * - Memory region queries
+ * - Generic timer access
+ * - Cache maintenance operations
+ * - CPU identification and cycle counting
  */
 
- #include <stddef.h>
+#ifndef RCAR_UTILS_H
+#define RCAR_UTILS_H
+
+#include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/***********************************************************************************************************************
- * Includes
- **********************************************************************************************************************/
-#include <stdint.h>
+/* ========================================================================== */
+/*                              Memory Utilities                              */
+/* ========================================================================== */
 
-/***********************************************************************************************************************
- * Typedef definitions
- **********************************************************************************************************************/
-/** 
- * @brief Enumeration for types of memory regions. 
+/**
+ * @defgroup UTILS_Mem Memory Utilities
+ * @brief APIs for querying system memory layout and regions
+ *
+ * These APIs provide information about different memory regions available
+ * in the system such as peripheral memory, CMA, OSAL, shared memory, and TCM.
+ *
+ * @{
+ */
+
+/**
+ * @typedef e_memory_type
+ * @brief Types of memory regions available in the system
  */
 typedef enum e_memory_type {
-    PERIPHERAL,
-    CMA,
-    OSAL,
-    SHARE_MEM,
-    TCM
+    PERIPHERAL,   /**< Peripheral address space */
+    CMA,          /**< Contiguous Memory Allocator regions */
+    OSAL,         /**< OS Abstraction Layer managed memory */
+    SHARE_MEM,    /**< Shared memory regions */
+    TCM           /**< Tightly Coupled Memory */
 } e_memory_type_t;
 
 /**
- * @brief Structure to represent a memory region.
- * 
- * This structure contains the base address and size of a memory region.
+ * @typedef st_memory
+ * @brief Memory region descriptor
+ *
+ * Represents a single memory region with a base address and size.
  */
 typedef struct st_memory {
-    uint32_t base_address;
-    uint32_t size;
+    uint32_t base_address; /**< Base physical address of the region */
+    uint32_t size;         /**< Size of the region in bytes */
 } st_memory_t;
 
-/***********************************************************************************************************************
- * Public APIs
- **********************************************************************************************************************/
 /**
- * @brief Get memory region info.
+ * @brief Get information about a specific memory region
  *
- * Returns the base address and size of a specified memory region.
+ * Retrieves the base address and size of a memory region of the given type.
  *
- * @param[in] type Memory type
- * @param[in] region_idx Region index (e.g., 0 for the first region)
+ * @param[in] type        Memory type (@ref e_memory_type_t)
+ * @param[in] region_idx  Index of the region (0-based)
  *
- * @return memory_t Struct containing base address and size
+ * @return st_memory_t    Memory region information.
+ *                       If the index is invalid, returned values are undefined.
  */
-st_memory_t R_UTILS_GetMemoryRegionInfo(e_memory_type_t type, uint8_t region_idx);
+st_memory_t R_UTILS_GetMemoryRegionInfo(
+    e_memory_type_t type,
+    uint8_t region_idx
+);
 
 /**
- * @brief Get total regions of a specific memory type.
- * 
- * Return the total number of regions for a given memory type.
- * 
- * @param[in] type Memory type
- * 
- * @return uint8_t Total number of memory regions for the given type
+ * @brief Get total number of regions for a memory type
+ *
+ * @param[in] type        Memory type (@ref e_memory_type_t)
+ *
+ * @return uint8_t        Number of regions of the given memory type
  */
 uint8_t R_UTILS_GetTotalRegionOfMemory(e_memory_type_t type);
 
+/** @} */ /* end of UTILS_Mem */
+
+/* ========================================================================== */
+/*                              Timer Utilities                               */
+/* ========================================================================== */
 
 /**
- * @brief Get counter of timer.
+ * @defgroup UTILS_Timer Generic Timer Utilities
+ * @brief
+ * Provides access to the ARM Generic Timer counter and frequency. In R-Car X5H,
+ * there is one Generic Timer accessible by the Cortex R52 CPU. The timer
+ * operates at a frequency of 66,666,667 Hz. Each counter increment increases by
+ * 16, which means the counter frequency is equal to 1066,666,667 Hz.
+ * @{
+ */
+
+/**
+ * @brief Get the current timer counter value
  *
- * Return the counter of timer.
- *
- *
- * @return uint64_t Timer counter.
+ * @return uint64_t Current value of the generic timer counter
  */
 uint64_t R_UTILS_GetTimerCounter(void);
 
 /**
- * @brief Get frequency of timer.
+ * @brief Get the generic timer frequency
  *
- * Return the counter of timer by hz.
- *
- *
- * @return uint64_t Timer frequency.
+ * @return uint32_t Timer frequency in Hertz
  */
 uint32_t R_UTILS_GetTimerFrequency(void);
 
-void * aligned_malloc(size_t align, size_t size);
-void aligned_free(void * ptr);
+/** @} */ /* end of UTILS_Timer */
+
+/* ========================================================================== */
+/*                         Aligned Memory Utilities                            */
+/* ========================================================================== */
 
 /**
- * @brief Flush (clean) data cache for a memory region.
+ * @brief Allocate aligned memory
  *
- * Writes dirty cache lines back to RAM to ensure memory is up to date.
+ * Allocates a memory block of the given size with the specified alignment.
  *
- * @param[in] addr Physical start address.
+ * @param[in] align Alignment in bytes (must be power of two)
+ * @param[in] size  Size of the allocation in bytes
  *
- * @param[in] size Buffer size in bytes.
+ * @return Pointer to allocated memory, or NULL on failure
+ */
+void *aligned_malloc(size_t align, size_t size);
+
+/**
+ * @brief Free memory allocated by aligned_malloc
  *
+ * @param[in] ptr Pointer returned by aligned_malloc
+ */
+void aligned_free(void *ptr);
+
+/* ========================================================================== */
+/*                              Cache Utilities                               */
+/* ========================================================================== */
+
+/**
+ * @defgroup UTILS_Cache Cache Utilities
+ * @brief Data cache maintenance APIs
+ *
+ * Provides APIs to clean and invalidate data cache regions.
+ *
+ * @{
+ */
+
+/**
+ * @brief Clean (flush) data cache for a memory range
+ *
+ * Writes back dirty cache lines to memory so that RAM contents are up to date.
+ *
+ * @param[in] addr Physical start address
+ * @param[in] size Size of memory range in bytes
  */
 void R_UTILS_FlushDCache(uint32_t addr, uint32_t size);
 
 /**
- * @brief Invalidate Data cache.
+ * @brief Invalidate data cache for a memory range
  *
- * Notify CPU to invalidate data cache before reading.
+ * Ensures that subsequent CPU reads fetch fresh data from memory.
  *
- * @param[in] addr Physical start address.
- *
- * @param[in] size Buffer size in byte.
- *
+ * @param[in] addr Physical start address
+ * @param[in] size Size of memory range in bytes
  */
 void R_UTILS_InvalidateDCache(uint32_t addr, uint32_t size);
 
 /**
- * @brief Invalidate All Data cache.
+ * @brief Invalidate entire data cache
  *
- * Notify CPU to invalidate data cache before reading.
- *
+ * Invalidates all data cache lines for the current CPU.
  */
-void R_UTILS_InvalidateDCacheAll();
+void R_UTILS_InvalidateDCacheAll(void);
 
 /**
- * @brief Invalidate cache and read memory for DMA.
- * 
- * Invalidates cache for the given address range and reads memory to ensure
- * fresh data after DMA transfer.
- * 
- * @param[in] addr Address to read.
- * @param[in] size Size of memory range to invalidate.
- * 
- * @return uint32_t Value read from memory.
+ * @brief Read memory safely after a DMA transfer
+ *
+ * Invalidates data cache for the given address range and performs a read
+ * to ensure fresh data is visible to the CPU.
+ *
+ * @param[in] addr Address to read from
+ * @param[in] size Size of the memory region to invalidate
+ *
+ * @return uint32_t Value read from memory
  */
 uint32_t R_UTILS_ReadMemForDMA(void *addr, uint32_t size);
 
-/**
- * @brief Get CPU cycles
- * 
- * @return uint64_t Return number of CPU cycles elapsed from when the PMU was enabled 
- *                  until this API is called.
- */
-uint64_t R_UTILS_GetCPUCycles();
+/** @} */ /* end of UTILS_Cache */
+
+/* ========================================================================== */
+/*                                CPU Utilities                               */
+/* ========================================================================== */
 
 /**
- * @brief Get CPU ID
- * 
- * @return uint32_t Return unique CPU ID based on Cluster ID and Core ID
+ * @defgroup UTILS_CPU CPU Utilities
+ * @brief CPU information and performance utilities
+ *
+ * @{
+ */
+
+/**
+ * @brief Get CPU cycle counter
+ *
+ * Returns the number of CPU cycles elapsed since the performance monitor
+ * unit (PMU) was enabled.
+ *
+ * @return uint64_t CPU cycle count
+ */
+uint64_t R_UTILS_GetCPUCycles(void);
+
+/**
+ * @brief Get unique CPU identifier
+ *
+ * CPU ID is derived from the cluster ID and core ID.
+ *
+ * @return uint32_t Unique CPU ID, equals to:
+ * ClusterID * CoresPerCluster + CPUIDInCluster
  */
 uint32_t R_UTILS_GetCpuID(void);
 
-/**-----------------------------------------------------------**/
+/** @} */ /* end of UTILS_CPU */
 
 #ifdef __cplusplus
 }
 #endif
 
-/** @} */ // end of UTILS_Module
-
-#endif // __RCAR_UTILS_H__
+#endif /* RCAR_UTILS_H */
