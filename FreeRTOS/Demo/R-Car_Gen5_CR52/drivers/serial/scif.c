@@ -153,74 +153,6 @@ static void uart_rcar_set_baudrate(uint32_t port, uint32_t baud_rate)
     }
 }
 
-static int uart_rcar_irq_is_enabled(uint32_t irq)
-{
-	return !!(uart_rcar_read_16(SCSCR) & irq);
-}
-
-static int uart_rcar_fifo_fill(const uint8_t *tx_data, int len)
-{
-	int num_tx = 0;
-	uint16_t reg_val;
-
-	while (((len - num_tx) > 0) &&
-	       (uart_rcar_read_16(SCFSR) & SCFSR_TDFE)) {
-		/* Send current byte */
-		uart_rcar_write_8(SCFTDR, tx_data[num_tx]);
-
-		reg_val = uart_rcar_read_16(SCFSR);
-		reg_val &= ~(SCFSR_TDFE | SCFSR_TEND);
-		uart_rcar_write_16(SCFSR, reg_val);
-
-		num_tx++;
-	}
-
-	return num_tx;
-}
-
-static int uart_rcar_fifo_read( uint8_t *rx_data,
-			       const int size)
-{
-	int num_rx = 0;
-	uint16_t reg_val;
-
-	while (((size - num_rx) > 0) &&
-	       (uart_rcar_read_16(SCFSR) & SCFSR_RDF)) {
-		/* Receive current byte */
-		rx_data[num_rx++] = uart_rcar_read_16(SCFRDR);
-
-		reg_val = uart_rcar_read_16(SCFSR);
-		reg_val &= ~(SCFSR_RDF);
-		uart_rcar_write_16(SCFSR, reg_val);
-
-	}
-
-	return num_rx;
-}
-
-static void uart_rcar_irq_tx_enable(void)
-{
-	uint16_t reg_val;
-
-	reg_val = uart_rcar_read_16(SCSCR);
-	reg_val |= (SCSCR_TIE);
-	uart_rcar_write_16(SCSCR, reg_val);
-}
-
-static void uart_rcar_irq_tx_disable(void)
-{
-	uint16_t reg_val;
-
-	reg_val = uart_rcar_read_16(SCSCR);
-	reg_val &= ~(SCSCR_TIE);
-	uart_rcar_write_16(SCSCR, reg_val);
-}
-
-static int uart_rcar_irq_tx_ready(void)
-{
-	return !!(uart_rcar_read_16(SCFSR) & SCFSR_TDFE);
-}
-
 static void uart_rcar_irq_rx_enable(void)
 {
 	uint16_t reg_val;
@@ -228,50 +160,6 @@ static void uart_rcar_irq_rx_enable(void)
 	reg_val = uart_rcar_read_16(SCSCR);
 	reg_val |= (SCSCR_RIE);
 	uart_rcar_write_16(SCSCR, reg_val);
-}
-
-static void uart_rcar_irq_rx_disable(void)
-{
-	uint16_t reg_val;
-
-	reg_val = uart_rcar_read_16(SCSCR);
-	reg_val &= ~(SCSCR_RIE);
-	uart_rcar_write_16(SCSCR, reg_val);
-}
-
-static int uart_rcar_irq_rx_ready(void)
-{
-	return !!(uart_rcar_read_16(SCFSR) & SCFSR_RDF);
-}
-
-static void uart_rcar_irq_err_enable(void)
-{
-	uint16_t reg_val;
-
-	reg_val = uart_rcar_read_16(SCSCR);
-	reg_val |= (SCSCR_REIE);
-	uart_rcar_write_16(SCSCR, reg_val);
-}
-
-static void uart_rcar_irq_err_disable(void)
-{
-
-	uint16_t reg_val;
-
-	reg_val = uart_rcar_read_16(SCSCR);
-	reg_val &= ~(SCSCR_REIE);
-	uart_rcar_write_16(SCSCR, reg_val);
-}
-
-static int uart_rcar_irq_is_pending(void)
-{
-	return (uart_rcar_irq_rx_ready() && uart_rcar_irq_is_enabled(SCSCR_RIE)) ||
-	       (uart_rcar_irq_tx_ready() && uart_rcar_irq_is_enabled(SCSCR_TIE));
-}
-
-static int uart_rcar_irq_update(void)
-{
-	return 1;
 }
 
 uint32_t console_init(uint32_t port) {
