@@ -85,6 +85,14 @@ static void prvHelloWorldTask( void *pvParameters )
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
     uint32_t cpu_id = R_UTILS_GetCpuID();
+    #ifdef tskKERNEL_VERSION_MAJOR
+        printf("FreeRTOS Kernel Version: %u.%u.%u\r\n",
+        (unsigned)tskKERNEL_VERSION_MAJOR,
+        (unsigned)tskKERNEL_VERSION_MINOR,
+        (unsigned)tskKERNEL_VERSION_BUILD);
+    #else
+        printf("FreeRTOS Kernel Version: <macros not avaiable>\r\n");
+    #endif
     for( ;; )
     {
         printf("CPU %d: prvHelloWorldTask ...\n", cpu_id);
