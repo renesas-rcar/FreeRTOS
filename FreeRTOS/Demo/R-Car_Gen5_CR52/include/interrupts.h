@@ -5,14 +5,14 @@
  *
  */
 
-/*
- * CMSIS GIC wrapper
+/**
+ * @defgroup Interrupt_Controller Interrupt Controller
+ * @{
+ * @brief This module provides functions and structures for managing interrupts.
  *
- * The CMSIS GIC code does most of what we need, with the exception of
- * registering a context that is used in the interrupt callback.
- *
- * This wrapper also allows us to set the default properties for interrupts
- * and do any device specifc initialisation.
+ * The Interrupt Module includes functionality for setting up, enabling, disabling,
+ * and handling interrupts. It also provides mechanisms for setting interrupt priorities,
+ * reading and writing to registers, and managing interrupt contexts.
  */
 
 #ifndef __INTERRUPTS_H_
@@ -311,17 +311,6 @@ extern "C" {
  * @brief Interrupt IDs of ECM
  */
 #define INTID_ECMERR_MERGE              0x0326
-
-/**
- * @defgroup Interrupt_Controller Interrupt Controller
- * @{
- * @brief This module provides functions and structures for managing interrupts.
- *
- * The Interrupt Module includes functionality for setting up, enabling, disabling,
- * and handling interrupts. It also provides mechanisms for setting interrupt priorities,
- * reading and writing to registers, and managing interrupt contexts.
- */
-
 
 /***********************************************************************************************************************
  * Typedef definitions
