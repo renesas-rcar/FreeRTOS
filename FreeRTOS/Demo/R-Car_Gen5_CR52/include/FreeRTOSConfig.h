@@ -17,7 +17,9 @@
  *
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define configSUPPORT_STATIC_ALLOCATION                 1
 #define configSUPPORT_DYNAMIC_ALLOCATION                1 /* Defaults to 1 anyway. */
@@ -259,6 +261,10 @@ unsigned long long portGet_Run_Time_Counter_Value(void);
  */
 void vConfigureTickInterrupt( void );
 #define configSETUP_TICK_INTERRUPT() vConfigureTickInterrupt()
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FREERTOSCONFIG_H_ */
 
