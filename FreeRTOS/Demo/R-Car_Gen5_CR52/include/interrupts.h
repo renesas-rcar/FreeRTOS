@@ -11,8 +11,8 @@
  * @brief This module provides functions and structures for managing interrupts.
  *
  * The Interrupt Module includes functionality for setting up, enabling, disabling,
- * and handling interrupts. It also provides mechanisms for setting interrupt priorities,
- * reading and writing to registers, and managing interrupt contexts.
+ * and handling interrupts. It also provides mechanisms for setting interrupt priorities
+ * and managing interrupt contexts.
  */
 
 #ifndef __INTERRUPTS_H_
@@ -413,23 +413,6 @@ void FreeRTOS_EndOfInterrupt(unsigned int id);
  * @retval -1 The IRQ ID is not a merged interrupt.
  */
 int Irq_GetTableId(unsigned int id);
-
-/**
- * @brief Reads a value from the specified register address.
- *
- * @param addr The address of the register.
- *
- * @return The value read from the register.
- */
-uint32_t Irq_RegRead(uint32_t addr);
-
-/**
- * @brief Writes a value to the specified register address.
- *
- * @param addr The address of the register.
- * @param val The value to be written to the register.
- */
-void Irq_RegWrite(uint32_t addr, uint32_t val);
 
 /**
  * @brief Sets up a merged IRQ entry.

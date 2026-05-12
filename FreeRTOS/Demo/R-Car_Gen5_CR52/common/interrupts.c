@@ -143,6 +143,23 @@ static const irq_table r8a78000_irq_table[] = {
 };
 
 /**
+ * @brief Reads a value from the specified register address.
+ *
+ * @param addr The address of the register.
+ *
+ * @return The value read from the register.
+ */
+static uint32_t Irq_RegRead(uint32_t addr);
+
+/**
+ * @brief Writes a value to the specified register address.
+ *
+ * @param addr The address of the register.
+ * @param val The value to be written to the register.
+ */
+static void Irq_RegWrite(uint32_t addr, uint32_t val);
+
+/**
  * @brief Get CPU ID that program is currently running.
  *
  * @param None.
@@ -313,12 +330,12 @@ int Irq_GetTableId(unsigned int id)
 	return -1;
 }
 
-uint32_t Irq_RegRead(uint32_t addr)
+static uint32_t Irq_RegRead(uint32_t addr)
 {
 	return *((volatile uint32_t *)addr);
 }
 
-void Irq_RegWrite(uint32_t addr, uint32_t val)
+static void Irq_RegWrite(uint32_t addr, uint32_t val)
 {
 	*((volatile uint32_t *)addr) = val;
 }
