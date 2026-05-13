@@ -24,6 +24,8 @@
 #define DMA_BUFFER_START_OFFSET                 1  ///< DMA buffer start offset (after PIO byte)
 #define MAX_I2C_UNITS                           7
 #define MAX_DMAC_UNITS                          4
+#define ICMAR_MASK_READ                         ((uint32_t)0xFF)
+#define ICMAR_MASK_WRITE                        ((uint32_t)0xFE)
 
 /* ==================== STATIC VARIABLES ==================== */
 static int clock_id;
@@ -470,7 +472,7 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, R_I2C_MDE_BIT | R_I2C_MAT_BIT);
 
     /* Set Master Address register (slave addr and write mode) */
-    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, ((SlaveAddr << 1) & (0xFFFFFFFE)));
+    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, ((SlaveAddr << 1) & ICMAR_MASK_WRITE));
 
     /* Load the first byte into the shift register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICTXD, Bytes[0]);
@@ -601,7 +603,7 @@ static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint3
                          | R_I2C_MDR_BIT | R_I2C_MAT_BIT);
 
     /* Set Master Address register (slave addr + 0x00 write mode) */
-    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, (SlaveAddr << 1) & (0xFFFFFFFE));
+    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, (SlaveAddr << 1) & ICMAR_MASK_WRITE);
 
     /* Load the slave register address into the shift register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICTXD, SlaveReg);
@@ -648,7 +650,7 @@ static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint3
         }
         /* Change from Write mode to Read mode */
         /* Set Master Address register (slave addr + 0x01 read mode) */
-        R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, (SlaveAddr << 1) | (uint32_t)0x01);
+        R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, ((SlaveAddr << 1) | (uint32_t)0x01) & ICMAR_MASK_READ);
 
         /* Set again the ESG bit in ICMCR, because we want a repeated
         * START condition on the bus when the data tranfer is resumed */
@@ -677,7 +679,7 @@ static uint32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *By
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, R_I2C_MDR_BIT | R_I2C_MAT_BIT);
 
     /* Set Master Address register (slave addr + 0x01 read mode) */
-    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, (SlaveAddr << 1) + 1);
+    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, ((SlaveAddr << 1) + 1) & ICMAR_MASK_READ);
 
     do {
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
@@ -948,7 +950,7 @@ static void rcar_i2c_irq_send(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
         {
             /* Change from Write mode to Read mode */
             /* Set Master Address register (slave addr + 0x01 read mode) */
-            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, (p_instance_ctrl->p_cfg->slave << 1) | 0x01);
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, ((p_instance_ctrl->p_cfg->slave << 1) | 0x01) & ICMAR_MASK_READ);
 
             /* Set again the ESG bit in ICMCR, because we want a repeated
             * START condition on the bus when the data tranfer is resumed */
