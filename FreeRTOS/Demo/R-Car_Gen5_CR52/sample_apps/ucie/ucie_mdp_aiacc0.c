@@ -44,11 +44,11 @@
 #define UCIE_EP_SIZE (configMINIMAL_STACK_SIZE * 20)
 
 #define PIO_X5H_RC0_WRITE_DATA      0xFFCCFFCC
-#define PIO_AIACCL_EP0_WRITE_DATA   0x68686868
+#define PIO_AIACC0_EP0_WRITE_DATA   0x68686868
 #define PIO_X5H_RC1_WRITE_DATA      0x12345678
-#define PIO_AIACCR_EP0_WRITE_DATA   0x87654321
-#define PIO_AIACCL_RC1_WRITE_DATA   0x11111111
-#define PIO_AIACCR_EP1_WRITE_DATA   0x22222222
+#define PIO_AIACC1_EP0_WRITE_DATA   0x87654321
+#define PIO_AIACC0_RC1_WRITE_DATA   0x11111111
+#define PIO_AIACC1_EP1_WRITE_DATA   0x22222222
 
 /*-----------------------------------------------------------*/
 
@@ -99,23 +99,31 @@ static void ucie_comm_task(void *pvParameters)
     ( void ) pvParameters;
 
     uint32_t ret = 0;
+    uint32_t ret1, ret2 = 0;
     uint32_t timeout;
     uint32_t timer_freq;
     uint64_t start;
     uint64_t x5h_rc0_addr    =  0x90000000;
-    uint64_t aiaccl_ep0_addr =  0x63800000;
+    uint64_t aiacc0_ep0_addr =  0x63800000;
     uint64_t x5h_rc1_addr    =  0x90001000;
-    uint64_t aiaccr_ep0_addr =  0x63801000;
-    uint64_t aiaccl_rc1_addr =  0x90005000;
-    uint64_t aiaccr_ep1_addr =  0x63805000;
+    uint64_t aiacc1_ep0_addr =  0x63801000;
+    uint64_t aiacc0_rc1_addr =  0x90005000;
+    uint64_t aiacc1_ep1_addr =  0x63805000;
 
-    printf("<----- [AIACCL-EP0] TC1: UCIE0 LINKUP ----->\n");
+    printf("<----- [AIACC0] TC1: UCIE0 INIT ----->\n");
     ret = R_UCIE_Setup(UCIE_CH0, UCIE_MODE_EP, LINKSPEED_16GTPS);
+    if (ret != LINKUP_ERROR) {
+        printf("Result: PASSED\n");
+    }
+    else {
+        printf("Result: FAILED\n");
+    }
+
+    printf("<----- [AIACC0] TC2: UCIE0 LINKUP ----->\n");
     if (ret == LINKUP_TIMEOUT) {
         printf("The first time linkup timeout. Retry 30 times\n");
         ret = R_UCIE_Retry_Linkup(UCIE_CH0, UCIE_MODE_EP, LINKSPEED_16GTPS, 30);
     }
-
     if (ret) {
         printf("Result: FAILED\n");
     }
@@ -123,78 +131,85 @@ static void ucie_comm_task(void *pvParameters)
         printf("Result: PASSED\n");
     }
 
-    printf("<----- [AIACCL-RC1] TC2: UCIE1 LINKUP ----->\n");
+    printf("<----- [AIACC0] TC3: UCIE1 INIT ----->\n");
     ret = R_UCIE_Setup(UCIE_CH1, UCIE_MODE_RC, LINKSPEED_16GTPS);
+    if (ret != LINKUP_ERROR) {
+        printf("Result: PASSED\n");
+    }
+    else {
+        printf("Result: FAILED\n");
+    }
+
+    printf("<----- [AIACC0] TC4: UCIE1 LINKUP ----->\n");
     if (ret == LINKUP_TIMEOUT) {
         printf("The first time linkup timeout. Retry 30 times\n");
         ret = R_UCIE_Retry_Linkup(UCIE_CH1, UCIE_MODE_RC, LINKSPEED_16GTPS, 30);
     }
-
-    if (ret) {
+    if(ret) {
         printf("Result: FAILED\n");
     }
     else {
         printf("Result: PASSED\n");
     }
 
-    printf("<----- [AIACCL-RC1] TC3: Set share mem region ----->\n");
+    printf("<----- [AIACC0] TC5: UCIE0 HDMA Transfer ----->\n");
+    printf("HDMA not suppport now\n");
+    printf("Result: FAILED\n");
 
+    printf("<----- [AIACC0] TC6: UCIE1 HDMA Transfer ----->\n");
+    printf("HDMA not suppport now\n");
+    printf("Result: FAILED\n");
+
+    /* Setup PIO region for X5H-AIACC0 */
     st_ucie_iatu_cfg_t cfg = {
         .ucie_ch = UCIE_CH1,
         .rgn = IATU_RGN0,
-        .mSrcAddr = aiaccl_rc1_addr,
-        .mDestAddr = aiaccr_ep1_addr,
+        .mSrcAddr = aiacc0_rc1_addr,
+        .mDestAddr = aiacc1_ep1_addr,
         .size = 0x1000
     };
 
-    ret = R_UCIE_IATU_SetRegion(&cfg);
+    ret1 = R_UCIE_IATU_SetRegion(&cfg);
 
-    if (ret) {
-        printf("Result: FAILED\n");
-    }
-    else {
-        printf("Result: PASSED\n");
-    }
-
-    printf("AIACCL-RC1 write 0x%X to share mem region\n", PIO_AIACCL_RC1_WRITE_DATA);
-    *(volatile uint32_t*)(uintptr_t)aiaccl_rc1_addr = PIO_AIACCL_RC1_WRITE_DATA;
+    printf("AIACC0-UCIE1 RC write 0x%X to PIO region\n", PIO_AIACC0_RC1_WRITE_DATA);
+    *(volatile uint32_t*)(uintptr_t)aiacc0_rc1_addr = PIO_AIACC0_RC1_WRITE_DATA;
 
     timer_freq = R_UTILS_GetTimerFrequency();
 
-    printf("<----- [AIACCL-EP0] TC4: Verify data written by RC ----->\n");
+    printf("<----- [AIACC0] TC7: UCIE0 PIO Transfer ----->\n");
 
-    ret = 1;
+    ret2 = 1;
     start = R_UTILS_GetTimerCounter();
     while ((R_UTILS_GetTimerCounter() - start)/timer_freq < 3) {
-        if (*(volatile uint32_t*)(uintptr_t)aiaccl_ep0_addr == PIO_X5H_RC0_WRITE_DATA) {
-            ret = 0;
+        if (*(volatile uint32_t*)(uintptr_t)aiacc0_ep0_addr == PIO_X5H_RC0_WRITE_DATA) {
+            ret2 = 0;
             break;
         }
     }
 
-    printf("Value at 0x%llX: 0x%X\n", aiaccl_ep0_addr, *(volatile uint32_t*)(uintptr_t)aiaccl_ep0_addr);
-    if (ret) {
+    printf("Value at 0x%llX: 0x%X\n", aiacc0_ep0_addr, *(volatile uint32_t*)(uintptr_t)aiacc0_ep0_addr);
+    if (ret1 || ret2) {
         printf("Result: FAILED\n");
     }
     else {
         printf("Result: PASSED\n");
     }
 
-    printf("AIACCL-EP0 write 0x%X to share mem region\n", PIO_AIACCL_EP0_WRITE_DATA);
-    *(volatile uint32_t*)(uintptr_t)aiaccl_ep0_addr = PIO_AIACCL_EP0_WRITE_DATA;
+    printf("AIACC0-UCIE0 EP write 0x%X to PIO region\n", PIO_AIACC0_EP0_WRITE_DATA);
+    *(volatile uint32_t*)(uintptr_t)aiacc0_ep0_addr = PIO_AIACC0_EP0_WRITE_DATA;
 
-    printf("<----- [AIACCL-RC1] TC5: Verify data written by EP ----->\n");
+    printf("<----- [AIACC0] TC8: UCIE1 PIO Transfer ----->\n");
 
     ret = 1;
     start = R_UTILS_GetTimerCounter();
     while ((R_UTILS_GetTimerCounter() - start)/timer_freq < 5) {
-        if (*(volatile uint32_t*)(uintptr_t)aiaccl_rc1_addr == PIO_AIACCR_EP1_WRITE_DATA) {
+        if (*(volatile uint32_t*)(uintptr_t)aiacc0_rc1_addr == PIO_AIACC1_EP1_WRITE_DATA) {
             ret = 0;
             break;
         }
     }
 
-    printf("Value at 0x%llX: 0x%X\n", aiaccl_rc1_addr, *(volatile uint32_t*)(uintptr_t)aiaccl_rc1_addr);
+    printf("Value at 0x%llX: 0x%X\n", aiacc0_rc1_addr, *(volatile uint32_t*)(uintptr_t)aiacc0_rc1_addr);
 
     if (ret) {
         printf("Result: FAILED\n");
@@ -203,7 +218,13 @@ static void ucie_comm_task(void *pvParameters)
         printf("Result: PASSED\n");
     }
 
-    printf("<----- [AIACCL] END TEST ----->\n");
+    printf("<----- [AIACC0] TC9: UCIE0 interrupt ----->\n");
+    printf("Result: FAILED\n");
+
+    printf("<----- [AIACC0] TC10: UCIE1 interrupt ----->\n");
+    printf("Result: FAILED\n");
+
+    printf("<----- [AIACC0] END TEST ----->\n");
 
     for(;;) {
         __asm__ volatile("nop");

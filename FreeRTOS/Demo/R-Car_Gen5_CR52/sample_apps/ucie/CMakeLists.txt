@@ -72,10 +72,10 @@ target_link_options(${app_name}
 
 convert_bin_to_srec(${app_name})
 
-set(app_name "ucie_mdp_aiaccl")
+set(app_name "ucie_mdp_aiacc0")
 
 add_executable(${app_name}
-    ucie_mdp_aiaccl.c
+    ucie_mdp_aiacc0.c
 )
 
 target_compile_definitions(${app_name}
@@ -96,10 +96,10 @@ target_link_options(${app_name}
 convert_bin_to_srec(${app_name})
 
 
-set(app_name "ucie_mdp_aiaccr")
+set(app_name "ucie_mdp_aiacc1")
 
 add_executable(${app_name}
-    ucie_mdp_aiaccr.c
+    ucie_mdp_aiacc1.c
 )
 
 target_compile_definitions(${app_name}
