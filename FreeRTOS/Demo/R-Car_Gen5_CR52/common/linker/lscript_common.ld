@@ -10,6 +10,7 @@ MEMORY
    remote_proc_rsc_table : ORIGIN = 0x96600000, LENGTH = 0x1000
    remote_proc_rsc_table_1 : ORIGIN = 0x96650000, LENGTH = 0x1000
    remote_proc_rsc_table_2 : ORIGIN = 0x966a0000, LENGTH = 0x1000
+   remote_proc_rsc_table_3 : ORIGIN = 0x90100000, LENGTH = 0x1000
 }
 
 /* --- BSP Configuration Symbols --- */

@@ -44,18 +44,20 @@ void *metal_machine_io_mem_map(void *va, metal_phys_addr_t pa,
 static struct remoteproc *
 x5h_proc_init(struct remoteproc *rproc, const struct remoteproc_ops *ops, void *arg)
 {
-    struct mfis_channel *mfis = (struct mfis_channel*) arg;
-    int ret;
+    struct remoteproc_priv *rproc_priv = arg;
+    struct mfis_channel *mfis = rproc_priv->p_mfis;
 
     (void)ops;
     if (!rproc)
         return NULL;
 
-    mfis->cb_function = x5h_proc_interrupt_cb;
-    mfis->arg = arg;
-    mfis_init(mfis);
-
-    rproc->priv = (void*)mfis;
+    if (mfis->ch != NO_USING_MFIS)
+    {
+        mfis->cb_function = x5h_proc_interrupt_cb;
+        mfis->arg = mfis;
+        mfis_init(mfis);
+    }
+    
 
     return rproc;
 }
@@ -126,7 +128,18 @@ x5h_proc_mmap(struct remoteproc *rproc, metal_phys_addr_t *pa,
 */
 static int x5h_proc_notify(struct remoteproc *rproc, uint32_t id)
 {
-    return mfis_trigger_interrupt((struct mfis_channel*)rproc->priv, (uint16_t)(id & 0x7FFF));
+    struct remoteproc_priv *rproc_priv = (struct remoteproc_priv*)rproc->priv;
+    uint32_t rproc_tx_addr = rproc_priv->shm_addr + NOTIFY_FLAG_OFFSET;
+    uint32_t rproc_rx_addr = rproc_priv->shm_addr + NOTIFY_FLAG_OFFSET + 0x4;
+    struct mfis_channel *mfis = rproc_priv->p_mfis;
+
+    if (mfis->ch != NO_USING_MFIS) {
+        mfis_trigger_interrupt(mfis, (uint16_t)(id & 0x7FFF));
+    }
+    else {
+        *((volatile uint32_t*)rproc_rx_addr) = (id << 1) | 0x01;
+    }
+    return 0;
 }
 
 /* Remote processor operations from r52 to a720. It defines

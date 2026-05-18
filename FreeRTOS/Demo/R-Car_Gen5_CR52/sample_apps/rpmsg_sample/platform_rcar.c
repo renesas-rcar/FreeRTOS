@@ -25,11 +25,12 @@ extern const struct remoteproc_ops x5h_r_a_proc_ops;
 static struct remoteproc rproc_inst;
 static struct mfis_channel mfis_inst =
 {
-    .ch = MFIS_CHAN,
+    .ch = 0,
     .int_source = 0,
     .recv_message = 0,
     .cb_function = NULL
 };
+struct remoteproc_priv priv;
 /* RPMsg virtio shared buffer pool */
 // static struct rpmsg_virtio_shm_pool shpool;
 
@@ -54,7 +55,10 @@ struct remoteproc * platform_create_proc(int mfis_ch, int rsc_index)
 
     /* Initialize remoteproc instance */
     mfis_inst.ch = mfis_ch;
-    if (!remoteproc_init(&rproc_inst, &x5h_r_a_proc_ops, (void*)&mfis_inst))
+    priv.shm_addr = (uint32_t)rsc_table;
+    priv.p_mfis = &mfis_inst;
+
+    if (!remoteproc_init(&rproc_inst, &x5h_r_a_proc_ops, (void*)&priv))
         return NULL;
 
     /* mmap resource table */
@@ -181,15 +185,32 @@ Otherwise return negative value
 int platform_poll(void *platform)
 {
     struct remoteproc *rproc = platform;
-    struct mfis_channel* mfis = (struct mfis_channel*)rproc->priv;
+    struct remoteproc_priv *rproc_priv = rproc->priv;
+    struct mfis_channel* mfis = rproc_priv->p_mfis;
     int ret = -1;
+    uint32_t rproc_tx_addr = rproc_priv->shm_addr + NOTIFY_FLAG_OFFSET;
+    uint32_t rproc_rx_addr = rproc_priv->shm_addr + NOTIFY_FLAG_OFFSET + 0x4;
 
-    if (0 != mfis->int_source)
+    
+
+    if (mfis->ch != NO_USING_MFIS)
     {
-	remoteproc_get_notification(rproc, RSC_NOTIFY_ID_ANY);
-        mfis->int_source = 0; // Reset int source to 0
-        ret = 0;
+            if (0 != mfis->int_source)
+        {
+        remoteproc_get_notification(rproc, RSC_NOTIFY_ID_ANY);
+            mfis->int_source = 0; // Reset int source to 0
+            ret = 0;
+        }
     }
+    else
+    {
+        if ((*((volatile uint32_t*)rproc_tx_addr) == 0x1)) {
+            remoteproc_get_notification(rproc, RSC_NOTIFY_ID_ANY);
+            *(volatile uint32_t*)rproc_tx_addr = 0x0;
+            ret = 0;
+        }
+    }
+    
 
     return ret;
 }
