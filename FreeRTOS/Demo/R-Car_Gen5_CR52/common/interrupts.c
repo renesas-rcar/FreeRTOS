@@ -42,6 +42,8 @@ static IvtEntry HandlerTable[MAX_IRQ_NUMBER];
 #define MASK_VIN(x)             (0x18A00000U + 0x954CU + ((x) * 0x4U))
 #define STAT_UMF(x)             (0x18A00000U + 0x874CU + ((x) * 0x4U))
 #define MASK_UMF(x)             (0x18A00000U + 0x974CU + ((x) * 0x4U))
+#define STAT_DOC(x)             (0x18A00000U + 0x8650U + ((x) * 0x4U))
+#define MASK_DOC(x)             (0x18A00000U + 0x9650U + ((x) * 0x4U))
 
 typedef struct
 {
@@ -140,6 +142,10 @@ static const irq_table r8a78000_irq_table[] = {
         { 0x1F4, 0x3, STAT_UMF(1), MASK_UMF(1) },
         { 0x1F5, 0x3, STAT_UMF(2), MASK_UMF(2) },
         { 0x1F6, 0x3, STAT_UMF(3), MASK_UMF(3) },
+
+        { 0x1B4, 0x3, STAT_DOC(0), MASK_DOC(0) },
+        { 0x1B5, 0x3, STAT_DOC(1), MASK_DOC(1) },
+        { 0x1B6, 0x3, STAT_DOC(2), MASK_DOC(2) },
 };
 
 /**
