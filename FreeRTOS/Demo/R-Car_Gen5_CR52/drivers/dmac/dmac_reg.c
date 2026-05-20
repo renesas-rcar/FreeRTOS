@@ -85,38 +85,6 @@ static const uint32_t rDmacTransferUnit_Table[] = {
     DRV_RTDMAC_REG_TRANS_UNIT_64BYTE,
 };
 
-/*!
- *  @brief          Write RTDMAC register with the dev number
- *  @details
- *  @param[in]      dev  : dev number
- *  @param[in]      reg  : RTDMAC register
- *  @param[in]      data : data to write
- *  @return         None
- *  @par    Refer   (none)
- *  @par    Modify  (none)
-*/
-static void R_RTDMAC_UnitWriteReg32(uint8_t dev, uint32_t reg, uint32_t data)
-{
-    uint32_t regAddr = fBaseAddress[dev] + reg;
-    *(volatile uint32_t*)regAddr = data;
-}
-
-/*!
- *  @brief          Read RTDMAC register with the dev number
- *  @details
- *  @param[in]      dev  : dev number
- *  @param[in]      reg  : RTDMAC register
- *  @return         data : data to be read
- *  @par    Refer   (none)
- *  @par    Modify  (none)
-*/
-static uint32_t R_RTDMAC_UnitReadReg32(uint8_t dev, uint32_t reg)
-{
-    uint32_t regAddr = fBaseAddress[dev] + reg;
-    uint32_t data;
-    data = *(volatile uint32_t*)regAddr;
-    return data;
-}
 
 /*!
  *  @brief          Write RTDMAC register with the SubChannel number
@@ -205,19 +173,6 @@ static void R_RTDMAC_WriteReg16(uint8_t dev, uint8_t ch, uint32_t reg, uint32_t 
 }
 
 /**
- * Get interrupt state of RDMISTA.
- *
- * The R_RTDMAC_Get_RDMISTA() function.
- * @param[in]  dev : dev number
- * @return     interrupt state of RDMISTA.
- * @attention
- */
-uint32_t R_RTDMAC_Get_RDMISTA(uint8_t dev)
-{
-    return R_RTDMAC_UnitReadReg32(dev, RDMISTA);
-}
-
-/**
  * Get operation register RDMOR.
  *
  * The R_RTDMAC_Get_RDMOR() function.
@@ -228,34 +183,6 @@ uint32_t R_RTDMAC_Get_RDMISTA(uint8_t dev)
 uint32_t R_RTDMAC_Get_RDMOR(uint8_t dev)
 {
     return (uint32_t)R_RTDMAC_UnitReadReg16(dev, RDMOR);
-}
-
-/**
- * Get channel control register RDMDAR.
- *
- * The R_RTDMAC_Get_RDMDAR() function.
- * @param[in]  dev : dev number
- * @param[in]  ch  : Sub Ch number
- * @return     channel control register RDMSAR.
- * @attention
- */
-uint32_t R_RTDMAC_Get_RDMDAR(uint8_t dev, uint8_t ch)
-{
-    return R_RTDMAC_ReadReg32(dev, ch, RDMDAR);
-}
-
-/**
- * Get channel control register RDMSAR.
- *
- * The R_RTDMAC_Get_RDMSAR() function.
- * @param[in]  dev : dev number
- * @param[in]  ch  : Sub Ch number
- * @return     channel control register RDMSAR.
- * @attention
- */
-uint32_t R_RTDMAC_Get_RDMSAR(uint8_t dev, uint8_t ch)
-{
-    return R_RTDMAC_ReadReg32(dev, ch, RDMSAR);
 }
 
 /**

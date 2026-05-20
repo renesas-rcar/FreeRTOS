@@ -386,12 +386,9 @@ typedef union u_rDmacFDSDM_STATUS {
 
 extern const uint32_t rDmacCH_MaskTable[];
 
-extern uint32_t R_RTDMAC_Get_RDMISTA(uint8_t dev);
 extern uint32_t R_RTDMAC_Get_RDMOR(uint8_t dev);
 extern uint32_t R_RTDMAC_Get_RDMCHCR(uint8_t dev,uint8_t ch);
 extern uint32_t R_RTDMAC_Get_RDMDPCR(uint8_t dev,uint8_t ch);
-extern uint32_t R_RTDMAC_Get_RDMDAR(uint8_t dev, uint8_t ch);
-extern uint32_t R_RTDMAC_Get_RDMSAR(uint8_t dev, uint8_t ch);
 
 extern void R_RTDMAC_Update_RDMOR(uint8_t dev, rDmacPriorityMode_t mode);
 extern void R_RTDMAC_Update_RDMCHCLR(uint8_t dev,uint8_t ch);
