@@ -320,9 +320,8 @@ void R_RTDMAC_Update_RDMCHCLR(uint8_t dev, uint8_t ch)
 {
     regRDMCHCLR_t rRDMCHCLR;
 
-    rRDMCHCLR.INT = 0;
-    rRDMCHCLR.INT |= rDmacCH_MaskTable[ch];
-    R_RTDMAC_UnitWriteReg32(dev, RDMCHCLR, rRDMCHCLR.INT);
+    rRDMCHCLR.INT = 1;
+    R_RTDMAC_WriteReg32(dev, ch, RDMCHCLR, rRDMCHCLR.INT);
 }
 
 /**
@@ -369,7 +368,11 @@ void R_RTDMAC_Update_RDMDAR(uint8_t dev, uint8_t ch, uint64_t Value)
  */
 void R_RTDMAC_Update_RDMTCR(uint8_t dev, uint8_t ch, uint32_t Value)
 {
-    R_RTDMAC_WriteReg32(dev, ch, RDMTCR, Value);
+    regRDMTCR_t rRDMTCR;
+
+    rRDMTCR.INT = R_RTDMAC_ReadReg32(dev, ch, RDMTCR);
+    rRDMTCR.bit.TCR = Value;
+    R_RTDMAC_WriteReg32(dev, ch, RDMTCR,  rRDMTCR.INT);
 }
 
 
@@ -620,7 +623,7 @@ void R_RTDMAC_Update_RDMDPCR(uint8_t dev, uint8_t ch, uint8_t Value)
     regRDMDPCR_t rRDMDPCR;
 
     rRDMDPCR.INT = R_RTDMAC_ReadReg32(dev, ch, RDMDPCR);
-    rRDMDPCR.bit.DIPT = Value;
+    rRDMDPCR.bit.DIPT_7_0 = Value;
     R_RTDMAC_WriteReg32(dev, ch, RDMDPCR, rRDMDPCR.INT);
 }
 

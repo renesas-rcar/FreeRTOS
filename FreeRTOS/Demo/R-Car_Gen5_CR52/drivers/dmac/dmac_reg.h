@@ -51,9 +51,9 @@
 #define DRV_RTDMAC_CH_REG_SIZE              (0x00000080U)      /* CH_REG */
 
 #define DRV_RTDMAC_REG_MASK_LOWER_RDMSAR    (0xFFFFFFFFU)      /* RDMSAR use bit lower mask */
-#define DRV_RTDMAC_REG_MASK_UPPER_RDMSAR    (0x000000FFU)      /* RDMSAR use bit upper mask */
+#define DRV_RTDMAC_REG_MASK_UPPER_RDMSAR    (0x000007FFU)      /* RDMSAR use bit upper mask */
 #define DRV_RTDMAC_REG_MASK_LOWER_RDMDAR    (0xFFFFFFFFU)      /* RDMDAR use bit lower mask */
-#define DRV_RTDMAC_REG_MASK_UPPER_RDMDAR    (0x000000FFU)      /* RDMDAR use bit upper mask */
+#define DRV_RTDMAC_REG_MASK_UPPER_RDMDAR    (0x000007FFU)      /* RDMDAR use bit upper mask */
 #define DRV_RTDMAC_REG_MASK_LOWER_RDMDPBASE (0xFFFFFFF0U)      /* RDMDPBASE use bit lower mask */
 #define DRV_RTDMAC_REG_MASK_UPPER_RDMDPBASE (0x000007FFU)      /* RDMDPBASE use bit upper mask */
 #define DRV_RTDMAC_REG_MASK_RDMCHCR_TS      (0x00000003U)      /* RDMCHCR use bit TS */
@@ -114,23 +114,10 @@ enum REGISTER {
 /* Structure of RDMISTA */
 typedef union u_regRDMISTA {
     struct {
-        uint32_t    I0:      1;     /* R Interrupt State in Channel 0 */
-        uint32_t    I1:      1;     /* R Interrupt State in Channel 1 */
-        uint32_t    I2:      1;     /* R Interrupt State in Channel 2 */
-        uint32_t    I3:      1;     /* R Interrupt State in Channel 3 */
-        uint32_t    I4:      1;     /* R Interrupt State in Channel 4 */
-        uint32_t    I5:      1;     /* R Interrupt State in Channel 5 */
-        uint32_t    I6:      1;     /* R Interrupt State in Channel 6 */
-        uint32_t    I7:      1;     /* R Interrupt State in Channel 7 */
-        uint32_t    I8:      1;     /* R Interrupt State in Channel 8 */
-        uint32_t    I9:      1;     /* R Interrupt State in Channel 9 */
-        uint32_t    I10:     1;     /* R Interrupt State in Channel 10 */
-        uint32_t    I11:     1;     /* R Interrupt State in Channel 11 */
-        uint32_t    I12:     1;     /* R Interrupt State in Channel 12 */
-        uint32_t    I13:     1;     /* R Interrupt State in Channel 13 */
-        uint32_t    I14:     1;     /* R Interrupt State in Channel 14 */
-        uint32_t    I15:     1;     /* R Interrupt State in Channel 15 */
-        uint32_t    reserve_1:      16;       /* R     Reserved */
+        uint32_t    I:          1;     /* R Interrupt state of channel */
+        uint32_t    reserve_1:  15;    /* R Reserved */
+        uint32_t    OV:         1;     /* R Event counter overflow status of channel */
+        uint32_t    reserve_2:  15;    /* R Reserved */
     } bit;
     uint32_t INT;
 } regRDMISTA_t;
@@ -151,8 +138,8 @@ typedef union u_regRDMOR {
 /* Structure of RDMCHCLR    */
 typedef union u_regRDMCHCLR {
     struct {
-        uint32_t    CLR:        16;  /* W Writing to a bit leads to clearing of all registers for the corresponding */
-        uint32_t    reserve_1:  16;  /* R Reserved */
+        uint32_t    CLR:        1;   /* W Writing to a bit leads to clearing of all registers for the corresponding */
+        uint32_t    reserve_1:  31;  /* R Reserved */
     } bit;
     uint32_t INT;
 } regRDMCHCLR_t;
@@ -189,7 +176,8 @@ typedef union u_regRDMDAR {
 /* Structure of RDMTCR_0 to RDMTCR_32    */
 typedef union u_regRDMTCR {
     struct {
-        uint32_t    TSR:      32;    /* R/W DMA Transfer Size */
+        uint32_t    TCR:        24;   /* R/W DMA Transfer Size */
+        uint32_t    reserve_1:  8;    /* R Reserved */
     } bit;
     uint32_t INT;
 } regRDMTCR_t;
@@ -290,8 +278,13 @@ typedef union u_regRDMDPBASE {
 /* Structure of RDMDPCR_0 to RDMDPCR_32    */
 typedef union u_regRDMDPCR {
     struct {
-        uint32_t    reserve_1:  24;    /* R   Reserved */
-        uint32_t    DIPT:       8;     /* R/W DMA Descriptor Control */
+        uint32_t    DPTR_11_8:  4;    /* R DMA Descriptor Control */
+        uint32_t    reserve_1:  4;    /* R   Reserved */
+        uint32_t    DNCT_11_8:  4;    /* R/W DMA Descriptor Control */
+        uint32_t    reserve_2:  4;    /* R   Reserved */
+        uint32_t    DIPT_11_8:  4;    /* R/W DMA Descriptor Control */
+        uint32_t    reserve_3:  4;    /* R   Reserved */
+        uint32_t    DIPT_7_0:   8;    /* R/W DMA Descriptor Control */
     } bit;
     uint32_t INT;
 } regRDMDPCR_t;
@@ -299,8 +292,8 @@ typedef union u_regRDMDPCR {
 /* Structure of RDMFIXSAR_0 to RDMFIXSAR_32    */
 typedef union u_regRDMFIXSAR {
     struct {
-        uint32_t    SAR:        8;     /* R/W DMA Fixed Source Address */
-        uint32_t    reserve_1:  24;    /* R   Reserved */
+        uint32_t    SAR:        11;    /* R/W DMA Fixed Source Address */
+        uint32_t    reserve_1:  21;    /* R   Reserved */
     } bit;
     uint32_t INT;
 } regRDMFIXSAR_t;
@@ -308,8 +301,8 @@ typedef union u_regRDMFIXSAR {
 /* Structure of RDMFIXDAR_0 to RDMFIXDAR_32    */
 typedef union u_regRDMFIXDAR {
     struct {
-        uint32_t    DAR:        8;     /* R/W DMA Fixed Destination Address */
-        uint32_t    reserve_1:  24;    /* R   Reserved */
+        uint32_t    DAR:        11;    /* R/W DMA Fixed Destination Address */
+        uint32_t    reserve_1:  21;    /* R   Reserved */
     } bit;
     uint32_t INT;
 } regRDMFIXDAR_t;
