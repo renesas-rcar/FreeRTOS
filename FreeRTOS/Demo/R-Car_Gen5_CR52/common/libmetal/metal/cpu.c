@@ -12,5 +12,5 @@
 
 void metal_cpu_yield(void)
 {
-    taskYIELD();
+    vTaskDelay(pdMS_TO_TICKS(1));
 }
