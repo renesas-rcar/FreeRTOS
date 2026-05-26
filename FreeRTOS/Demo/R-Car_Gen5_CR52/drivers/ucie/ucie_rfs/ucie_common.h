@@ -29,4 +29,6 @@
 
 #define UCIE_ADDR_MASK          (0xFFF)
 
+#define IATU_RGN_OFFSET         (0x80000)
+
 #endif /* R_UCIE_COMMON_H_ */

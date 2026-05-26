@@ -87,8 +87,8 @@ uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg)
         return 1;
     }
 
-    if (rgn != IATU_RGN0) {
-        printf("ERROR: Invalid iATU region. This environment only supports region 0\n");
+    if (rgn > IATU_RGN31) {
+        printf("ERROR: Invalid iATU region\n");
         return 1;
     }
 
@@ -98,7 +98,7 @@ uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg)
         return 1;
     }
 
-    base = UCIE_APB_BASE(ucie_ch);
+    base = UCIE_APB_BASE(ucie_ch) +  ((uint32_t)rgn * IATU_RGN_OFFSET);
 
     val = *(volatile uint32_t*)(base + UCIE_MAPPING_EN_OFF);
     if (val & (1 << UCIE_MAPPING_STATUS_BIT)) {
