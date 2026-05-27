@@ -27,15 +27,8 @@
   *  @par    Modify  (none)
  */
  uint16_t R_RTDMAC_RcarDmacCtrlInit(DMAC_t dev, rDmacPriorityMode_t mode)
- {
-     uint8_t Value;
- 
- 
-     Value = R_DMAC_RcarDmacCtrlInit(dev, mode);
-     if (Value)
-         printf_delay("RTDMAC initialization failed\n");
- 
-     return drv_OK;
+ { 
+    return R_DMAC_RcarDmacCtrlInit(dev, mode);
  }
  
  /*!
