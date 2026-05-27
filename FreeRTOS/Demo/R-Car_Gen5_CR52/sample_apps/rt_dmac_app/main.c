@@ -346,28 +346,48 @@ static void prvDMACTask(void *pvParameters)
         }
     }
 
-    printf("**********************************************************\r\n");
-    printf("***TC1: RT-DMAC mem-to-mem transfer in Normal mode***\r\n");
+    printf("***TC1: Initialize RT-DMAC Control***\r\n");
 
     /* Device Driver Part */
-    R_RTDMAC_RcarDmacCtrlInit(rDmacIrqHandler_t_irq.Unit, DRV_RTDMAC_PRIO_FIX);
-
-    *(volatile uint32_t *)cfg0.mDestAddr = 0x9;
-    printf("Value at DestAddr before DMA: 0x%x \n", *(volatile uint32_t *)cfg0.mDestAddr);
-
-    *(volatile uint32_t *)cfg0.mSrcAddr = 0x3;
-    printf("Value at SrcAddr: 0x%x \n", *(volatile uint32_t *)cfg0.mSrcAddr);
+    ret = R_RTDMAC_RcarDmacCtrlInit(rDmacIrqHandler_t_irq.Unit, DRV_RTDMAC_PRIO_FIX);
 
     ret = R_RTDMAC_RcarCallBackSet(&rDmacIrqHandler_t_irq, dmacUserCallback, &usr_context);
-    if (ret)
-        printf("CallbackSet Failed: ret = %d\n", ret);
+
+    if (ret == 0)
+    {
+        printf("TC1 Result: Passed\n");
+    }
+    else
+    {
+        printf("TC1 Result: Failed\n");
+    }
+    printf("**********************************************************\r\n");
+    *(volatile uint32_t *)cfg0.mDestAddr = 0x9;
+    *(volatile uint32_t *)cfg0.mSrcAddr = 0x3;
 
     int dmaStatus = R_RTDMAC_RcarDmacExec(rDmacIrqHandler_t_irq.Unit, rDmacIrqHandler_t_irq.SubCh, &cfg0, NULL);
 
+    // Check DMA execution status
+    if (dmaStatus != 0)
+        printf("DMA execution failed with status: %d\n", dmaStatus);
+
+    printf("***TC2: RT-DMAC Interrupt Callback***\r\n");
+
     // Wait DMA to transfer data.
-    if (xSemaphoreTake(xSemaphore, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(xSemaphore, pdMS_TO_TICKS(DMA_WAIT_TIMEOUT_MS)) == pdTRUE)
     {
+        printf("TC2 Result: Passed\n");
     }
+    else
+    {
+        printf("TC2 Result: Failed\n");
+    }
+
+    printf("**********************************************************\r\n");
+    printf("***TC3: RT-DMAC mem-to-mem transfer in Normal mode***\r\n");
+
+    printf("Value at DestAddr before DMA: 0x%x \n", *(volatile uint32_t *)cfg0.mDestAddr);
+    printf("Value at SrcAddr: 0x%x \n", *(volatile uint32_t *)cfg0.mSrcAddr);
 
     // Verify destination data
     uint32_t total_transfer_size = 4;
@@ -376,17 +396,17 @@ static void prvDMACTask(void *pvParameters)
 
     if (destData == (*(volatile uint32_t *)cfg0.mSrcAddr))
     {
-        printf("TC1 Result: Passed\n");
+        printf("TC3 Result: Passed\n");
     }
     else
     {
-        printf("TC1 Result: Failed\n");
+        printf("TC3 Result: Failed\n");
     }
 
     R_RTDMAC_RcarDmacStop(rDmacIrqHandler_t_irq.Unit, rDmacIrqHandler_t_irq.SubCh);
 
     printf("*************************************************************\r\n");
-    printf("***TC2: RT-DMAC mem-to-mem transfer in Descriptor Normal mode***\r\n");
+    printf("***TC4: RT-DMAC mem-to-mem transfer in Descriptor Normal mode***\r\n");
     /* Device Driver Part */
     R_RTDMAC_RcarDmacCtrlInit(rDmacIrqHandler_t_irq1.Unit, DRV_RTDMAC_PRIO_FIX);
 
@@ -431,16 +451,16 @@ static void prvDMACTask(void *pvParameters)
 
     if (ret == 0)
     {
-        printf("TC2 Result: Passed\n");
+        printf("TC4 Result: Passed\n");
     }
     else
     {
-        printf("TC2 Result: Failed\n");
+        printf("TC4 Result: Failed\n");
     }
 
     R_RTDMAC_RcarDmacStop(rDmacIrqHandler_t_irq1.Unit, rDmacIrqHandler_t_irq1.SubCh);
     printf("**********************************************************\r\n");
-    printf("***TC3: RT-DMAC mem-to-mem transfer in Descriptor Repeat mode***\r\n");
+    printf("***TC5: RT-DMAC mem-to-mem transfer in Descriptor Repeat mode***\r\n");
     /* Device Driver Part */
     R_RTDMAC_RcarDmacCtrlInit(rDmacIrqHandler_t_irq2.Unit, DRV_RTDMAC_PRIO_FIX);
 
@@ -493,15 +513,15 @@ static void prvDMACTask(void *pvParameters)
 
     if(ret == 0)
     {
-        printf("TC3 Result: Passed\n");
+        printf("TC5 Result: Passed\n");
     }
     else
     {
-        printf("TC3 Result: Failed\n");
+        printf("TC5 Result: Failed\n");
     }
 
     printf("*************************************************************\r\n");
-    printf("***TC4: RT-DMAC mem-to-mem transfer in Descriptor Read-out mode***\r\n");
+    printf("***TC6: RT-DMAC mem-to-mem transfer in Descriptor Read-out mode***\r\n");
     /* Device Driver Part */
     R_RTDMAC_RcarDmacCtrlInit(rDmacIrqHandler_t_irq3.Unit, DRV_RTDMAC_PRIO_FIX);
 
@@ -550,14 +570,14 @@ static void prvDMACTask(void *pvParameters)
 
     if(ret == 0)
     {
-        printf("TC4 Result: Passed\n");
+        printf("TC6 Result: Passed\n");
     }
     else
     {
-        printf("TC4 Result: Failed\n");
+        printf("TC6 Result: Failed\n");
     }
     printf("*************************************************************\r\n");
-     printf("***TC5: RT-DMAC mem-to-mem transfer in Descriptor Infinite Repeat mode***\r\n");
+     printf("***TC7: RT-DMAC mem-to-mem transfer in Descriptor Infinite Repeat mode***\r\n");
     /* Device Driver Part */
     R_RTDMAC_RcarDmacCtrlInit(RT_DMAC0, DRV_RTDMAC_PRIO_FIX);
 
@@ -601,11 +621,11 @@ static void prvDMACTask(void *pvParameters)
 
     if(ret == 0)
     {
-        printf("TC5 Result: Passed\n");
+        printf("TC7 Result: Passed\n");
     }
     else
     {
-        printf("TC5 Result: Failed\n");
+        printf("TC7 Result: Failed\n");
     }
     R_RTDMAC_RcarDmacStop(RT_DMAC0, DMAC_CH5);
     printf("*************************************************************\r\n");
