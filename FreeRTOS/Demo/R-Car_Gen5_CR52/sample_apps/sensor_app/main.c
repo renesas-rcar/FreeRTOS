@@ -284,21 +284,26 @@ static void sensorAppExample(void)
     } else{
         SENSOR_LOG("SCMI Sensor description, num_returned: 0x%x ", page.num_returned);
         SENSOR_LOG("SCMI Sensor description, num_remaining: 0x%x ", page.num_remaining);
-        for (uint8_t i = 0; i < page.num_returned; i++){
-            SENSOR_LOG("SCMI Sensor description, sensor_id: 0x%x ", out[0].sensor_id);
-            SENSOR_LOG("SCMI Sensor description, sensor_attributes_low: 0x%x ", out[i].sensor_attributes_low);
-            SENSOR_LOG("SCMI Sensor description, sensor_attributes_high: 0x%x ", out[i].sensor_attributes_high);
-            SENSOR_LOG("SCMI Sensor description, sensor_name: %s ", out[i].sensor_name);
-            SENSOR_LOG("SCMI Sensor description, ext_attrs_supported: 0x%x ", out[i].ext_attrs_supported);
-            SENSOR_LOG("SCMI Sensor description, sensor_power_uW: 0x%x ", out[i].sensor_power_uW);
-            SENSOR_LOG("SCMI Sensor description, resolution_valid: 0x%x ", out[i].resolution_valid);
-            SENSOR_LOG("SCMI Sensor description, resolution_exponent: 0x%x ", out[i].resolution_exponent);
-            SENSOR_LOG("SCMI Sensor description, resolution_res: 0x%x ", out[i].resolution_res);
-            SENSOR_LOG("SCMI Sensor description, range_valid: 0x%x ", out[i].range_valid);
-            SENSOR_LOG("SCMI Sensor description, min_range: 0x%x ", out[i].min_range);
-            SENSOR_LOG("SCMI Sensor description, max_range: 0x%x ", out[i].max_range);
+        if ((page.num_returned + page.num_remaining) > X5H_SENSOR_NUM) {
+            SENSOR_LOG("Number of sensors is over supported sensor number in X5H");
+            SENSOR_LOG("Test case is FAIL");
+        } else {
+            for (uint8_t i = 0; i < page.num_returned; i++){
+                SENSOR_LOG("SCMI Sensor description, sensor_id: 0x%x ", out[i].sensor_id);
+                SENSOR_LOG("SCMI Sensor description, sensor_attributes_low: 0x%x ", out[i].sensor_attributes_low);
+                SENSOR_LOG("SCMI Sensor description, sensor_attributes_high: 0x%x ", out[i].sensor_attributes_high);
+                SENSOR_LOG("SCMI Sensor description, sensor_name: %s ", out[i].sensor_name);
+                SENSOR_LOG("SCMI Sensor description, ext_attrs_supported: 0x%x ", out[i].ext_attrs_supported);
+                SENSOR_LOG("SCMI Sensor description, sensor_power_uW: 0x%x ", out[i].sensor_power_uW);
+                SENSOR_LOG("SCMI Sensor description, resolution_valid: 0x%x ", out[i].resolution_valid);
+                SENSOR_LOG("SCMI Sensor description, resolution_exponent: 0x%x ", out[i].resolution_exponent);
+                SENSOR_LOG("SCMI Sensor description, resolution_res: 0x%x ", out[i].resolution_res);
+                SENSOR_LOG("SCMI Sensor description, range_valid: 0x%x ", out[i].range_valid);
+                SENSOR_LOG("SCMI Sensor description, min_range: 0x%x ", out[i].min_range);
+                SENSOR_LOG("SCMI Sensor description, max_range: 0x%x ", out[i].max_range);
+            }
+            SENSOR_LOG("Test case is PASS");
         }
-        SENSOR_LOG("Test case is PASS");
     }
     SENSOR_LOG("*******TC%d: SCMI Sensor description end!*******\r\n\r\n", tc_number);
 }
