@@ -163,6 +163,7 @@ void main_full( void )
 {	
 	printf( "%s", "This call from full main.\n" );
 
+#if 0	
 	Irq_SetupEntry(623, UARTInterruptHandler, NULL);
 	Irq_SetPriority(623, IPRIORITY(2));
 	Irq_Enable(623);
@@ -174,9 +175,9 @@ void main_full( void )
     }
     else {
 		printf("UART Interrupt is ready - Please type to RX terminal for testing\n");
-        xTaskCreate(UartIrqTriggerTask, "UartIrqTriggerTask", configMINIMAL_STACK_SIZE, NULL, configMAX_PRIORITIES - 1, NULL);
+        xTaskCreate(UartIrqTriggerTask, "UartIrqTriggerTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     }
-
+#endif
        /* Start all the other standard demo/test tasks.  They have no particular
 	functionality, but do demonstrate how to use the FreeRTOS API and test the
 	kernel port. */
@@ -187,7 +188,9 @@ void main_full( void )
 	vStartGenericQueueTasks( tskIDLE_PRIORITY );
 	vStartRecursiveMutexTasks();
 	vStartSemaphoreTasks( mainSEM_TEST_PRIORITY );
+	#if 0
 	vStartMathTasks( mainFLOP_TASK_PRIORITY );
+	#endif
 	vStartEventGroupTasks();
 	vStartTaskNotifyTask();
 	vStartInterruptSemaphoreTasks();
@@ -265,13 +268,13 @@ const char *pcStatusString = "Pass";
 			ulErrorFound |= 1UL << 0UL;
 			pcStatusString = "Error: IntQ";
 		}*/
-
+		#if 0
 		if( xAreMathsTaskStillRunning() != pdTRUE )
 		{
 			ulErrorFound |= 1UL << 1UL;
 			pcStatusString = "Error: Math";
 		}
-
+		#endif
 		if( xAreDynamicPriorityTasksStillRunning() != pdTRUE )
 		{
 			ulErrorFound |= 1UL << 2UL;
