@@ -30,20 +30,33 @@ typedef struct
 
 static IvtEntry HandlerTable[MAX_IRQ_NUMBER];
 
-#define MASK_DMA_RT(x,y)        (0x18A00000U + 0x93C8U + ((uint32_t)(x) * 0x20U) + ((uint32_t)(y) * 0x4U))
-#define STAT_DMA_RT(x,y)        (0x18A00000U + 0x83C8U + ((uint32_t)(x) * 0x20U) + ((uint32_t)(y) * 0x4U))
-#define MASK_SYS_DMA(x,y)       (0x18A00000U + 0x9468U + ((uint32_t)(x) * 0x20U) + ((uint32_t)(y) * 0x4U))
-#define STAT_SYS_DMA(x,y)       (0x18A00000U + 0x8468U + ((uint32_t)(x) * 0x20U) + ((uint32_t)(y) * 0x4U))
-#define STAT_UCIE(x)            (0x18A00000U + 0x8770U + ((uint32_t)(x) * 0x4U))
-#define STAT_UCIE_ERROR(x)      (0x18A00000U + 0x8778U + ((uint32_t)(x) * 0x4U))
-#define MASK_UCIE(x)            (0x18A00000U + 0x9770U + ((uint32_t)(x) * 0x4U))
-#define MASK_UCIE_ERROR(x)      (0x18A00000U + 0x9778U + ((uint32_t)(x) * 0x4U))
-#define STAT_VIN(x)             (0x18A00000U + 0x854CU + ((uint32_t)(x) * 0x4U))
-#define MASK_VIN(x)             (0x18A00000U + 0x954CU + ((uint32_t)(x) * 0x4U))
-#define STAT_UMF(x)             (0x18A00000U + 0x874CU + ((uint32_t)(x) * 0x4U))
-#define MASK_UMF(x)             (0x18A00000U + 0x974CU + ((uint32_t)(x) * 0x4U))
-#define STAT_DOC(x)             (0x18A00000U + 0x8650U + ((uint32_t)(x) * 0x4U))
-#define MASK_DOC(x)             (0x18A00000U + 0x9650U + ((uint32_t)(x) * 0x4U))
+#if (BOARD == AI_ACC)
+#define MASK_DMA_RT(x,y)        (0x18A00000U + 0x93C8U + ((x) * 0x20U) + ((y) * 0x4U))
+#define STAT_DMA_RT(x,y)        (0x18A00000U + 0x83C8U + ((x) * 0x20U) + ((y) * 0x4U))
+#define STAT_UCIE(x)            (0x18A00000U + 0x8780U + ((x) * 0x28U))
+#define STAT_UCIE_ERROR(x)      (0x18A00000U + 0x87D0U + ((x) * 0x4U))
+#define MASK_UCIE(x)            (0x18A00000U + 0x9780U + ((x) * 0x28U))
+#define MASK_UCIE_ERROR(x)      (0x18A00000U + 0x97D0U + ((x) * 0x4U))
+#define STAT_VIN(x)             (0x18A00000U + 0x854CU + ((x) * 0x4U))
+#define MASK_VIN(x)             (0x18A00000U + 0x954CU + ((x) * 0x4U))
+
+#else
+#define MASK_DMA_RT(x,y)        (0x18A00000U + 0x93C8U + ((x) * 0x20U) + ((y) * 0x4U))
+#define STAT_DMA_RT(x,y)        (0x18A00000U + 0x83C8U + ((x) * 0x20U) + ((y) * 0x4U))
+#define MASK_SYS_DMA(x,y)       (0x18A00000U + 0x9468U + ((x) * 0x20U) + ((y) * 0x4U))
+#define STAT_SYS_DMA(x,y)       (0x18A00000U + 0x8468U + ((x) * 0x20U) + ((y) * 0x4U))
+#define STAT_UCIE(x)            (0x18A00000U + 0x8770U + ((x) * 0x4U))
+#define STAT_UCIE_ERROR(x)      (0x18A00000U + 0x8778U + ((x) * 0x4U))
+#define MASK_UCIE(x)            (0x18A00000U + 0x9770U + ((x) * 0x4U))
+#define MASK_UCIE_ERROR(x)      (0x18A00000U + 0x9778U + ((x) * 0x4U))
+#define STAT_VIN(x)             (0x18A00000U + 0x854CU + ((x) * 0x4U))
+#define MASK_VIN(x)             (0x18A00000U + 0x954CU + ((x) * 0x4U))
+#define STAT_UMF(x)             (0x18A00000U + 0x874CU + ((x) * 0x4U))
+#define MASK_UMF(x)             (0x18A00000U + 0x974CU + ((x) * 0x4U))
+#define STAT_DOC(x)             (0x18A00000U + 0x8650U + ((x) * 0x4U))
+#define MASK_DOC(x)             (0x18A00000U + 0x9650U + ((x) * 0x4U))
+
+#endif
 
 typedef struct
 {
@@ -53,7 +66,62 @@ typedef struct
 	uint32_t mask_reg;
 } irq_table;
 
-static const irq_table r8a78000_irq_table[] = {
+#if (BOARD == AI_ACC)
+static const irq_table merged_irq_table[] = {
+	{ 0x112, 0x3, STAT_DMA_RT(0,0), MASK_DMA_RT(0,0) },
+        { 0x113, 0x3, STAT_DMA_RT(0,1), MASK_DMA_RT(0,1) },
+        { 0x114, 0x3, STAT_DMA_RT(0,2), MASK_DMA_RT(0,2) },
+        { 0x115, 0x3, STAT_DMA_RT(0,3), MASK_DMA_RT(0,3) },
+        { 0x116, 0x3, STAT_DMA_RT(0,4), MASK_DMA_RT(0,4) },
+        { 0x117, 0x3, STAT_DMA_RT(0,5), MASK_DMA_RT(0,5) },
+        { 0x118, 0x3, STAT_DMA_RT(0,6), MASK_DMA_RT(0,6) },
+        { 0x119, 0x3, STAT_DMA_RT(0,7), MASK_DMA_RT(0,7) },
+        { 0x11A, 0x3, STAT_DMA_RT(1,0), MASK_DMA_RT(1,0) },
+        { 0x11B, 0x3, STAT_DMA_RT(1,1), MASK_DMA_RT(1,1) },
+        { 0x11C, 0x3, STAT_DMA_RT(1,2), MASK_DMA_RT(1,2) },
+        { 0x11D, 0x3, STAT_DMA_RT(1,3), MASK_DMA_RT(1,3) },
+        { 0x11E, 0x3, STAT_DMA_RT(1,4), MASK_DMA_RT(1,4) },
+        { 0x11F, 0x3, STAT_DMA_RT(1,5), MASK_DMA_RT(1,5) },
+        { 0x120, 0x3, STAT_DMA_RT(1,6), MASK_DMA_RT(1,6) },
+        { 0x121, 0x3, STAT_DMA_RT(1,7), MASK_DMA_RT(1,7) },
+        { 0x122, 0x3, STAT_DMA_RT(2,0), MASK_DMA_RT(2,0) },
+        { 0x123, 0x3, STAT_DMA_RT(2,1), MASK_DMA_RT(2,1) },
+        { 0x124, 0x3, STAT_DMA_RT(2,2), MASK_DMA_RT(2,2) },
+        { 0x125, 0x3, STAT_DMA_RT(2,3), MASK_DMA_RT(2,3) },
+        { 0x126, 0x3, STAT_DMA_RT(2,4), MASK_DMA_RT(2,4) },
+        { 0x127, 0x3, STAT_DMA_RT(2,5), MASK_DMA_RT(2,5) },
+        { 0x128, 0x3, STAT_DMA_RT(2,6), MASK_DMA_RT(2,6) },
+        { 0x129, 0x3, STAT_DMA_RT(2,7), MASK_DMA_RT(2,7) },
+        { 0x12A, 0x3, STAT_DMA_RT(3,0), MASK_DMA_RT(3,0) },
+        { 0x12B, 0x3, STAT_DMA_RT(3,1), MASK_DMA_RT(3,1) },
+        { 0x12C, 0x3, STAT_DMA_RT(3,2), MASK_DMA_RT(3,2) },
+        { 0x12D, 0x3, STAT_DMA_RT(3,3), MASK_DMA_RT(3,3) },
+        { 0x12E, 0x3, STAT_DMA_RT(3,4), MASK_DMA_RT(3,4) },
+        { 0x12F, 0x3, STAT_DMA_RT(3,5), MASK_DMA_RT(3,5) },
+        { 0x130, 0x3, STAT_DMA_RT(3,6), MASK_DMA_RT(3,6) },
+        { 0x131, 0x3, STAT_DMA_RT(3,7), MASK_DMA_RT(3,7) },
+
+        { 0x173, 0xFF, STAT_VIN(0), MASK_VIN(0) },
+        { 0x174, 0xFF, STAT_VIN(1), MASK_VIN(1) },
+        { 0x175, 0xFF, STAT_VIN(2), MASK_VIN(2) },
+        { 0x176, 0xFF, STAT_VIN(3), MASK_VIN(3) },
+        { 0x177, 0xFF, STAT_VIN(4), MASK_VIN(4) },
+        { 0x178, 0xFF, STAT_VIN(5), MASK_VIN(5) },
+        { 0x179, 0xFF, STAT_VIN(6), MASK_VIN(6) },
+        { 0x17A, 0xFF, STAT_VIN(7), MASK_VIN(7) },
+        { 0x17B, 0xFF, STAT_VIN(8), MASK_VIN(8) },
+        { 0x17C, 0xFF, STAT_VIN(9), MASK_VIN(9) },
+        { 0x17D, 0xFF, STAT_VIN(10), MASK_VIN(10) },
+        { 0x17E, 0xFF, STAT_VIN(11), MASK_VIN(11) },
+
+        { 0x1FC, 0x1F, STAT_UCIE(0), MASK_UCIE(0) },
+        { 0x1FD, 0x1F, STAT_UCIE(1), MASK_UCIE(1) },
+        { 0x1FE, 0x1FF, STAT_UCIE_ERROR(0), MASK_UCIE_ERROR(0) },
+        { 0x1FF, 0x1FF, STAT_UCIE_ERROR(1), MASK_UCIE_ERROR(1) },
+};
+
+#else
+static const irq_table merged_irq_table[] = {
 	{ 0x112, 0x3, STAT_DMA_RT(0,0), MASK_DMA_RT(0,0) },
         { 0x113, 0x3, STAT_DMA_RT(0,1), MASK_DMA_RT(0,1) },
         { 0x114, 0x3, STAT_DMA_RT(0,2), MASK_DMA_RT(0,2) },
@@ -147,6 +215,8 @@ static const irq_table r8a78000_irq_table[] = {
         { 0x1B5, 0x3, STAT_DOC(1), MASK_DOC(1) },
         { 0x1B6, 0x3, STAT_DOC(2), MASK_DOC(2) },
 };
+
+#endif
 
 /**
  * @brief Reads a value from the specified register address.
@@ -324,9 +394,9 @@ void vApplicationIRQHandler(uint32_t ulICCIAR)
 
 int Irq_GetTableId(unsigned int id)
 {
-	for (unsigned int i = 0 ; i < sizeof(r8a78000_irq_table) / sizeof(r8a78000_irq_table[0]); i++)
+	for (unsigned int i = 0 ; i < sizeof(merged_irq_table) / sizeof(merged_irq_table[0]); i++)
 	{
-        if (id == r8a78000_irq_table[i].irq) {
+		if (id == merged_irq_table[i].irq) {
 			return i;
         }
 	}
@@ -356,13 +426,13 @@ int Irq_MergeSetup(unsigned int id)
 		return t_id;
     }
 
-	val = Irq_RegRead(r8a78000_irq_table[t_id].mask_reg);
-	val &= ~r8a78000_irq_table[t_id].mask_val;
-	Irq_RegWrite(r8a78000_irq_table[t_id].mask_reg, val);
+	val = Irq_RegRead(merged_irq_table[t_id].mask_reg);
+	val &= ~merged_irq_table[t_id].mask_val;
+	Irq_RegWrite(merged_irq_table[t_id].mask_reg, val);
 
     // Check whether the register is reflected setting value.
     while (timeout-- && (current_val != val)) {
-        current_val = Irq_RegRead(r8a78000_irq_table[t_id].mask_reg);
+        current_val = Irq_RegRead(merged_irq_table[t_id].mask_reg);
     }
 
     if (timeout == 0) {
@@ -381,7 +451,7 @@ int Irq_GetMergeStatReg(unsigned int id)
 		return t_id;
     }
 
-	return Irq_RegRead(r8a78000_irq_table[t_id].status_reg);
+	return Irq_RegRead(merged_irq_table[t_id].status_reg);
 }
 
 int Irq_SetIntType(unsigned int id, r_irq_type type)
