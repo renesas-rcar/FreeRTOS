@@ -14,9 +14,10 @@ extern "C" {
 #endif
 
 #define X5H_VDK             1
-#define AI_ACC              2
+#define MDP_AIACC_RFS2      2
 #define X5H_IRONHIDE        3
 #define X5H_RFS2            4
+#define MDP_AIACC_HIL       5
 
 #ifdef __cplusplus
 }
