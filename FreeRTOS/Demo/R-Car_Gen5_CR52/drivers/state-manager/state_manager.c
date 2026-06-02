@@ -119,7 +119,7 @@ static void system_notification(void *data)
 	}
 }
 
-#if (BOARD == X5H_RFS2 || BOARD == AI_ACC)
+#if (BOARD == X5H_RFS2 || BOARD == MDP_AI-ACC_RFS2 || BOARD == MDP_AIACC_HIL)
 int R_StateManager_Init(void)
 {
     return 0;
@@ -212,7 +212,7 @@ int R_StateManager_Reset_Status_Get(int domain_id, e_reset_domain_status_t *stat
 	return 0;
 }
 
-#else
+#else	// (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE)
 int R_StateManager_Init(void)
 {
 	int ret;
