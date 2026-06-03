@@ -45,7 +45,7 @@ typedef enum e_rcar_pfc_group
     RCAR_PFC_GROUP_10 = 0x0A,           ///< PFC Group 10
     RCAR_PFC_GROUP_MAX,
 } rcar_pfc_group_t;
-#else   // BOARD == AI_ACC
+#else   // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
 typedef enum e_rcar_pfc_group
 {
     RCAR_PFC_GROUP_00 = 0x00,           ///< PFC Group 00

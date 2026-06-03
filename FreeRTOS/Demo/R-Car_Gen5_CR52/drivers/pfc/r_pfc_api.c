@@ -36,7 +36,7 @@
 #define PFC_GR_9           (0xC9B00000U + PFC_BASE_OFFSET)
 #define PFC_GR_10          (0xC9B00800U + PFC_BASE_OFFSET)
 
-#else	//BOARD == AI_ACC
+#else	// (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
 
 #define PFC_GR_0           (0x38080000U + PFC_BASE_OFFSET)
 #define PFC_GR_1           (0x38080800U + PFC_BASE_OFFSET)
@@ -299,7 +299,7 @@ static const st_driver_group_t all_drv_groups[] = {
     {.module_id = MODULE_INVALID, .group = 0},
 };
 
-#else	//  BOARD == AI_ACC
+#else   // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
 
 #define HTX0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_00, RCAR_PFC_FUNC_0)
 #define HRX0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_01, RCAR_PFC_FUNC_0)
@@ -471,7 +471,7 @@ static uint32_t getPfcRegister(rcar_pfc_group_t grp, uint32_t offset)
 
     return reg_addr;
 }
-#else	// BOARD == AI_ACC
+#else   // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
 static uint32_t getPfcRegister(rcar_pfc_group_t grp, uint32_t offset)
 {
     uint32_t base_addr;
