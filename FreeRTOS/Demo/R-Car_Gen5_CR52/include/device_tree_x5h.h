@@ -38,13 +38,14 @@ typedef enum {
     MODULE_I2C4,            ///< Module ID: I2C4.
     MODULE_I2C5,            ///< Module ID: I2C5.
     MODULE_I2C6,            ///< Module ID: I2C6.
-    MODULE_I2C7,	    ///< Module ID: I2C7.
+    MODULE_I2C7,            ///< Module ID: I2C7.
     MODULE_I2C8,            ///< Module ID: I2C8.
     MODULE_AUDIO_0,
     // Add device_id
     MODULE_MAX = 255        ///< Max module ID.
 } e_module_id_t;
 
+#if (BOARD == X5H_IRONHIDE)
 #define MODULE_CONFIGS \
     MODULE_CONFIG(MODULE_SCIF1, 1), \
     MODULE_CONFIG(MODULE_I2C0,  1), \
@@ -59,12 +60,31 @@ typedef enum {
     /* Sentinel guard: Do not remove */ \
     MODULE_CONFIG(MODULE_INVALID, 0) \
 
+#elif (BOARD == MDP_AIACC_HIL)
+#define MODULE_CONFIGS \
+    MODULE_CONFIG(MODULE_SCIF1, 1), \
+    MODULE_CONFIG(MODULE_I2C0,  1), \
+    MODULE_CONFIG(MODULE_I2C1,  1), \
+    MODULE_CONFIG(MODULE_I2C2,  1), \
+    MODULE_CONFIG(MODULE_I2C3,  1), \
+    /* Add module configs here */   \
+    /* Sentinel guard: Do not remove */ \
+    MODULE_CONFIG(MODULE_INVALID, 0) \
+
+#else // (BOARD == X5H_VDK || BOARD == X5H_RFS2 || BOARD == MDP_AIACC_RFS2)
+#define MODULE_CONFIGS \
+    /* Add module configs here */   \
+    /* Sentinel guard: Do not remove */ \
+    MODULE_CONFIG(MODULE_INVALID, 0) \
+
+#endif
+
 /**
  * @brief Configuration PFC for module HW IP.
  */
 typedef struct {
     e_module_id_t module_id;	///< Module id.
-    uint32_t is_enabled;	///< Enable PFC for module or not.
+    uint32_t is_enabled;	    ///< Enable PFC for module or not.
 } st_module_config_t;
 
 static inline st_module_config_t* getModuleConfigs() {

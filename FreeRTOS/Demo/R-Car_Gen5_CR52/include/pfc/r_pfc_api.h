@@ -29,6 +29,7 @@ extern "C" {
  * 
  * Defines groups of pins for pin function control.
  */
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
 typedef enum e_rcar_pfc_group
 {
     RCAR_PFC_GROUP_00 = 0x00,           ///< PFC Group 00
@@ -42,7 +43,17 @@ typedef enum e_rcar_pfc_group
     RCAR_PFC_GROUP_08 = 0x08,           ///< PFC Group 08
     RCAR_PFC_GROUP_09 = 0x09,           ///< PFC Group 09
     RCAR_PFC_GROUP_10 = 0x0A,           ///< PFC Group 10
+    RCAR_PFC_GROUP_MAX,
 } rcar_pfc_group_t;
+#else   // BOARD == AI_ACC
+typedef enum e_rcar_pfc_group
+{
+    RCAR_PFC_GROUP_00 = 0x00,           ///< PFC Group 00
+    RCAR_PFC_GROUP_01 = 0x01,           ///< PFC Group 01
+    RCAR_PFC_GROUP_02 = 0x02,           ///< PFC Group 02
+    RCAR_PFC_GROUP_MAX,
+} rcar_pfc_group_t;
+#endif
 
 /** 
  * @brief PFC pins enumeration.

@@ -21,6 +21,9 @@
 
 /* PFC base adrress */
 #define PFC_BASE_OFFSET    0x000
+
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+
 #define PFC_GR_0           (0xC1080000U + PFC_BASE_OFFSET)
 #define PFC_GR_1           (0xC1080800U + PFC_BASE_OFFSET)
 #define PFC_GR_2           (0xC1081000U + PFC_BASE_OFFSET)
@@ -32,6 +35,14 @@
 #define PFC_GR_8           (0xC0401800U + PFC_BASE_OFFSET)
 #define PFC_GR_9           (0xC9B00000U + PFC_BASE_OFFSET)
 #define PFC_GR_10          (0xC9B00800U + PFC_BASE_OFFSET)
+
+#else	//BOARD == AI_ACC
+
+#define PFC_GR_0           (0x38080000U + PFC_BASE_OFFSET)
+#define PFC_GR_1           (0x38080800U + PFC_BASE_OFFSET)
+#define PFC_GR_2           (0x38081000U + PFC_BASE_OFFSET)
+
+#endif
 
 /* PFC register: offset address */
 #define GP_PMMR             0x000
@@ -167,6 +178,13 @@ static int name[MAX_ITEM_IN_GROUP] = {__VA_ARGS__, -1};
 
 #define ADD_GROUP(name)     name
 
+typedef struct {
+    e_module_id_t module_id;
+    int *group;
+} st_driver_group_t;
+
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+
 #define HTX0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_05, RCAR_PFC_PIN_00, RCAR_PFC_FUNC_0)
 #define HRX0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_05, RCAR_PFC_PIN_01, RCAR_PFC_FUNC_0)
 #define HRTS0_N             GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_05, RCAR_PFC_PIN_02, RCAR_PFC_FUNC_0)
@@ -263,11 +281,6 @@ CREATE_GROUP(i2c8_grp, SDA8, SCL8, MODSEL_SDA8, MODSEL_SCL8)
 #define SSI5_SD             GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_07, RCAR_PFC_PIN_11, RCAR_PFC_FUNC_0)
 CREATE_GROUP(audio0_grp, AUDIO_CLKA, AUDIO0_CLKOUT0, SSI5_SCK, SSI5_WS, SSI5_SD)
 
-typedef struct {
-    e_module_id_t module_id;
-    int *group;
-} st_driver_group_t;
-
 static const st_driver_group_t all_drv_groups[] = {
     {.module_id = MODULE_HSCIF0, .group = ADD_GROUP(hscif0_grp)},
     {.module_id = MODULE_SCIF0, .group = ADD_GROUP(scif0_grp)},
@@ -285,6 +298,76 @@ static const st_driver_group_t all_drv_groups[] = {
     // Add driver groups.
     {.module_id = MODULE_INVALID, .group = 0},
 };
+
+#else	//  BOARD == AI_ACC
+
+#define HTX0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_00, RCAR_PFC_FUNC_0)
+#define HRX0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_01, RCAR_PFC_FUNC_0)
+#define HRTS0_N             GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_02, RCAR_PFC_FUNC_0)
+#define HCTS0_N             GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_03, RCAR_PFC_FUNC_0)
+#define HSCK0               GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_04, RCAR_PFC_FUNC_0)
+CREATE_GROUP(hscif0_grp, HTX0, HRX0, HRTS0_N, HCTS0_N, HSCK0)
+
+#define TX0                 GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_00, RCAR_PFC_FUNC_1)
+#define RX0                 GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_01, RCAR_PFC_FUNC_1)
+#define RTS0_N              GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_02, RCAR_PFC_FUNC_1)
+#define CTS0_N              GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_03, RCAR_PFC_FUNC_1)
+#define SCK0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_04, RCAR_PFC_FUNC_1)
+#define SCIF_CLK            GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_05, RCAR_PFC_FUNC_0)
+CREATE_GROUP(scif0_grp, TX0, RX0, RTS0_N, CTS0_N, SCK0, SCIF_CLK)
+
+#define HTX1                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_06, RCAR_PFC_FUNC_0)
+#define HRX1                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_07, RCAR_PFC_FUNC_0)
+#define HRTS1_N             GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_08, RCAR_PFC_FUNC_0)
+#define HCTS1_N             GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_09, RCAR_PFC_FUNC_0)
+#define HSCK1               GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_10, RCAR_PFC_FUNC_0)
+CREATE_GROUP(hscif1_grp, HTX1, HRX1, HRTS1_N, HCTS1_N, HSCK1)
+
+#define TX1                 GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_06, RCAR_PFC_FUNC_1)
+#define RX1                 GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_07, RCAR_PFC_FUNC_1)
+#define RTS1_N              GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_08, RCAR_PFC_FUNC_1)
+#define CTS1_N              GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_09, RCAR_PFC_FUNC_1)
+#define SCK1                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_00, RCAR_PFC_PIN_10, RCAR_PFC_FUNC_1)
+CREATE_GROUP(scif1_grp, TX1, RX1, RTS1_N, CTS1_N, SCK1)
+
+#define SDA0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_21, RCAR_PFC_FUNC_0)
+#define SCL0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_20, RCAR_PFC_FUNC_0)
+#define MODSEL_SDA0         GEN_ID(REG_MODSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_21, MODSEL_I2C_MODE)
+#define MODSEL_SCL0         GEN_ID(REG_MODSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_20, MODSEL_I2C_MODE)
+CREATE_GROUP(i2c0_grp, SDA0, SCL0, MODSEL_SDA0, MODSEL_SCL0)
+
+#define SDA1                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_23, RCAR_PFC_FUNC_0)
+#define SCL1                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_22, RCAR_PFC_FUNC_0)
+#define MODSEL_SDA1         GEN_ID(REG_MODSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_23, MODSEL_I2C_MODE)
+#define MODSEL_SCL1         GEN_ID(REG_MODSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_22, MODSEL_I2C_MODE)
+CREATE_GROUP(i2c1_grp, SDA1, SCL1, MODSEL_SDA1, MODSEL_SCL1)
+
+#define SDA2                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_25, RCAR_PFC_FUNC_0)
+#define SCL2                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_24, RCAR_PFC_FUNC_0)
+#define MODSEL_SDA2         GEN_ID(REG_MODSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_25, MODSEL_I2C_MODE)
+#define MODSEL_SCL2         GEN_ID(REG_MODSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_24, MODSEL_I2C_MODE)
+CREATE_GROUP(i2c2_grp, SDA2, SCL2, MODSEL_SDA2, MODSEL_SCL2)
+
+#define SDA3                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_27, RCAR_PFC_FUNC_0)
+#define SCL3                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_26, RCAR_PFC_FUNC_0)
+#define MODSEL_SDA3         GEN_ID(REG_MODSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_27, MODSEL_I2C_MODE)
+#define MODSEL_SCL3         GEN_ID(REG_MODSEL, RCAR_PFC_GROUP_01, RCAR_PFC_PIN_26, MODSEL_I2C_MODE)
+CREATE_GROUP(i2c3_grp, SDA3, SCL3, MODSEL_SDA3, MODSEL_SCL3)
+
+static const st_driver_group_t all_drv_groups[] = {
+    {.module_id = MODULE_HSCIF0, .group = ADD_GROUP(hscif0_grp)},
+    {.module_id = MODULE_SCIF0,  .group = ADD_GROUP(scif0_grp)},
+    {.module_id = MODULE_HSCIF1, .group = ADD_GROUP(hscif1_grp)},
+    {.module_id = MODULE_SCIF1,  .group = ADD_GROUP(scif1_grp)},
+    {.module_id = MODULE_I2C0,  .group = ADD_GROUP(i2c0_grp)},
+    {.module_id = MODULE_I2C1,  .group = ADD_GROUP(i2c1_grp)},
+    {.module_id = MODULE_I2C2,  .group = ADD_GROUP(i2c2_grp)},
+    {.module_id = MODULE_I2C3,  .group = ADD_GROUP(i2c3_grp)},
+    // Add driver groups.
+    {.module_id = MODULE_INVALID, .group = 0},
+};
+
+#endif
 
 /******************* Define pin functions *******************/
 
@@ -339,6 +422,7 @@ static void clearbit_l(uint32_t addr, uint32_t pos)
     writel(val &= ~BIT(pos), addr);
 }
 
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
 static uint32_t getPfcRegister(rcar_pfc_group_t grp, uint32_t offset)
 {
     uint32_t base_addr;
@@ -387,6 +471,32 @@ static uint32_t getPfcRegister(rcar_pfc_group_t grp, uint32_t offset)
 
     return reg_addr;
 }
+#else	// BOARD == AI_ACC
+static uint32_t getPfcRegister(rcar_pfc_group_t grp, uint32_t offset)
+{
+    uint32_t base_addr;
+    uint32_t reg_addr;
+
+    switch (grp) {
+    case 0:
+        base_addr = PFC_GR_0;
+        break;
+    case 1:
+        base_addr = PFC_GR_1;
+        break;
+    case 2:
+        base_addr = PFC_GR_2;
+        break;
+    default:
+        printf("PFC group %d not exist!\n", grp);
+        return PFC_INVALID_ADDR;
+    }
+
+    reg_addr = base_addr + offset;
+
+    return reg_addr;
+}
+#endif
 
 static void pfcWrite(rcar_pfc_group_t grp, uint32_t addr, uint32_t val)
 {
@@ -441,7 +551,7 @@ static int pfcSetFunction(rcar_pfc_group_t grp, rcar_pfc_pin_t pin,
     uint8_t i;
 
     if (grp < RCAR_PFC_GROUP_00 ||
-        grp > RCAR_PFC_GROUP_10)
+        grp > (RCAR_PFC_GROUP_MAX - 1))
     {
         printf("%s: Invalid group %d\n", __func__, pin);
         return -1;
@@ -495,7 +605,7 @@ static int pfcSetModeSel(rcar_pfc_group_t grp, rcar_pfc_pin_t pin,
     int ret = 0;
 
     if (grp < RCAR_PFC_GROUP_00 ||
-        grp > RCAR_PFC_GROUP_10)
+        grp > (RCAR_PFC_GROUP_MAX - 1))
     {
         printf("%s: Invalid group %d\n", __func__, pin);
         return -1;
@@ -537,7 +647,7 @@ static int pfcSetDrvControlReg(rcar_pfc_group_t grp, rcar_pfc_pin_t pin,
     uint8_t i;
 
     if (grp < RCAR_PFC_GROUP_00 ||
-        grp > RCAR_PFC_GROUP_10)
+        grp > (RCAR_PFC_GROUP_MAX - 1))
     {
         printf("%s: Invalid group %d\n", __func__, pin);
         return -1;
@@ -583,7 +693,7 @@ static int pfcSetTdselControlReg(rcar_pfc_group_t grp, rcar_pfc_pin_t pin,
     uint8_t i;
 
     if (grp < RCAR_PFC_GROUP_00 ||
-        grp > RCAR_PFC_GROUP_10)
+        grp > (RCAR_PFC_GROUP_MAX - 1))
     {
         printf("%s: Invalid group %d\n", __func__, pin);
         return -1;
