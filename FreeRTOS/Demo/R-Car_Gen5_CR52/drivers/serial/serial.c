@@ -18,55 +18,9 @@
 #include "serial/r_serial.h"
 #include "pfc/r_pfc_api.h"
 
-#if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
-/* PFC (Pin Function Controller) */
-#define RCAR_PFC_GPSR1  0xC0800840u       /* R/W 32 GPIO/Peripheral_Function Select register PortGroup 1 */
-#define RCAR_PFC_GPSR1_SCIF_ENABLE  0x0001F000u  /* bit16:HRX0, bit15:HSCK0, bit14:HRTS0#, bit13:HCTS0#, bit12:HTX0 */
-#define RCAR_PFC_IP1SR1 0xC0800864u       /* R/W 32 Peripheral Function Select register 1 PortGroup 1 */
-#define RCAR_PFC_IP1SR1_SCIF_ENABLE  0x11110000u /* [31:16]: 0x1111 (select SCK0, RTS0#, CTS0#, TX0) */
-#define RCAR_PFC_IP1SR1_SCIF_CLEAR_MASK  0x0000FFFFu /* [31:16]:clear */
-#define RCAR_PFC_IP2SR1 0xC0800868u       /* R/W 32 Peripheral Function Select register 2 PortGroup 1 */
-#define RCAR_PFC_IP2SR1_SCIF_ENABLE  0x00000001u /* [3:0]: 0x1 (select RX0) */
-#define RCAR_PFC_IP2SR1_SCIF_CLEAR_MASK  0xFFFFFFF0u /* [3:0]: clear */
-#define RCAR_PFC_PMMR(addr)  ((addr) & 0xFFFFF800u) /* R/W 32 LSI Multiplexed Pin Setting Mask Register */
-#else
-/* Offset of RW, SET, CLEAR registers */
-#define PFC_RW_OFFSET   (0x0000U)
-#define PFC_SET_OFFSET  (0x0200U)
-#define PFC_CLR_OFFSET  (0x0400U)
-
-/* Read/Write registers */
-#define PFC_PORT_GRP_MASK   (0xFFFFF800U)
-
-/* Port Group0 */
-#define PFC_PORT_GRP0   (0x38080000U + 0x0000U)    /* Port Group0 */
-
-#define PFC_GP0_GPSR_RW     (PFC_PORT_GRP0 + PFC_RW_OFFSET + 0x0040U)
-#define PFC_GP0_ALTSEL0_RW  (PFC_PORT_GRP0 + PFC_RW_OFFSET + 0x0060U)
-#define PFC_GP0_ALTSEL1_RW  (PFC_PORT_GRP0 + PFC_RW_OFFSET + 0x0064U)
-#define PFC_GP0_ALTSEL2_RW  (PFC_PORT_GRP0 + PFC_RW_OFFSET + 0x0068U)
-#define PFC_GP0_ALTSEL3_RW  (PFC_PORT_GRP0 + PFC_RW_OFFSET + 0x006CU)
-
-#define	PFC_PMMR(addr)			((addr) & (uintptr_t)0xFFFFF800U)	// R/W	32	LSI Multiplexed Pin Setting Mask Register
-
-
-#define PFC_TX              (0x00000001U)                   /* HTX0 / TX0 */
-#define PFC_RX              (0x00000002U)                   /* HRX0 / RX0 */
-#define PFC_SCIF_EXTCLK     (0x00000020U)             /* Mask value of IPSR (External Clock) */
-#define PFC_SCIF_MASK       (PFC_TX | PFC_RX | PFC_SCIF_EXTCLK)                   /* SCIF0/HSCIF0 RX/TX */
-static inline void pfc_reg_write(uint32_t addr, uint32_t data)
-{
-    sys_write32(~data, (addr & PFC_PORT_GRP_MASK));
-    sys_write32(data, addr);
-
-}
-#endif
-
 static bool portInitialized = false;
 
 static void outbyte(char c);
-
-static void uart_rcar_pfc_init(void);
 
 static int uart_set_pfc(e_serial_devices_t device);
 
@@ -310,69 +264,3 @@ static void outbyte(char c)
 
 	console_putc(c);
 }
-
-#if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
-static void uart_rcar_pfc_init(void)
-{
-	uint32_t drv_data;
-
-	/* GPSR1:Set 0xf to [16:12] */
-	drv_data = sys_read32(RCAR_PFC_GPSR1);
-	drv_data = drv_data | RCAR_PFC_GPSR1_SCIF_ENABLE;
-	sys_write32(~drv_data, RCAR_PFC_PMMR(RCAR_PFC_GPSR1));
-	sys_write32(drv_data, RCAR_PFC_GPSR1);
-
-	/* IP1SR1:Set 0x1111 to [31:16] */
-	drv_data = sys_read32(RCAR_PFC_IP1SR1);
-	drv_data = (drv_data & RCAR_PFC_IP1SR1_SCIF_CLEAR_MASK) | RCAR_PFC_IP1SR1_SCIF_ENABLE;
-	sys_write32(~drv_data, RCAR_PFC_PMMR(RCAR_PFC_IP1SR1));
-	sys_write32(drv_data, RCAR_PFC_IP1SR1);
-
-	/* IP2SR1:Set 0x1 to [3:0] */
-	drv_data = sys_read32(RCAR_PFC_IP2SR1);
-	drv_data = (drv_data & RCAR_PFC_IP2SR1_SCIF_CLEAR_MASK) | RCAR_PFC_IP2SR1_SCIF_ENABLE;
-	sys_write32(~drv_data, RCAR_PFC_PMMR(RCAR_PFC_IP2SR1));
-	sys_write32(drv_data, RCAR_PFC_IP2SR1);
-}
-#else
-static void uart_rcar_pfc_init(void)
-{
-	uint32_t reg;
-	uint32_t gpsr_scif_val = 0U;
-	uint32_t altsel_scif_val[4] = {0U};
-
-	/* This setting value set to GPSR, the GP05_00/GP00_00 and GP05_01/GP00_01 switch to peripheral function. */
-	gpsr_scif_val = (PFC_TX | PFC_RX);
-
-	/* When Mode pin is HSCIF 3Mbps.
-	* This setting value set to GPSR, it's pin function of the external clock switch to peripheral function. */
-	gpsr_scif_val |= PFC_SCIF_EXTCLK;
-
-	/* Setting value set to ALTSELn. */
-	reg = sys_read32(PFC_GP0_ALTSEL0_RW);
-	reg &= (~(PFC_SCIF_MASK));
-	reg |= altsel_scif_val[0U];
-	pfc_reg_write(PFC_GP0_ALTSEL0_RW, reg);
-
-	reg = sys_read32(PFC_GP0_ALTSEL1_RW);
-	reg &= (~(PFC_SCIF_MASK));
-	reg |= altsel_scif_val[1U];
-	pfc_reg_write(PFC_GP0_ALTSEL1_RW, reg);
-
-	reg = sys_read32(PFC_GP0_ALTSEL2_RW);
-	reg &= (~(PFC_SCIF_MASK));
-	reg |= altsel_scif_val[2U];
-	pfc_reg_write(PFC_GP0_ALTSEL2_RW, reg);
-
-	reg = sys_read32(PFC_GP0_ALTSEL3_RW);
-	reg &= (~(PFC_SCIF_MASK));
-	reg |= altsel_scif_val[3U];
-	pfc_reg_write(PFC_GP0_ALTSEL3_RW, reg);
-
-	/* Setting value set to GPSR. */
-	reg = sys_read32(PFC_GP0_GPSR_RW);
-	reg &= (~(PFC_SCIF_MASK));
-	reg |= gpsr_scif_val;
-	pfc_reg_write(PFC_GP0_GPSR_RW, reg);
-}
-#endif

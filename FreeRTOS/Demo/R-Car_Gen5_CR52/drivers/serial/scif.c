@@ -109,7 +109,6 @@ void wait(uint32_t count)
 
 typedef void (*uart_irq_callback_user_data_t)(void *user_data);
 
-
 static void uart_rcar_write_8(uint32_t offs, uint8_t value)
 {
 	sys_write8(value, scif_base + offs);
@@ -175,7 +174,7 @@ uint32_t console_init(uint32_t port) {
         0xc0718000, // HSCIF2
         0xc071C000  // HSCIF3
     };
-#else
+#else   // (BOARD == MDP_AIACC_RFS2 || BOARD == MDP_AIACC_HIL)
     const uint32_t serial_channels_arr[] = {
         0x38000000, // SCIF0
         0x38004000, // SCIF1
