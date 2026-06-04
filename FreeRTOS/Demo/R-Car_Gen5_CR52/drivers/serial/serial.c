@@ -119,7 +119,38 @@ static int uart_set_pfc(e_serial_devices_t device)
 end_set_pfc:
     return ret;
 }
-#else
+#elif (BOARD == MDP_AIACC_HIL)
+static int uart_set_pfc(e_serial_devices_t device)
+{
+    int ret = 0;
+    st_module_config_t uart_module;
+
+    uart_module.is_enabled = 1;
+
+    switch (device) {
+        case SCIF0:
+            uart_module.module_id = MODULE_SCIF0;
+            break;
+        case SCIF1:
+            uart_module.module_id = MODULE_SCIF1;
+            break;
+        case HSCIF0:
+            uart_module.module_id = MODULE_HSCIF0;
+            break;
+        case HSCIF1:
+            uart_module.module_id = MODULE_HSCIF1;
+            break;
+        default:
+            ret = -1;
+            goto end_set_pfc;
+    }
+
+    ret = pfcInitModule(uart_module);
+
+end_set_pfc:
+    return ret;
+}
+#else   // (BOARD == MDP_AIACC_RFS2 || BOARD == X5H_VDK || BOARD == X5H_RFS2)
 static int uart_set_pfc(e_serial_devices_t device)
 {
     return 0;
