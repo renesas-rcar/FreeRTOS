@@ -119,7 +119,7 @@ static void system_notification(void *data)
 	}
 }
 
-#if (BOARD == X5H_RFS2 || BOARD == MDP_AI-ACC_RFS2 || BOARD == MDP_AIACC_HIL)
+#if (BOARD == X5H_RFS2 || BOARD == MDP_AIACC_RFS2 || BOARD == MDP_AIACC_HIL)
 int R_StateManager_Init(void)
 {
     return 0;
