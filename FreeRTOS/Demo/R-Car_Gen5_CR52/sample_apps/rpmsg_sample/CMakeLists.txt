@@ -138,3 +138,39 @@ target_link_options(${app_name} BEFORE
 )
 
 convert_bin_to_srec(${app_name})
+
+set(app_name "rpmsg_multi_task")
+
+add_executable(${app_name}
+    rpmsg_multi_task.c
+    platform_rcar.c
+    remoteproc_rcar.c
+    rsc_table.c
+)
+
+target_include_directories(${app_name}
+    PRIVATE
+    ${BSP_DIR}
+    ${BSP_DIR}/CMSIS_5
+    ${BSP_DIR}/CMSIS_5/CMSIS/Core_R/Include
+)
+
+# Essential libraries to link with
+target_link_libraries(${app_name}
+    freertos_bsp
+    openamp
+    libmetal
+    m
+)
+
+target_link_options(${app_name}
+    PRIVATE
+    -T${BSP_DIR}/common/linker/lscript_rsc_table_vram1.ld
+)
+
+target_link_options(${app_name} BEFORE
+    PRIVATE
+    -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/${app_name}.map
+)
+
+convert_bin_to_srec(${app_name})
