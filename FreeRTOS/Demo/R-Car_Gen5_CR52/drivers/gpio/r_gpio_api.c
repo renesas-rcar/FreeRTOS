@@ -6,6 +6,7 @@
  */
 
 #include "stdio.h"
+#include "board.h"
 #include "pfc/r_pfc_api.h"
 #include "r_gpio_api.h"
 
@@ -31,7 +32,10 @@
 #define CLR_AREA            0x400
 
 /* GPIO base adrress */
-#define GPIO_BASE_OFFSET    0x100
+#define GPIO_BASE_OFFSET    0x100U
+
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
+
 #define GPIO_GR_0           (0xC1080000U + GPIO_BASE_OFFSET)
 #define GPIO_GR_1           (0xC1080800U + GPIO_BASE_OFFSET)
 #define GPIO_GR_2           (0xC1081000U + GPIO_BASE_OFFSET)
@@ -43,6 +47,14 @@
 #define GPIO_GR_8           (0xC0401800U + GPIO_BASE_OFFSET)
 #define GPIO_GR_9           (0xC9B00000U + GPIO_BASE_OFFSET)
 #define GPIO_GR_10          (0xC9B00800U + GPIO_BASE_OFFSET)
+
+#else // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
+
+#define GPIO_GR_0           (0x38080000U + GPIO_BASE_OFFSET)
+#define GPIO_GR_1           (0x38080800U + GPIO_BASE_OFFSET)
+#define GPIO_GR_2           (0x38081000U + GPIO_BASE_OFFSET)
+
+#endif
 
 /* GPIO register: offset address */
 #define GP_IOINTSEL         0x010
@@ -331,6 +343,7 @@ static void clearbit_l(uint32_t addr, uint32_t pos)
     writel(val &= ~BIT(pos), addr);
 }
 
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
 static uint32_t getGpioRegister(rcar_gpio_group_t grp, uint32_t offset)
 {
     uint32_t base_addr;
@@ -371,18 +384,41 @@ static uint32_t getGpioRegister(rcar_gpio_group_t grp, uint32_t offset)
         base_addr = GPIO_GR_10;
         break;
     default:
-        base_addr = GPIO_BASE_ADDR_ERR;
-        goto hang_drive;
+        (void)printf("GPIO group %d not exist!\n", grp);
+        return GPIO_BASE_ADDR_ERR;
     }
 
     reg_addr = base_addr + offset;
 
     return reg_addr;
-
-hang_drive:
-    printf("GPIO group %d not exist!\n", grp);
-    while(1) {}
 }
+
+#else // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
+static uint32_t getGpioRegister(rcar_gpio_group_t grp, uint32_t offset)
+{
+    uint32_t base_addr;
+    uint32_t reg_addr;
+
+    switch (grp) {
+    case 0:
+        base_addr = GPIO_GR_0;
+        break;
+    case 1:
+        base_addr = GPIO_GR_1;
+        break;
+    case 2:
+        base_addr = GPIO_GR_2;
+        break;
+    default:
+        (void)printf("GPIO group %d not exist!\n", grp);
+        return GPIO_BASE_ADDR_ERR;
+    }
+
+    reg_addr = base_addr + offset;
+
+    return reg_addr;
+}
+#endif
 
 static void gpioSetGeneralOutputMode(rcar_gpio_group_t grp, rcar_pin_t pin)
 {
