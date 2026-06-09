@@ -34,11 +34,11 @@ uint16_t mfis_get_message(struct mfis_channel *ch)
 {
     if(ch->type == MFIS_TYPE_RECEVER)
     {
-        return (volatile uint16_t) EMBR(ch->ch);
+        return *(volatile uint16_t *) EMBR(ch->ch);
     }
     else
     {
-        return (volatile uint16_t) IMBR(ch->ch);
+        return *(volatile uint16_t *) IMBR(ch->ch);
     }
     
 }
