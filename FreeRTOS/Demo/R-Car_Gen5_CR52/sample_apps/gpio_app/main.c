@@ -53,6 +53,22 @@ static void prvGPIOTask( void *pvParameters );
 static void gpioUserCallback(void *data);
 /*-----------------------------------------------------------*/
 
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
+
+#define TC1_PIN             GPIO_PORT_07_PIN_18
+#define TC2_PIN_INPUT       GPIO_PORT_00_PIN_14
+#define TC2_PIN_OUTPUT      GPIO_PORT_00_PIN_15
+#define TC3_PIN_INPUT_IRQ   GPIO_PORT_00_PIN_14
+
+#else   // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
+
+#define TC1_PIN             GPIO_PORT_00_PIN_8
+#define TC2_PIN_INPUT       GPIO_PORT_00_PIN_7
+#define TC2_PIN_OUTPUT      GPIO_PORT_00_PIN_6
+#define TC3_PIN_INPUT_IRQ   GPIO_PORT_00_PIN_7
+
+#endif
+
 /*
  * Declare some structs used for GPIO API.
  */
@@ -61,7 +77,7 @@ gpio_pin_cfg_t g_gpio_pin_cfg_pull[] =
 {
     {
         .pin_cfg = GPIO_DIRECTION_INPUT,
-        .pin = GPIO_PORT_07_PIN_18
+        .pin = TC1_PIN
     },
 };
 
@@ -79,11 +95,11 @@ gpio_pin_cfg_t g_gpio_pin_cfg[] =
 {
     {
         .pin_cfg = GPIO_DIRECTION_INPUT,
-        .pin = GPIO_PORT_00_PIN_14
+        .pin = TC2_PIN_INPUT
     },
     {
         .pin_cfg = GPIO_DIRECTION_OUTPUT,
-        .pin = GPIO_PORT_00_PIN_15
+        .pin = TC2_PIN_OUTPUT
     },
 };
 
@@ -101,7 +117,7 @@ gpio_pin_cfg_t g_gpio_pin_cfg_irq =
 {
 
     .pin_cfg = GPIO_INTERRUPT_INPUT_BOTH_EDGE,
-    .pin = GPIO_PORT_00_PIN_14
+    .pin = TC3_PIN_INPUT_IRQ
 };
 
 gpio_cfg_t g_gpio_cfg_irq =
@@ -152,6 +168,8 @@ static void prvGPIOTask( void *pvParameters )
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
 
+    vTaskDelay(500);
+
     printf("\n********** TC1: GPIO Pull up/down/disable **********\n");
     ret = R_GPIO_Open(&g_gpio_instance_ctrl_pull, &g_gpio_cfg_pull);
     printf("Open : ret = %d\n", ret);
@@ -188,6 +206,31 @@ static void prvGPIOTask( void *pvParameters )
     ret = R_GPIO_PinSetPull(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, GPIO_REQ_PULL_DOWN);
     printf("R_GPIO_PinSetPull: Down ret = %d\n", ret);
 
+#if(BOARD == MDP_AIACC_HIL)
+
+    ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, &readLevel);
+    printf("\nPinRead: Before IN  =%d\n", readLevel);
+
+    printf("AIACC: Wait signal from MDP_X5H\n");
+
+    ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, &readLevel);
+    while (readLevel != 1)
+        ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, &readLevel);
+    printf("PinRead: After IN  =%d\n\n", readLevel);
+
+    vTaskDelay(1000);
+
+    ret  = R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[1].pin, &readLevel);
+    printf("PinRead: Before OUT =%d\n", readLevel);
+
+    printf("AIACC: Send signal to MDP_X5H\n");
+    ret  = R_GPIO_PinWrite(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[1].pin, GPIO_LEVEL_HIGH);
+
+    ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[1].pin, &readLevel);
+    printf("PinRead: After OUT =%d\n\n", readLevel);
+
+#else
+
     ret  = R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[1].pin, &readLevel);
     printf("PinRead: Before OUT =%d\n", readLevel);
     ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, &readLevel);
@@ -210,6 +253,8 @@ static void prvGPIOTask( void *pvParameters )
         vTaskDelay(1000);
     }
 
+#endif
+
     ret = R_GPIO_Close(&g_gpio_instance_ctrl);
     printf("Close: ret = %d\n", ret);
 
@@ -224,7 +269,14 @@ static void prvGPIOTask( void *pvParameters )
     ret = R_GPIO_CallbackSet(&g_gpio_instance_ctrl_irq, gpioUserCallback, &g_gpio_instance_ctrl_irq);
     printf("CallbackSet: ret = %d\n", ret);
 
-    /* Config GPIO_0_17 as General output mode */
+#if(BOARD == MDP_AIACC_HIL)
+
+    printf("AIACC: Wait signal from MDP_X5H\n");
+    vTaskDelay(5000);
+
+#else
+
+    /* Config pin to General output mode */
     ret = R_GPIO_PinCfg(&g_gpio_instance_ctrl_irq, g_gpio_cfg.p_pin_cfg_data[1].pin,
                         g_gpio_cfg.p_pin_cfg_data[1].pin_cfg);
     printf("PinCfg: ret = %d\n", ret);
@@ -240,6 +292,8 @@ static void prvGPIOTask( void *pvParameters )
         ret = R_GPIO_PinWrite(&g_gpio_instance_ctrl_irq, g_gpio_cfg.p_pin_cfg_data[1].pin, lv);
         vTaskDelay(500);
     }
+
+#endif
 
     ret = R_GPIO_Close(&g_gpio_instance_ctrl_irq);
     printf("Close: ret = %d\n", ret);
