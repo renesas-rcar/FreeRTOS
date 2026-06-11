@@ -455,21 +455,6 @@ static void writel(const uint32_t value, const uintptr_t address)
     *((volatile unsigned int*) address)  = value;
 }
 
-static void setbit_l(uint32_t addr, uint32_t pos)
-{
-    writel(readl(addr) | BIT(pos), addr);
-}
-
-static uint32_t getbit_l(uint32_t addr, uint32_t pos)
-{
-    return !!(readl(addr) & BIT(pos));
-}
-
-static void clearbit_l(uint32_t addr, uint32_t pos)
-{
-    writel(readl(addr) & ~BIT(pos), addr);
-}
-
 /************************************ WCRC functions ************************************/
 static int wcrcPrepareIndependentCrcMode(wcrc_instance_ctrl_t * const p_instance_ctrl);
 
