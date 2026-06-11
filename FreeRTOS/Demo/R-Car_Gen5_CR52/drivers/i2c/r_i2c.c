@@ -26,6 +26,8 @@
 #define MAX_DMAC_UNITS                          4
 #define ICMAR_MASK_READ                         ((uint32_t)0xFF)
 #define ICMAR_MASK_WRITE                        ((uint32_t)0xFE)
+#define ICMSR_MASK                              ((uint32_t)0x7F)
+#define ICMCR_CLEAR                             ((uint32_t)0x80)
 
 /* ==================== STATIC VARIABLES ==================== */
 static int clock_id;
@@ -387,6 +389,23 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
 
         /* Copy the byte into the buffer */
         Bytes[0] = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICRXD);
+        
+        /* Clear MDR */
+        val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
+        val &= ~(uint32_t)R_I2C_MDR_BIT;
+        R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
+
+        /* Wait MST */
+        r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
+        if (r < 0) 
+        {
+            return -1;
+        }
+
+        /* Clear MST */
+        val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
+        val &= ~(uint32_t)R_I2C_MST_BIT;
+        R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         return 0;
     } else {
@@ -432,7 +451,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         /* Generate a STOP condition after transmission */
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x8A);
 
-        /* Clear ICMSR_MDE bit */
+        /* Clear ICMSR_MDR bit */
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & (uint32_t)0x7f;
         val &= (uint32_t)~R_I2C_MDR_BIT;
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
@@ -446,6 +465,20 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
 
         /* Copy the last byte into the buffer */
         Bytes[i++] = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICRXD);
+
+        val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
+        val &= ~(uint32_t)R_I2C_MDR_BIT;
+        R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
+
+        /* Wait for transmission to complete */
+        r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
+        if (r < 0) {
+            return -1;
+        }
+
+        val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
+        val &= ~(uint32_t)R_I2C_MST_BIT; 
+        R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         return 0;
     }
@@ -525,6 +558,9 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
             printf("[R_I2C_Write] loc_WaitMsrEvent :Return value(r) is %d.(Wait for transmission to complete) Failed(0)\r\n",r);
                 return -1;
             } else {
+                val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
+                val &= ~(uint32_t)R_I2C_MST_BIT;
+                R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
                 return 0;
             }
         } else {
@@ -578,6 +614,9 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
             printf("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,--i);
                 return --i;
             } else {
+                val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
+                val &= ~(uint32_t)R_I2C_MST_BIT;
+                R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
                 return 0;
             }
         }
@@ -697,10 +736,10 @@ static int RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl)
     r_i2c_Unit_t Unit = p_instance_ctrl->p_cfg->channel;
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint8_t ret;
-
+    
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, 0);
-    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0);
+    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, ICMCR_CLEAR);
 
     ret = R_StateManager_ClockOff(clock_id);
     if (ret)
