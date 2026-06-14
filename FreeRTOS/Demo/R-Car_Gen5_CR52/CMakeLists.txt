@@ -29,17 +29,23 @@ if(NOT DEFINED RAM_REGION)
     set(RAM_REGION 1)
 endif()
 set(LDFILE ${BSP_DIR}/common/linker/lscript_sram.ld)
+set(PLATFORM_DEVICE_TREE "")
 if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2" OR BOARD STREQUAL "mdp_aiacc_hil")
     if(BOARD STREQUAL "x5h_vdk")
         set(BOARD_ID 1)
+        set(PLATFORM_DEVICE_TREE "device_tree_x5h.h")
     elseif(BOARD STREQUAL "x5h_ironhide")
         set(BOARD_ID 3)
+        set(PLATFORM_DEVICE_TREE "device_tree_x5h.h")
     elseif(BOARD STREQUAL "x5h_rfs2")
         set(BOARD_ID 4)
+        set(PLATFORM_DEVICE_TREE "device_tree_x5h.h")
     elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
         set(BOARD_ID 2)
+        set(PLATFORM_DEVICE_TREE "device_tree_mdp_aiacc.h")
     elseif(BOARD STREQUAL "mdp_aiacc_hil")
         set(BOARD_ID 5)
+        set(PLATFORM_DEVICE_TREE "device_tree_mdp_aiacc.h")
     else()
         message(FATAL_ERROR "Invalid BOARD: ${BOARD}.")
     endif()
@@ -260,7 +266,7 @@ target_include_directories(freertos_bsp
 if(ENABLE_OPENAMP)
     target_include_directories(freertos_bsp PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/libraries/openamp/open-amp/lib/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/libraries//libmetal/build/lib/include/>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/libraries/libmetal/build/lib/include>
         $<BUILD_INTERFACE:${BSP_DIR}/drivers/virtio>
         $<BUILD_INTERFACE:${BSP_DIR}/drivers/virtio-iommu-backend>
     )
@@ -292,6 +298,12 @@ install(
 install(
     DIRECTORY ${BSP_DIR}/include
     DESTINATION .
+    PATTERN "device_tree_*.h" EXCLUDE
+)
+# Specify device tree header depend on BOARD_ID
+install(
+    FILES ${BSP_DIR}/include/${PLATFORM_DEVICE_TREE}
+    DESTINATION include
 )
 
 # Logging
