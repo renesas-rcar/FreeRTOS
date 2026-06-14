@@ -38,7 +38,7 @@
 
 #include "smmu/smmu.h"
 #include "pfc/r_pfc_api.h"
-#include "device_tree_x5h.h"
+#include "device_tree.h"
 #include "rcar_utils.h"
 
 #define main_SMMU_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )

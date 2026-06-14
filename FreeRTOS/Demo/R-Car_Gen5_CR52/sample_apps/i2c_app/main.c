@@ -36,7 +36,7 @@
 #include "i2c/r_i2c.h"
 #define main_I2C_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 #include "pfc/r_pfc_api.h"
-#include "device_tree_x5h.h"
+#include "device_tree.h"
 #include "dmac/dmac_common.h"
 #include "rcar_utils.h"
 

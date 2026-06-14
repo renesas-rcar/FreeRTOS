@@ -39,7 +39,7 @@
 #define WRITE_VALUE                123456789
 
 #include "pfc/r_pfc_api.h"
-#include "device_tree_x5h.h"
+#include "device_tree.h"
 
 /*-----------------------------------------------------------*/
 

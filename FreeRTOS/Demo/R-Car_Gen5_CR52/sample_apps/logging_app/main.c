@@ -36,7 +36,7 @@
 #define main_Logging_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 
 #include "pfc/r_pfc_api.h"
-#include "device_tree_x5h.h"
+#include "device_tree.h"
 /* Logging Function include. */
 #ifdef LIBRARY_LOG_LEVEL
 #include "logging_stack.h"

@@ -36,7 +36,7 @@
 #include "string.h"
 #include "ucie/r_ucie.h"
 #include "pfc/r_pfc_api.h"
-#include "device_tree_x5h.h"
+#include "device_tree.h"
 #include "ucie_concept.h"
 #include "rcar_utils.h"
 

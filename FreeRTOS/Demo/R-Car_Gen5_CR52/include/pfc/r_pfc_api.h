@@ -13,7 +13,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "device_tree_x5h.h"
+#include "device_tree.h"
 
 /**
 * @defgroup PFC_Module Pin Function Control Module
