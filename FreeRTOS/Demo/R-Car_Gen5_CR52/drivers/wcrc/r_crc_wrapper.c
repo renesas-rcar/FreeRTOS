@@ -628,6 +628,7 @@ int wcrc_set_callback(wcrc_sub_module_t module, wcrc_instance_ctrl_t * const p_i
         module != KCRC_SUB_MODULE) {
         ret = -1;
         printf("%s: Invalid module\n", __func__);
+        return ret;
     }
 
     wcrc_cfg_dma_t * p_cfg_dma[E2E_CRC_USE_2_DMA_CHAN];
