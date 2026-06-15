@@ -35,7 +35,7 @@
 #include "stdio.h"
 
 #include "pfc/r_pfc_api.h"
-#include "device_tree.h"
+#include "device_tree_x5h.h"
 #include "rcar_utils.h"
 #include "taud/r_taud.h"
 

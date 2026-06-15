@@ -7,7 +7,7 @@
 
 #include "stdio.h"
 #include "pfc/r_pfc_api.h"
-#include "device_tree.h"
+#include "device_tree_x5h.h"
 #include "board.h"
 
 #define LIBRARY_LOG_LEVEL 0

@@ -38,7 +38,7 @@
 #include "string.h"
 #include "serial/r_serial.h"
 #include "pfc/r_pfc_api.h"
-#include "device_tree.h"
+#include "device_tree_x5h.h"
 #define main_LOG_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 

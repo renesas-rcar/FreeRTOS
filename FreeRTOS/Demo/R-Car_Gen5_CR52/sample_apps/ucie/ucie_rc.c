@@ -37,7 +37,7 @@
 #include "string.h"
 
 #include "pfc/r_pfc_api.h"
-#include "device_tree.h"
+#include "device_tree_x5h.h"
 #include "smmu/smmu.h"
 #include "ucie/r_ucie.h"
 #include "ucie_concept.h"

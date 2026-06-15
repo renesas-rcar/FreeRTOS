@@ -46,7 +46,7 @@ static void prvAk4619Task( void *pvParameters );
 extern char _RAM_START;
 
 #include "pfc/r_pfc_api.h"
-#include "device_tree.h"
+#include "device_tree_x5h.h"
 /*-----------------------------------------------------------*/
 
 int main( void )

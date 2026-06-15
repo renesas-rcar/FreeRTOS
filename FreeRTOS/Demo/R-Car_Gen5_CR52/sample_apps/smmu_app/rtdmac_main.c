@@ -35,7 +35,7 @@
 #include "dmac/rtdmac_ctrl.h"
 #include "dmac/sysdmac_ctrl.h"
 #include "pfc/r_pfc_api.h"
-#include "device_tree.h"
+#include "device_tree_x5h.h"
 #include "rcar_utils.h"
 #include "smmu/smmu.h"
 

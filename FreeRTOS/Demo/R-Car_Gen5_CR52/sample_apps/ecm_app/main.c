@@ -37,7 +37,7 @@
 #include "stdio.h"
 #include "serial/r_serial.h"
 #include "pfc/r_pfc_api.h"
-#include "device_tree.h"
+#include "device_tree_x5h.h"
 #include "ecm/r_ecm.h"
 #include "ecm/r_error_domain_id.h"
 #include "../drivers/ecm/r_ecm_reg.h"

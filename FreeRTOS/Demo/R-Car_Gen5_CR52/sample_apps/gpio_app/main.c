@@ -38,7 +38,7 @@
 #define main_GPIO_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 
 #include "pfc/r_pfc_api.h"
-#include "device_tree.h"
+#include "device_tree_x5h.h"
 /*-----------------------------------------------------------*/
 
 /*

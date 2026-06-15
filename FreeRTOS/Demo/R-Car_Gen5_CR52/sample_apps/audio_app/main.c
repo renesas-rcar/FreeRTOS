@@ -36,7 +36,7 @@
 #include <audio/rcar_audio.h>
 #include "dummy_wav_data.h"
 #include "pfc/r_pfc_api.h"
-#include "device_tree.h"
+#include "device_tree_x5h.h"
 
 #define main_Audio_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 
