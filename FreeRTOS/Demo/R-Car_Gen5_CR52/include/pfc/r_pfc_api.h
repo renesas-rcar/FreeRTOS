@@ -13,6 +13,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "board.h"
 
 #if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
 

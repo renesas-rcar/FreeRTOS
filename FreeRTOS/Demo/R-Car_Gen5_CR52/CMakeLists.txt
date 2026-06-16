@@ -141,7 +141,7 @@ if (BOARD STREQUAL "x5h_ironhide")
     set(UCIE_SRC_LIST
         ${BSP_DIR}/drivers/ucie/uciedrv.c
     )
-elseif (BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "ai_acc")
+elseif (BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2")
     set(UCIE_SRC_LIST 
         ${BSP_DIR}/drivers/ucie/ucie_rfs/uciedrv.c
     )
@@ -358,60 +358,147 @@ function(convert_bin_to_srec app_name)
     )
 endfunction()
 
+function(add_subdirectory_from_list list_app)
+    foreach(app IN LISTS ${list_app})
+        add_subdirectory(sample_apps/${app})
+    endforeach()
+endfunction()
+
 #######################################################################################
 # Add subdirectory for applications below
 if(ENABLE_OPENAMP)
     add_subdirectory(libraries/libmetal)
     add_subdirectory(libraries/openamp)
-    add_custom_target(openamp_full)
-    add_dependencies(openamp_full libmetal_build openamp_build)
-endif()
-
-if(ENABLE_OPENAMP)
-    add_dependencies(freertos_bsp openamp_full)
-endif()
-
-add_subdirectory(Blinky)
-if(ENABLE_FULL_DEMO)
-    add_subdirectory(Full_Demo)
-endif()
-add_subdirectory(sample_apps/hello_world)
-add_subdirectory(sample_apps/uart_app)
-add_subdirectory(sample_apps/logging_app)
-add_subdirectory(sample_apps/mpu_app)
-add_subdirectory(sample_apps/gpio_app)
-add_subdirectory(sample_apps/ak4619_app)
-add_subdirectory(sample_apps/cpp_app)
-add_subdirectory(sample_apps/i2c_app)
-add_subdirectory(sample_apps/sys_dmac_app)
-add_subdirectory(sample_apps/rt_dmac_app)
-add_subdirectory(sample_apps/swdt_app)
-add_subdirectory(sample_apps/wwdt_app)
-add_subdirectory(sample_apps/smmu_app)
-add_subdirectory(sample_apps/power-management_app)
-add_subdirectory(sample_apps/wcrc_app)
-add_subdirectory(sample_apps/utils_app)
-add_subdirectory(sample_apps/taud_app)
-add_subdirectory(sample_apps/ecm_app)
-add_subdirectory(sample_apps/sensor_app)
-add_subdirectory(sample_apps/dummy_app)
-add_subdirectory(sample_apps/gic_app )
-add_subdirectory(sample_apps/generic_timer_app)
-if(ENABLE_OPENAMP)
     add_subdirectory(sample_apps/rpmsg_sample)
     add_subdirectory(sample_apps/virtio_iommu_frontend_sample)
     add_subdirectory(sample_apps/virtio_iommu_backend_sample)
+    add_custom_target(openamp_full)
+    add_dependencies(openamp_full libmetal_build openamp_build)
+    add_dependencies(freertos_bsp openamp_full)
 endif()
 
-if (BOARD STREQUAL "x5h_vdk")
-    add_subdirectory(sample_apps/cxl_app)
-elseif (BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "ai_acc")
-    add_subdirectory(sample_apps/ucie)
+if(ENABLE_FULL_DEMO)
+    add_subdirectory(Full_Demo)
 endif()
 
-if(NOT BOARD STREQUAL "ai_acc")
-    add_subdirectory(sample_apps/audio_app)
+if(BOARD STREQUAL "x5h_vdk")
+    set(SAMPLE_APPS
+        hello_world
+        uart_app
+        logging_app
+        mpu_app
+        gpio_app
+        ak4619_app
+        cpp_app
+        i2c_app
+        sys_dmac_app
+        rt_dmac_app
+        swdt_app
+        wwdt_app
+        smmu_app
+        power-management_app
+        wcrc_app
+        utils_app
+        taud_app
+        ecm_app
+        sensor_app
+        dummy_app
+        cxl_app
+        audio_app
+    )
+elseif(BOARD STREQUAL "x5h_ironhide")
+    set(SAMPLE_APPS
+        hello_world
+        uart_app
+        logging_app
+        mpu_app
+        gpio_app
+        ak4619_app
+        cpp_app
+        i2c_app
+        sys_dmac_app
+        rt_dmac_app
+        swdt_app
+        wwdt_app
+        smmu_app
+        power-management_app
+        wcrc_app
+        utils_app
+        taud_app
+        ecm_app
+        sensor_app
+        dummy_app
+        ucie
+        audio_app
+    )
+elseif(BOARD STREQUAL "x5h_rfs2")
+    set(SAMPLE_APPS
+        hello_world
+        uart_app
+        logging_app
+        mpu_app
+        gpio_app
+        cpp_app
+        i2c_app
+        sys_dmac_app
+        rt_dmac_app
+        swdt_app
+        wwdt_app
+        smmu_app
+        wcrc_app
+        utils_app
+        taud_app
+        ecm_app
+        dummy_app
+        ucie
+        audio_app
+    )
+elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
+    set(SAMPLE_APPS
+        hello_world
+        uart_app
+        logging_app
+        mpu_app
+        gpio_app
+        cpp_app
+        i2c_app
+        rt_dmac_app
+        swdt_app
+        wwdt_app
+        smmu_app
+        wcrc_app
+        utils_app
+        ecm_app
+        ucie
+        dummy_app
+    )
+elseif(BOARD STREQUAL "mdp_aiacc_hil")
+    set(SAMPLE_APPS
+        hello_world
+        uart_app
+        logging_app
+        mpu_app
+        gpio_app
+        cpp_app
+        i2c_app
+        rt_dmac_app
+        swdt_app
+        wwdt_app
+        smmu_app
+        power-management_app
+        wcrc_app
+        utils_app
+        ecm_app
+        sensor_app
+        dummy_app
+    )
+else()
+    message(FATAL_ERROR "Invalid BOARD: ${BOARD}. Cannot add apps!")
 endif()
+
+add_subdirectory_from_list(SAMPLE_APPS)
+
+add_subdirectory(Blinky)
 
 # TODO: Delete application makefile
 # TODO: Remove porting code in Kernel
