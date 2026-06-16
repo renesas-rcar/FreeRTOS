@@ -82,7 +82,7 @@ endif()
 
 if (BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2")
     set(UCIE_VER "RCAR_UCIE_V100")
-elseif(BOARD STREQUAL "ai_acc")
+elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
     set(UCIE_VER "RCAR_UCIE_V102")
 else()
     set(UCIE_VER "NONE")

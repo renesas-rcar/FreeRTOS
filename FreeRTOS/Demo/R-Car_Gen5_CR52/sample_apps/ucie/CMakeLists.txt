@@ -74,7 +74,7 @@ if(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2")
     convert_bin_to_srec(${app_name})
 endif()
 
-if(BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_aiacc_rfs2")
+if(BOARD STREQUAL "mdp_aiacc_rfs2")
     set(app_name "ucie_mdp_aiacc0")
     
     add_executable(${app_name}
