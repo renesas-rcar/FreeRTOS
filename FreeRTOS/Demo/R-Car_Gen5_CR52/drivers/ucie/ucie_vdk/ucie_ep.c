@@ -104,8 +104,9 @@ int ucie_epf_test_write(struct st_pcie_ep *ep, ucie_epf_test_reg_t *bar0_reg)
     }
 
     /* Create the test data */
-    for (i = 0; i < size; i++)
+    for (i = 0; i < size; i++) {
         ((uint8_t *)buf)[i] = i & 0xFF;
+    }
 
     printf_delay("[%s] Executing memcpy\n",__func__);
     vTaskDelay(2);
@@ -136,8 +137,9 @@ void R_PCIE_EPF_Test_CmdHandler(struct st_pcie_ep *ep)
 
     while(1) {
 	command = bar0_reg->command;
-	if (command == 0)
+    if (command == 0) {
 	    vTaskDelay(2);
+    }
 
 	bar0_reg->command = 0;
 	bar0_reg->status = 0;
@@ -146,20 +148,22 @@ void R_PCIE_EPF_Test_CmdHandler(struct st_pcie_ep *ep)
 	if (command & COMMAND_READ) {
 	    printf_delay("[%s]: Received Read Request\n",__func__);
 	    ret = ucie_epf_test_read(ep, bar0_reg);
-	    if (!ret)
+        if (!ret) {
 		bar0_reg->status |= STATUS_READ_SUCCESS;
-	    else
+        } else {
 		bar0_reg->status |= STATUS_READ_FAIL;
+        }
 	    ucie_epf_test_raise_irq(ep, bar0_reg);
 	    vTaskDelay(2);
 
 	} else if (command & COMMAND_WRITE) {
 	    printf_delay("[%s]: Received Write Request\n",__func__);
 	    ret = ucie_epf_test_write(ep, bar0_reg);
-	    if (!ret)
+        if (!ret) {
 		bar0_reg->status |= STATUS_WRITE_SUCCESS;
-	    else
+        } else {
 		bar0_reg->status |= STATUS_WRITE_FAIL;
+        }
 	    ucie_epf_test_raise_irq(ep, bar0_reg);
 	    vTaskDelay(2);
 	}
@@ -191,13 +195,15 @@ static int rcar_ucie_ep_init(struct st_pcie_ep *ep, uint16_t channel)
     /* Allocate and initialize the ib/ob window map
        assuming number of ib/out window = 32 */
     ep->ib_window_map = pvPortMalloc(32 * sizeof(uint32_t));
-    if (ep->ib_window_map == NULL)
+    if (ep->ib_window_map == NULL) {
 	return -ENOMEM;
+    }
     memset(ep->ib_window_map, 0, 32 * sizeof(uint32_t));
 
     ep->ob_window_map = pvPortMalloc(32 * sizeof(uint32_t));
-    if (ep->ob_window_map == NULL)
+    if (ep->ob_window_map == NULL) {
         return -ENOMEM;
+    }
     memset(ep->ob_window_map, 0, 32 * sizeof(uint32_t));
 
     R_UCIE_RegWrite16(channel, UCIE_COMMAND, 0);
@@ -322,10 +328,11 @@ int R_PCIE_EP_TransferDataDMA(struct st_pcie_ep *ep, uint64_t pcie_addr,
         R_UCIE_RegWrite32(channel, UCIE_DMA_RD_INT_CLR, 0x1);
     }
 
-    if (memcmp(pcie_data, local_addr, size) == 0)
+    if (memcmp(pcie_data, local_addr, size) == 0) {
 	printf_delay("PASS\n");
-    else
+    } else {
 	printf_delay("FAILED\n");
+    }
 }
 
 void R_PCIE_EP_Inbound_ATU(struct st_pcie_ep *ep, uint16_t channel)
@@ -370,15 +377,17 @@ void R_PCIE_EP_Init(struct st_pcie_ep *ep, uint16_t channel)
 
     //rcar_ucie_ep_hw_enable(channel);
 
-    if (rcar_ucie_ep_init(ep, channel))
+    if (rcar_ucie_ep_init(ep, channel)) {
 	printf_delay("Failed to initialize UCIe EP!\n");
+    }
 
     rcar_ucie_setup(channel);
 
     rcar_ucie_ep_header(channel);
 
-    if (ep->msi_cap)
+    if (ep->msi_cap) {
 	R_UCIE_RegWrite16(channel, UCIE_MSI_CAP, 0x8a);
+    }
 
     R_PCIE_EP_Inbound_ATU(ep, channel);
 

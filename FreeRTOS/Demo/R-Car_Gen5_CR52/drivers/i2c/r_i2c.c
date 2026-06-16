@@ -344,8 +344,9 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
         p_usr_context->ctx = p_instance_ctrl->p_dmac_handle_irq;
 
         ret = R_SYSDMAC_RcarCallBackSet(p_instance_ctrl->p_dmac_handle_irq, (void *)rcar_i2c_dma_callback, p_usr_context);
-        if (ret != 0)
+        if (ret != 0) {
             return -1;
+        }
 
         vPortFree(p_usr_context);
     }
@@ -1120,8 +1121,9 @@ static int R_I2C_Irq_handler(i2c_instance_ctrl_t * p_instance_ctrl)
     msr = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & (uint32_t)0x7f;
     msr &= R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMIER);
 
-    if (val == 0)
+    if (val == 0) {
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMAR) & (uint32_t)0x1;
+    }
 
     if ((msr & R_I2C_MAL_BIT) != 0) {
         /* Arbitration lost */
@@ -1138,11 +1140,12 @@ static int R_I2C_Irq_handler(i2c_instance_ctrl_t * p_instance_ctrl)
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
     }
 
-    if (val != 0)
+    if (val != 0) {
         rcar_i2c_irq_recv(p_instance_ctrl, msr);
-    else
+    } else {
         rcar_i2c_irq_send(p_instance_ctrl, msr);
-    
+    }
+
     return 0;
 }
 

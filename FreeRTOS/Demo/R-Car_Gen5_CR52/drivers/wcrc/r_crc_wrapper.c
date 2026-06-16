@@ -433,12 +433,15 @@ static uint32_t getRegister(uint8_t module, wcrc_unit_t unit, uint32_t offset)
         return 0;
     }
 
-    if (module == WCRC_MODULE)
+    if (module == WCRC_MODULE) {
         base_addr = WCRC_BASE_ADDR(unit);
-    if (module == CRC_MODULE)
+    }
+    if (module == CRC_MODULE) {
         base_addr = CRC_BASE_ADDR(unit);
-    if (module == KCRC_MODULE)
+    }
+    if (module == KCRC_MODULE) {
         base_addr = KCRC_BASE_ADDR(unit);
+    }
 
     reg_addr = base_addr + offset;
 
@@ -551,8 +554,9 @@ static int wcrcPrepareIndependentCrcMode(wcrc_instance_ctrl_t * const p_instance
 
 void wcrcRemoveBuffer(void * p_buf)
 {
-    if (p_buf != NULL)
+    if (p_buf != NULL) {
         vPortFree(p_buf);
+    }
 }
 
 int wcrcStart(wcrc_instance_ctrl_t * const p_instance_ctrl)
@@ -922,10 +926,11 @@ static int wcrc_set_e2e_mode(uint8_t module, wcrc_cfg_t const * const p_cfg)
 
     //3. (For CRC)  Set DCRAmCTL, DCRAmCTL2, DCRAmCOUT registers.
     //   (For KCRC) Set KCRCmCTL, KCRCmPOLY, KCRCmXOR, KCRCmDOUT registers.
-    if (module == CRC_SUB_MODULE)
+    if (module == CRC_SUB_MODULE) {
         crc_setting(unit, crc_cfg);
-    else if (module == KCRC_SUB_MODULE)
+    } else if (module == KCRC_SUB_MODULE) {
         kcrc_setting(unit, kcrc_cfg);
+    }
 
     //4. Set in_en=1, trans_en=1, res_en=1 in WCRC_XXXX_EN register.
     reg_addr = getRegister(reg_type, unit, WCRC_XXXX_EN(module));
@@ -1307,21 +1312,21 @@ static int wcrc_get_dma_request_id(wcrc_sub_module_t module,
     /* TO DO: Check when to use request ID:
      * MID_RID_WCRC_OUT and MID_RID_WCRC_RES_MULTI
      */
-    if (port == PORT_DATA(CRC_M) ||
-        port == PORT_DATA(KCRC_M))
+    if (port == PORT_DATA(CRC_M) || port == PORT_DATA(KCRC_M)) {
         dma_req_id = MID_RID_WCRC_IN(module, unit);
+    }
 
-    if (port == PORT_CMD(CRC_M) ||
-        port == PORT_CMD(KCRC_M))
+    if (port == PORT_CMD(CRC_M) || port == PORT_CMD(KCRC_M)) {
         dma_req_id = MID_RID_WCRC_IN(module, unit);
+    }
 
-    if (port == PORT_EXPT_DATA(CRC_M) ||
-        port == PORT_EXPT_DATA(KCRC_M))
+    if (port == PORT_EXPT_DATA(CRC_M) || port == PORT_EXPT_DATA(KCRC_M)) {
         dma_req_id = MID_RID_WCRC_IN(module, unit);
+    }
 
-    if (port == PORT_RES(CRC_M) ||
-        port == PORT_RES(KCRC_M))
+    if (port == PORT_RES(CRC_M) || port == PORT_RES(KCRC_M)) {
         dma_req_id = MID_RID_WCRC_RES(module, unit);
+    }
 
     return dma_req_id;
 }

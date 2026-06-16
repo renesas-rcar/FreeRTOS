@@ -43,7 +43,9 @@ bool adg_set_clock(adg_conf_t *adg, bool use_brgb){
 			float brr_float = (N / (2*divider_base) ) - 1;
 			uint32_t brr = (uint32_t)(brr_float + 0.5);
 			
-			if(brr > 255) continue;
+			if(brr > 255) {
+				continue;
+			}
 			
 			uint32_t actual_div = divider_base *2*(brr + 1);
 			uint32_t actual_clk = input_freq / actual_div;
@@ -62,10 +64,11 @@ bool adg_set_clock(adg_conf_t *adg, bool use_brgb){
 				best_sample_rate = actual_sample_rate;
 				}
 			}
-		
 		}
 		
-		if(min_error == UINT32_MAX) return false;
+		if(min_error == UINT32_MAX) {
+			return false;
+		}
 		
 		adg->div_ssi = best_div_ssi;
 		

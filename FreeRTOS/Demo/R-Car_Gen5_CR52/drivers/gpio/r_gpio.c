@@ -122,12 +122,14 @@ static void r_gpio_pin_set(gpio_port_pin_t pin, uint32_t cfg) {
 
     uint32_t port_num = (GPIO_PRV_PORT_BITS & (uint32_t)pin) >> GPIO_PRV_PORT_OFFSET;
     uint32_t pin_num  = (GPIO_PRV_PIN_BITS & (uint32_t)pin);
-    if (cfg == GPIO_DIRECTION_OUTPUT || cfg == GPIO_DIRECTION_INPUT)
+    if (cfg == GPIO_DIRECTION_OUTPUT || cfg == GPIO_DIRECTION_INPUT) {
         (void) R_GPIO_PinConfigMode(port_num, pin_num, cfg);
-    else if (cfg == GPIO_INTERRUPT_INPUT_RISING_EDGE ||
+    } else if (cfg == GPIO_INTERRUPT_INPUT_RISING_EDGE ||
             cfg == GPIO_INTERRUPT_INPUT_FALLING_EDGE ||
             cfg == GPIO_INTERRUPT_INPUT_BOTH_EDGE)
+    {
         (void) R_GPIO_PinConfigInterruptMode(port_num, pin_num, cfg);
+    }
 }
 
 static void r_gpio_pins_config (const gpio_cfg_t * p_cfg) {

@@ -463,12 +463,13 @@ void R_GIC_SetAddr(void* dist, void* rdist) {
 uint32_t R_GIC_Enable(void) {
     uint32_t result = 1;  // Success indicator
 
-    if (gic_dist == NULL)
+    if (gic_dist == NULL) {
         return 1;
+    }
 
     gic_dist->GICD_CTLR = 0x13; // Enable group 0, group 1 and affinity.
 
-    while ((gic_dist->GICD_CTLR & 0x80000000) != 0x0); // Wait for RWP clear.
+    while ((gic_dist->GICD_CTLR & 0x80000000) != 0x0) {} // Wait for RWP clear.
 
     return result;
 }
@@ -479,13 +480,15 @@ uint32_t R_GIC_Enable(void) {
 uint32_t R_GIC_GetRedistID(uint32_t affinity) {
     uint32_t index = 0;
 
-    if (gic_rdist == 0)
+    if (gic_rdist == 0) {
       return 0xFFFFFFFF;
+    }
 
     do
     {
-      if ((gic_rdist[index].target_ctrl.GICR_TYPER[1] & 0x0F) == (affinity & 0xFF))
+        if ((gic_rdist[index].target_ctrl.GICR_TYPER[1] & 0x0F) == (affinity & 0xFF)) {
          return index;
+        }
 
       index++;
     }
@@ -495,13 +498,13 @@ uint32_t R_GIC_GetRedistID(uint32_t affinity) {
 }
 
 uint32_t R_GIC_WakeUpRedist(uint32_t rd) {
-    if (gic_rdist == 0)
+    if (gic_rdist == 0) {
         return 1;
+    }
 
     gic_rdist[rd].target_ctrl.GICR_WAKER &= 0xFFFFFFFD;
 
-    while ((gic_rdist[rd].target_ctrl.GICR_WAKER&0x4) == 0x4) {
-    }
+    while ((gic_rdist[rd].target_ctrl.GICR_WAKER&0x4) == 0x4) {}
 
     return 0;
 }
@@ -544,8 +547,9 @@ uint32_t R_GIC_SetIntPriority(uint32_t ID, uint32_t rd, uint8_t priority) {
 
     if (ID < 32)
     {
-      if (rd > gic_max_rd)
+        if (rd > gic_max_rd) {
          return 1;
+        }
 
       gic_rdist[rd].sgi_ppi.GICR_IPRIORITYR[ID] = priority;
     }
@@ -558,8 +562,9 @@ uint32_t R_GIC_SetIntPriority(uint32_t ID, uint32_t rd, uint8_t priority) {
 }
 
 uint32_t R_GIC_SetIntType(uint32_t ID, uint32_t rd, uint32_t type) {
-    if (gic_rdist==0)
+    if (gic_rdist==0) {
         return 1;
+    }
 
     if (ID < 31)
     {
@@ -570,15 +575,18 @@ uint32_t R_GIC_SetIntType(uint32_t ID, uint32_t rd, uint32_t type) {
       GIC_SetConfiguration(gic_dist, ID, type);
     }
     else
+    {
       return 1;
+    }
     
     return 0;
 }
 
 uint32_t R_GIC_SetIntGroup(uint32_t ID, uint32_t rd, uint32_t security) {
     // Just support group 1 non secure
-    if (gic_rdist==0)
+    if (gic_rdist==0) {
         return 1;
+    }
 
     if (ID < 31)
     {
@@ -595,8 +603,9 @@ uint32_t R_GIC_SetIntGroup(uint32_t ID, uint32_t rd, uint32_t security) {
 }
 
 uint32_t R_GIC_SetIntRoute(uint32_t ID, uint32_t mode, uint32_t affinity) {
-    if (gic_rdist==0)
+    if (gic_rdist==0) {
         return 0xFFFFFFFF;
+    }
 
     if (ID >= 32)
     {
@@ -610,8 +619,9 @@ uint32_t R_GIC_SetIntRoute(uint32_t ID, uint32_t mode, uint32_t affinity) {
 uint32_t R_GIC_SetIntPending(uint32_t ID, uint32_t rd) {
     uint32_t bank;
 
-    if (gic_rdist==0)
+    if (gic_rdist==0) {
       return 0xFFFFFFFF;
+    }
 
     if (ID < 31) {
       gic_rdist[rd].sgi_ppi.GICR_ISPENDR[0] = 1 << (ID%32);
@@ -621,16 +631,18 @@ uint32_t R_GIC_SetIntPending(uint32_t ID, uint32_t rd) {
       GIC_SetPendingIRQ(gic_dist, ID);
       GIC_ClearPendingIRQ(gic_dist, ID);
     }
-    else
+    else {
       return 1;
+    }
 
     return 0;
 
 }
 
 uint32_t R_GIC_ClearIntPending(uint32_t ID, uint32_t rd) {
-    if (gic_rdist==0)
+    if (gic_rdist==0) {
       return 0xFFFFFFFF;
+    }
 
     if (ID < 31)
     {
@@ -640,8 +652,9 @@ uint32_t R_GIC_ClearIntPending(uint32_t ID, uint32_t rd) {
     {
       GIC_SetPendingIRQ(gic_dist, ID);
     }
-    else
+    else {
       return 1;
+    }
 
     return 0;
 }

@@ -113,7 +113,9 @@ int32_t R_SERIAL_ReConfigure(e_serial_devices_t device)
 	int ret = 0;
 
 	ret = console_init(device);
-	if (ret != 0) return ret;
+    if (ret != 0) {
+        return ret;
+    }
 	
 	ret = uart_set_pfc(device);
 	return ret;
@@ -172,8 +174,9 @@ static int uart_set_pfc(e_serial_devices_t device)
 
 int32_t R_SERIAL_PutString(const unsigned char *buffer, unsigned short length)
 {
-	if (!portInitialized)
+    if (!portInitialized) {
         return -1;
+    }
 
     if (log_sync)
     {
@@ -185,8 +188,9 @@ int32_t R_SERIAL_PutString(const unsigned char *buffer, unsigned short length)
 
     /* Send each character in the string, one at a time. */
     while (length--) {
-        if (*buffer == '\n')
+        if (*buffer == '\n') {
             console_putc('\r');
+        }
         console_putc(*buffer);
         buffer++;
     }
@@ -300,8 +304,9 @@ int printf_delay(const char *format, ...)
 static void outbyte(char c)
 {
 	/* Standard practice to convert \n to \r\n */
-	if (c == '\n')
+    if (c == '\n') {
 		console_putc('\r');
+    }
 
 	console_putc(c);
 }

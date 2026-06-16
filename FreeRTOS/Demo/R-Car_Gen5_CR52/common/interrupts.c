@@ -224,9 +224,9 @@ void Irq_SetupEntry(unsigned int id, IrqHandlerFn Handler, Context_t *Context)
 {
 	int ret;
 	/* Just in case... */
-	if (id > MAX_IRQ_NUMBER)
-		while (1)
-			;
+    if (id > MAX_IRQ_NUMBER) {
+        while (1) {}
+    }
 
 	ret = Irq_MergeSetup(id);
 
@@ -238,17 +238,16 @@ void Irq_SetupEntry(unsigned int id, IrqHandlerFn Handler, Context_t *Context)
 
 static void StubHandler(void *data)
 {
-	while (1)
-		;
+    while (1) {}
 }
 
 /* Remove a CR7 or INTC-RT GIC entry */
 void Irq_RemoveEntry(unsigned int id)
 {
 	/* Just in case... */
-	if (id > MAX_IRQ_NUMBER)
-		while (1)
-			;
+    if (id > MAX_IRQ_NUMBER) {
+        while (1) {}
+    }
 
 	Irq_Disable(id);
 
@@ -311,8 +310,7 @@ void vApplicationIRQHandler(uint32_t ulICCIAR)
 
 	if (!pEntry->Handler) {
 		/* No interrupt handler! */
-		while (1)
-			;
+		while (1) {}
 	}
 
     int channel_info = Irq_GetMergeStatReg(id);
@@ -328,8 +326,9 @@ int Irq_GetTableId(unsigned int id)
 {
 	for (unsigned int i = 0 ; i < sizeof(r8a78000_irq_table) / sizeof(r8a78000_irq_table[0]); i++)
 	{
-		if (id == r8a78000_irq_table[i].irq)
+        if (id == r8a78000_irq_table[i].irq) {
 			return i;
+        }
 	}
 
 	/* The irq id is not a merged interrupt */
@@ -353,8 +352,9 @@ int Irq_MergeSetup(unsigned int id)
     uint32_t timeout = 1000;
 
 	t_id = Irq_GetTableId(id);
-	if (t_id < 0)
+    if (t_id < 0) {
 		return t_id;
+    }
 
 	val = Irq_RegRead(r8a78000_irq_table[t_id].mask_reg);
 	val &= ~r8a78000_irq_table[t_id].mask_val;
@@ -365,8 +365,9 @@ int Irq_MergeSetup(unsigned int id)
         current_val = Irq_RegRead(r8a78000_irq_table[t_id].mask_reg);
     }
 
-    if (timeout == 0)
+    if (timeout == 0) {
         printf("Merge interrupt: Setup fail");
+    }
 
 	return 0;
 }
@@ -376,8 +377,9 @@ int Irq_GetMergeStatReg(unsigned int id)
 	int t_id;
 
 	t_id = Irq_GetTableId(id);
-	if (t_id < 0)
+    if (t_id < 0) {
 		return t_id;
+    }
 
 	return Irq_RegRead(r8a78000_irq_table[t_id].status_reg);
 }

@@ -197,8 +197,9 @@ int scmi_shmem_channel_free_set(const struct scmi_dev *shmem,
 		layout = (struct scmi_shmem_layout *)data->regmap[0];
 	}
 
-	if ((layout->chan_status & SCMI_SHMEM_CHAN_STATUS_FREE_BIT) != 0)
+	if ((layout->chan_status & SCMI_SHMEM_CHAN_STATUS_FREE_BIT) != 0) {
 		return SCMI_GENERIC_ERROR;
+	}
 
 	layout->chan_status |= SCMI_SHMEM_CHAN_STATUS_FREE_BIT;
 	return 0;
@@ -248,13 +249,18 @@ int scmi_shmem_init(struct scmi_dev *dev)
 {
 	uint8_t cpuid = __get_MPIDR() & 0xFF;
 
-	if (!dev)
+	if (!dev) {
 		return -EINVAL;
+	}
 
 	for (int i = 0; i < MAX_SHMEM_REGION; ++i)
+	{
 		if ((configs_main[i].size < sizeof(struct scmi_shmem_layout)) ||
 			(configs_2nd[i].size < sizeof(struct scmi_shmem_layout)))
+		{
 			return -EINVAL;
+		}
+	}
 
 	dev->data = &data;
 

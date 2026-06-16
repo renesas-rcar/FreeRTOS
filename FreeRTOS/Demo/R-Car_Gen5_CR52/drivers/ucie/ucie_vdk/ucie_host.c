@@ -122,8 +122,9 @@ void R_PCIE_InitHost(struct st_pcie_host *host, uint16_t channel)
     rcar_ucie_setup_rc(channel);
 
     ret = ucie_link_up(channel);
-    if (ret == 1)
+    if (ret == 1) {
         printf_delay("UCIe Link up\n");
-    else
+    } else {
         printf_delay("UCIe Link down\n");
+    }
 }

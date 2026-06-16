@@ -55,8 +55,9 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
 
 	clock_id = X5H_CLOCK_ID_MDLC_WDT0;
 	ret = R_StateManager_ClockOn(clock_id);
-	if (ret)
+    if (ret) {
 		printf("Error: Failed to set clock id %d ON.\r\n", clock_id);
+    }
 
 	switch(unit) {
 		case R_WWDT0:
@@ -167,27 +168,34 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
 		}
 
        ret = R_StateManager_ResetAssert(clock_id_0);
-       if (ret)
+        if (ret) {
                printf("Error: Failed to reset clock id %d.\r\n", clock_id_0);
+        }
+
        ret = R_StateManager_ResetAssert(clock_id_1);
-       if (ret)
+        if (ret) {
                printf("Error: Failed to reset clock id %d.\r\n", clock_id_1);
+        }
 
        ret = R_StateManager_ResetDeassert(clock_id_0);
-       if (ret)
+        if (ret) {
                printf("Error: Failed to DeassertReset clock id %d.\r\n", clock_id_0);
+        }
 
        ret = R_StateManager_ResetDeassert(clock_id_1);
-       if (ret)
+        if (ret) {
                printf("Error: Failed to DeassertReset clock id %d.\r\n", clock_id_1);
+        }
 
 	clk_rate = (wwdt_base_addr == 0xC1380000) ? CLK_LSIOSC : RCLK;
 	val = r_wwdt_read8(wwdt_base_addr + WDTA0MD);
-	if (!err_mode)
+    if (!err_mode) {
 		val &= ~WDTA0ERM;
+    }
 	val |= WDTA0OVF(TIMEOUT_TO_X(timeout_msec, wwdt_base_addr)) | WSIZE(wsize);
-	if (irq_75p)
+    if (irq_75p) {
 		val |= WDTA0WIE;
+    }
 
 	r_wwdt_write8(wwdt_base_addr + WDTA0MD, val);
 

@@ -111,8 +111,9 @@ bool rcar_ucie_calc_even_parity(uint64_t data)
 {
     int i;
 
-    for (i = 32; i > 0; i /= 2)
+    for (i = 32; i > 0; i /= 2) {
         data ^= data >> i;
+    }
 
     return (data & 1);
 }

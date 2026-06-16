@@ -622,8 +622,9 @@ static int pfcSetTdselControlReg(rcar_pfc_group_t grp, rcar_pfc_pin_t pin,
 
 static const int* findGroupByModule(st_module_config_t module) {
     for (int indx = 0; indx < sizeof(all_drv_groups)/sizeof(all_drv_groups[0]);indx++) {
-        if (all_drv_groups[indx].module_id == module.module_id)
+        if (all_drv_groups[indx].module_id == module.module_id) {
             return all_drv_groups[indx].group;
+        }
     }
     return NULL;
 }
@@ -641,8 +642,9 @@ int pfcInitModule(st_module_config_t module)
 
     for (indx = 0;;indx++)
     {
-        if (p_drv_grp[indx] == -1)
+        if (p_drv_grp[indx] == -1) {
             break;
+        }
 
         reg = (p_drv_grp[indx] & REG_TYPE_MASK) >>  (REG_TYPE_POS);
         grp = (p_drv_grp[indx] & GROUP_MASK)    >>  (GROUP_START_POS);
@@ -718,10 +720,12 @@ static void pfcPullMode(uint8_t enable, rcar_pfc_group_t grp, rcar_pfc_pin_t pin
 
     reg_addr = getPfcRegister(grp, GP_PULLEN);
     val = readl(reg_addr);
-    if (enable == PFC_ENABLE_PULL)
+    if (enable == PFC_ENABLE_PULL) {
         val |= BIT(pin);
-    if (enable == PFC_DISABLE_PULL)
+    }
+    if (enable == PFC_DISABLE_PULL) {
         val &= ~BIT(pin);
+    }
     pfcWrite(grp, reg_addr, val);
 }
 
@@ -731,10 +735,12 @@ static void pfcSetPullType(uint8_t option, rcar_pfc_group_t grp, rcar_pfc_pin_t 
 
     reg_addr = getPfcRegister(grp, GP_PUDSEL);
     val = readl(reg_addr);
-    if (option == RCAR_PFC_PULL_UP)
+    if (option == RCAR_PFC_PULL_UP) {
         val |= BIT(pin);
-    if (option == RCAR_PFC_PULL_DOWN)
+    }
+    if (option == RCAR_PFC_PULL_DOWN) {
         val &= ~BIT(pin);
+    }
     pfcWrite(grp, reg_addr, val);
 }
 

@@ -156,8 +156,9 @@ __STATIC_INLINE void bss_init(unsigned int* section_begin, unsigned int* section
   // Iterate and clear word by word.
   // It is assumed that the pointers are word aligned.
   unsigned int *p = section_begin;
-  while (p < section_end)
+    while (p < section_end) {
     *p++ = 0;
+    }
 }
 
 static void FPU_Enable(void)

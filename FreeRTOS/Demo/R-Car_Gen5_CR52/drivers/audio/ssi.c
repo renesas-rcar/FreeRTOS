@@ -62,24 +62,25 @@ void ssi_stop(ssi_conf_t *p_conf)
 {
 	uint32_t cr_own = p_conf->cr_own;
 	cr_own &= ~(EN);
-	while(((*((volatile uint32_t *)(SSI0SR(p_conf->chan)))) & DIRQ) == 0u);
+	while(((*((volatile uint32_t *)(SSI0SR(p_conf->chan)))) & DIRQ) == 0u) {}
 	*((volatile uint32_t *)(SSICR0(p_conf->chan))) &= ~(EN);
-	while(((*((volatile uint32_t *)(SSI0SR(p_conf->chan)))) & IDST) == 0u);
+	while(((*((volatile uint32_t *)(SSI0SR(p_conf->chan)))) & IDST) == 0u) {}
 	p_conf->cr_own = cr_own;
 }
 
 void ssi_trans(ssi_conf_t *p_conf, uint32_t data)
 {
-	while(((*((volatile uint32_t *)(SSI0SR(p_conf->chan)))) & DIRQ) == 0u);
+	while(((*((volatile uint32_t *)(SSI0SR(p_conf->chan)))) & DIRQ) == 0u) {}
 	*((volatile uint32_t *)(SSI0TDR(p_conf->chan))) = data;
 }
 
 int ssi_receive(ssi_conf_t *p_conf)
 {
 	uint32_t data;
-	while(((*((volatile uint32_t *)(SSI0SR(p_conf->chan)))) & DIRQ) == 0u);
-	while(((*((volatile uint32_t *)(SSI0SR(p_conf->chan)))) & DIRQ) == 1u)
+    while(((*((volatile uint32_t *)(SSI0SR(p_conf->chan)))) & DIRQ) == 0u) {}
+    while(((*((volatile uint32_t *)(SSI0SR(p_conf->chan)))) & DIRQ) == 1u) {
 			data = *((volatile uint32_t *)(SSI0RDR(p_conf->chan)));
+    }
 	return data;
 }
 

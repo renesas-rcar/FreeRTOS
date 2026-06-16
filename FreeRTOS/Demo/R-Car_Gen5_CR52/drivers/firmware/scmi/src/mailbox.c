@@ -133,13 +133,15 @@ int scmi_mbox_init(struct scmi_dev *transport)
 {
 	int ret;
 
-	if (!transport)
+	if (!transport) {
 		return -EINVAL;
+	}
 
 	/* Setup shmem */
 	ret = scmi_shmem_init(&shmem_dev);
-	if (ret)
+	if (ret) {
 		return -EINVAL;
+	}
 
 	/* Setup mbox spec */
 	ret = mfis_mailbox_init(&scmi_channel_16_0_priv.tx);

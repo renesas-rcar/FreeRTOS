@@ -113,8 +113,9 @@ static int is_done(wcrc_sub_module_t module, wcrc_ctrl_t * p_ctrl, uint32_t time
         vTaskDelay(1);
     }
 
-    if (is_done != true)
+    if (is_done != true) {
         return -1;
+    }
 
     return 0;
 }
@@ -142,8 +143,9 @@ int R_CRC_Wait_Operation(wcrc_ctrl_t * p_ctrl, uint32_t timeout)
         break;
     };
 
-    if (ret)
+    if (ret) {
         printf("%s: Waiting timeout\n", __func__);
+    }
 
     return ret;
 }
@@ -414,20 +416,24 @@ static int wcrc_enable_clock(wcrc_cfg_t const * const p_cfg)
     }
 
     ret = wcrc_get_clock_ids(p_cfg->unit, &wcrc_id, &crc_id, &kcrc_id);
-    if (ret) 
+    if (ret) {
         return ret;
+    }
 
     ret = R_StateManager_ClockOn(wcrc_id); 
-    if (ret) 
+    if (ret) {
         return ret;
+    }
 
     ret = R_StateManager_ClockOn(crc_id);  
-    if (ret) 
+    if (ret) {
         return ret;
+    }
 
     ret = R_StateManager_ClockOn(kcrc_id); 
-    if (ret) 
+    if (ret) {
         return ret; 
+    }
     
     return 0;
 }

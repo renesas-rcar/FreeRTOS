@@ -148,15 +148,17 @@ void platform_update_vring_addr(struct remoteproc *rproc, unsigned int vdev_id, 
 	size_t vdev_rsc_offset;
 	unsigned int num_vrings, i;
 
-	if (role == VIRTIO_DEV_DEVICE)
+    if (role == VIRTIO_DEV_DEVICE) {
 		return;
+    }
 
 	metal_assert(rproc);
 	metal_mutex_acquire(&rproc->lock);
 
 	vdev_rsc_offset = find_rsc(rsc_table, RSC_VDEV, vdev_id);
-	if (!vdev_rsc_offset)
+    if (!vdev_rsc_offset) {
 		goto err;
+    }
 
 	vdev_rsc = (struct fw_rsc_vdev *)(rsc_table + vdev_rsc_offset);
 	num_vrings = vdev_rsc->num_of_vrings;
@@ -167,8 +169,9 @@ void platform_update_vring_addr(struct remoteproc *rproc, unsigned int vdev_id, 
 
 		vring_rsc = &vdev_rsc->vring[i];
 
-		if (vring_rsc->da == FW_RSC_U32_ADDR_ANY)
+        if (vring_rsc->da == FW_RSC_U32_ADDR_ANY) {
 			vring_rsc->da = priv->vring_mem_pa + i * priv->vring_mem_offset;
+        }
 	}
 
 err:

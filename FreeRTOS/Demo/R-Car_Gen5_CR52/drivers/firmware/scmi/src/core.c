@@ -66,8 +66,10 @@ static int scmi_agent_respond(const struct scmi_dev *transport,
 	struct scmi_message msg;
 
 	/* Set channel is as notification to receive msg */
-	if (!chan->is_notification)
+	if (!chan->is_notification) {
 		chan->is_notification = true;
+	}
+
 	ret = scmi_transport_channel_free_set(transport, chan);
 	if (ret) {
 		SCMI_LOG_ERR("Failed to respond.");
@@ -108,11 +110,13 @@ static void scmi_notification_process(void *unused)
 
 	for(;;) {
 		vTaskDelay(1);
-		if (xSemaphoreTake(hasNotifSemaphore, portMAX_DELAY) != pdTRUE)
+		if (xSemaphoreTake(hasNotifSemaphore, portMAX_DELAY) != pdTRUE) {
 			continue;
+		}
 
-		if (!hasNotifEvent)
+		if (!hasNotifEvent) {
 			continue;
+		}
 
 		hasNotifEvent = false;
 		xSemaphoreTake(chanModeMutex, portMAX_DELAY);
@@ -147,8 +151,9 @@ static void scmi_notification_process(void *unused)
 			/* Set channel for command */
 			chan->is_notification = false;
 			 xSemaphoreGive(chanModeMutex);
-			if (cb_list[protocol_id - SCMI_PROTOCOL_BASE])
+			if (cb_list[protocol_id - SCMI_PROTOCOL_BASE]) {
 				cb_list[protocol_id - SCMI_PROTOCOL_BASE](&notifier);
+			}
 		} else {
 			scmi_agent_respond(transport, chan);
 			/* Set channel for command */
@@ -220,7 +225,7 @@ int scmi_send_message(struct scmi_protocol *proto,
 	/* Wait until the message is read by SCP.
 	 * Will add timeout in the future.
 	 */
-	while (!api->channel_is_free(proto->transport, proto->tx));
+	while (!api->channel_is_free(proto->transport, proto->tx)) {}
 
     ret = scmi_transport_read_message(proto->transport, proto->tx, reply);
     if (ret < 0) {

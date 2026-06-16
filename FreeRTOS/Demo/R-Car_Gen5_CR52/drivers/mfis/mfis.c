@@ -52,8 +52,9 @@ void mfis_interrupt_cb(void* data)
     ch->int_source = mfis_get_int_source_num(ch);
     ch->recv_message = mfis_get_message(ch);
 
-    if(ch->cb_function != (void*)0)
+    if(ch->cb_function != (void*)0) {
         ch->cb_function(ch->arg);
+    }
 
     /* Clear interrupt flag */
     uint32_t value;

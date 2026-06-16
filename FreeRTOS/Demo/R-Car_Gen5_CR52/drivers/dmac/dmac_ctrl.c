@@ -99,8 +99,9 @@ void R_DMAC_RcarInterruptHandler(void* p_context)
         }
     }
 
-    if (args->p_callback != NULL)
+    if (args->p_callback != NULL) {
         args->p_callback(args->p_context);
+    }
 }
 
 static int R_DMAC_SetInterruptCallback(uint8_t irq, IrqHandlerFn handler, void *irq_arg)

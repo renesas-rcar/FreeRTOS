@@ -96,7 +96,7 @@ __attribute__((weak)) void vApplicationMallocFailedHook( void )
     /* Weak function  */
     /* if want to use this function redefine this function */
     printf("%s\n", __func__);
-    for(;;);
+    for(;;) {}
 }
 
 typedef void* TaskHandle_t;

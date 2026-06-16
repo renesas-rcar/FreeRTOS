@@ -329,8 +329,9 @@ int R_StateManager_SCMI_Info_Show(void)
 			return ret;
 		}
 		SM_LOG_INFO("SCMI base protocol num_protocols: %d", num_protocols);
-		for (i = 0; i < num_protocols; ++i)
+		for (i = 0; i < num_protocols; ++i) {
 			SM_LOG_INFO("protocols[%d] = %d", i, protocols[i]);
+		}
 
         if (protocols != NULL)
         {
@@ -435,10 +436,11 @@ int R_StateManager_Power_Get(int domain_id, e_power_state_t *state)
 		return ret;
 	}
 
-	if (pwr_cfg.power_state == SCMI_POWER_STATE_ON)
+	if (pwr_cfg.power_state == SCMI_POWER_STATE_ON) {
 		*state = POWER_ON;
-	else if (pwr_cfg.power_state == SCMI_POWER_STATE_OFF)
+	} else if (pwr_cfg.power_state == SCMI_POWER_STATE_OFF) {
 		*state = POWER_OFF;
+	}
 
 	return 0;
 }

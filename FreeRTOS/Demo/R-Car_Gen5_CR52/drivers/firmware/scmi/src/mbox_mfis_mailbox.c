@@ -77,8 +77,9 @@ static void mfis_mailbox_isr(Context_t *context)
 			continue;
 		}
 
-		if (data->cb[i] && data->user_data[i])
+		if (data->cb[i] && data->user_data[i]) {
 			data->cb[i](NULL, 0, data->user_data[i], NULL);
+		}
 	}
 }
 
@@ -91,8 +92,9 @@ static int mfis_mailbox_send(const struct scmi_dev *dev, uint32_t channel,
 	uint32_t mfis_irq = X5H_MFIS_SCP_IRQ_REG_SOURCE(0U) |
 						X5H_MFIS_SCP_IRQ_REG_INT(1U);
 
-	if (channel >= MAILBOX_MAX_CHANNELS)
+	if (channel >= MAILBOX_MAX_CHANNELS) {
 		return -EINVAL;
+	}
 
 	if (msg == NULL) {
 		MFIS_SCP_REG_MFISRSEMBR(cfg->base, mfis_rtcore_num) = mfis_msg;
@@ -101,8 +103,9 @@ static int mfis_mailbox_send(const struct scmi_dev *dev, uint32_t channel,
 		return 0;
 	}
 
-	if (msg->size != MAILBOX_MBOX_SIZE)
+	if (msg->size != MAILBOX_MBOX_SIZE) {
 		return -EMSGSIZE;
+	}
 
 	/* No code here */
 	return 0;
@@ -172,8 +175,9 @@ int mfis_mailbox_init(struct mbox_spec *spec)
 	struct scmi_dev *dev = &mfis_dev;
 	int irq_id = CURRENT_CORE_IDX + SCP2CR_INT_BASE_ID;
 
-	if (!spec)
+	if (!spec) {
 		return -EINVAL;
+	}
 
 	/* Set Handler for Irq */
 	Irq_SetupEntry(irq_id, (IrqHandlerFn)mfis_mailbox_isr, &mfis_mailbox_cxt);

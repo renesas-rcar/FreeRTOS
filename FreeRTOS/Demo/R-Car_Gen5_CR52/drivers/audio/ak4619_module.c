@@ -431,13 +431,24 @@ int ak4619_module_init(ak4619_instance_set_t *instance_set, uint8_t max_channel,
     ak4619_i2c_init();
     uint8_t ret = 0;
     ret = ak4619_set_reset_bit(false); // make sure to set RSTN bit = 0
-    if (ret != 0) return ret;
+    if (ret != 0) {
+        return ret;
+    }
+
     ret = ak4619_configure_word_length(instance_set->didl_set, WORD_24BIT); // DODL 24 bit hardcode because it dont use now, so use default for it
-    if (ret != 0) return ret;
+    if (ret != 0) {
+        return ret;
+    }
+    
     ret = ak4619_configure_audio_format(instance_set->format); // only support one mode currently
-    if (ret != 0) return ret;
+    if (ret != 0) {
+        return ret;
+    }
+    
     ret = ak4619_configure_clock(instance_set->mclk_multiplier, max_channel, bit_per_channel, instance_set->fs);
-    if (ret != 0) return ret;
+    if (ret != 0) {
+        return ret;
+    }
 
     uint8_t reg_v = 0;
     if (R_I2C_ReadRegMap(&g_i2c_device_ak4619, REG_AUDIO_IF_FORMAT_ADDRESS_1, &reg_v, sizeof(reg_v)) != 0) 
@@ -457,13 +468,21 @@ int ak4619_module_init(ak4619_instance_set_t *instance_set, uint8_t max_channel,
 
     ak4916_set_volume();
 
-
     ret = ak4619_set_dac(true); // enable DAC1 
-    if (ret != 0) return ret;
+    if (ret != 0) { 
+        return ret;
+    }
+    
     ret = ak4619_configure_input_dac(instance_set->dac_1);
-    if (ret != 0) return ret;
+    if (ret != 0) { 
+        return ret;
+    }
+    
     ret = ak4619_set_reset_bit(true); // release reset state, set RSTN bit = 1 -> normal operation
-    if (ret != 0) return ret;
+    if (ret != 0) { 
+        return ret;
+    }
+    
     return 0;  
 }
 

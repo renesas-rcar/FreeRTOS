@@ -84,10 +84,11 @@ int R_GPIO_PinWriteOutput(rcar_gpio_group_t grp, rcar_pin_t pin, bool lvl)
     uint32_t reg_addr;
 
     reg_addr = getGpioRegister(grp, GP_OUTDT);
-    if (lvl)
+    if (lvl) {
         setbit_l(reg_addr, pin);
-    else
+    } else {
         clearbit_l(reg_addr, pin);
+    }
 
     return 0;
 }
@@ -114,10 +115,11 @@ bool R_GPIO_PinReadInput(rcar_gpio_group_t grp, rcar_pin_t pin)
     uint32_t bit = BIT(pin);
     bool pin_val;
 
-    if (readl(getGpioRegister(grp, GP_INOUTSEL)) & bit)
+    if (readl(getGpioRegister(grp, GP_INOUTSEL)) & bit) {
             pin_val = !!(readl(getGpioRegister(grp, GP_OUTDT)) & bit);
-    else
+    } else {
             pin_val = !!(readl(getGpioRegister(grp, GP_INDT)) & bit);
+    }
 
     return pin_val;
 }
@@ -195,11 +197,12 @@ int R_GPIO_PinConfigInterruptMode(rcar_gpio_group_t grp, rcar_pin_t pin,
     /* (1) Set the positive or negative logic as the interrupt
      *     input condition in POSNEG.
      */
-    if (trigger_mode == RCAR_INTERRUPT_INPUT_RISING_EDGE)
+    if (trigger_mode == RCAR_INTERRUPT_INPUT_RISING_EDGE) {
         clearbit_l(getGpioRegister(grp, GP_POSNEG), pin);
-    else
+    } else {
         setbit_l(getGpioRegister(grp, GP_POSNEG), pin);
-
+    }
+    
     /* (2) Set the edge (set to 1) as the interrupt input
      *     condition in EDGLEVEL.
      */
@@ -208,10 +211,11 @@ int R_GPIO_PinConfigInterruptMode(rcar_gpio_group_t grp, rcar_pin_t pin,
     /* (3) Set the one edge/both edge as the interrupt input
      *     condition in BOTHEDGE.
      */
-    if (trigger_mode == RCAR_INTERRUPT_INPUT_BOTH_EDGE)
+    if (trigger_mode == RCAR_INTERRUPT_INPUT_BOTH_EDGE) {
         setbit_l(getGpioRegister(grp, GP_BOTHEDGE), pin);
-    else
+    } else {
         clearbit_l(getGpioRegister(grp, GP_BOTHEDGE), pin);
+    }
 
     /* Select "Input Enable" in INEN */
     setbit_l(getGpioRegister(grp, GP_INEN), pin);
@@ -377,7 +381,7 @@ static uint32_t getGpioRegister(rcar_gpio_group_t grp, uint32_t offset)
 
 hang_drive:
     printf("GPIO group %d not exist!\n", grp);
-    while(1);
+    while(1) {}
 }
 
 static void gpioSetGeneralOutputMode(rcar_gpio_group_t grp, rcar_pin_t pin)

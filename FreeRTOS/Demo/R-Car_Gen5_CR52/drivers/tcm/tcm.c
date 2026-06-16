@@ -74,9 +74,9 @@ static uint32_t Get_Bit_Field_TCM_Size(rcar_tcm_size_t * p_size)
     rcar_tcm_size_t size = *p_size;
     uint32_t bit_field = 0;
 
-    if (size != RCAR_TCM_SIZE_8KB && size != RCAR_TCM_SIZE_16KB &&
-        size != RCAR_TCM_SIZE_32KB)
+    if (size != RCAR_TCM_SIZE_8KB && size != RCAR_TCM_SIZE_16KB && size != RCAR_TCM_SIZE_32KB) {
         return 0;
+    }
 
     switch (size) {
         case RCAR_TCM_SIZE_8KB:
@@ -100,9 +100,9 @@ static uint32_t Get_Bit_Field_TCM_EL(rcar_tcm_el_t * p_el)
     rcar_tcm_el_t el= *p_el;
     uint32_t bit_field = 0;
 
-    if (el != RCAR_TCM_EL0 && el != RCAR_TCM_EL1 &&
-        el != RCAR_TCM_EL2)
+    if (el != RCAR_TCM_EL0 && el != RCAR_TCM_EL1 && el != RCAR_TCM_EL2) {
         return 0;
+    }
 
     switch (el) {
         case RCAR_TCM_EL0:
@@ -125,12 +125,14 @@ void ConfigureTCM(rcar_tcm_region_t region, uint32_t base_addr, rcar_tcm_size_t 
 {
     uint32_t reg_val = 0, bit_field_size = 0;
 
-    if (!IS_8KB_ALIGNED(base_addr))
+    if (!IS_8KB_ALIGNED(base_addr)) {
         return;
+    }
 
     bit_field_size = Get_Bit_Field_TCM_Size(&size);
-    if (bit_field_size == 0)
+    if (bit_field_size == 0) {
         return;
+    }
 
     reg_val = base_addr | bit_field_size;
     WriteTCM(region, reg_val);
@@ -140,12 +142,14 @@ void ControlTCM(rcar_tcm_region_t region, rcar_tcm_el_t el, rcar_tcm_state_t sta
 {
     uint32_t reg_val = 0, bit_field_el = 0;
 
-    if (state != RCAR_TCM_ENABLE && state != RCAR_TCM_DISABLE)
+    if (state != RCAR_TCM_ENABLE && state != RCAR_TCM_DISABLE) {
         return;
+    }
 
     bit_field_el = Get_Bit_Field_TCM_EL(&el);
-    if (bit_field_el == 0)
+    if (bit_field_el == 0) {
         return;
+    }
 
     reg_val = ReadTCM(region);
 
