@@ -34,18 +34,23 @@ if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "
     if(BOARD STREQUAL "x5h_vdk")
         set(BOARD_ID 1)
         set(PLATFORM_DEVICE_TREE "device_tree_x5h.h")
+        set(PLATFORM_DEVICE "x5h")
     elseif(BOARD STREQUAL "x5h_ironhide")
         set(BOARD_ID 3)
         set(PLATFORM_DEVICE_TREE "device_tree_x5h.h")
+        set(PLATFORM_DEVICE "x5h")
     elseif(BOARD STREQUAL "x5h_rfs2")
         set(BOARD_ID 4)
         set(PLATFORM_DEVICE_TREE "device_tree_x5h.h")
+        set(PLATFORM_DEVICE "x5h")
     elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
         set(BOARD_ID 2)
         set(PLATFORM_DEVICE_TREE "device_tree_mdp_aiacc.h")
+        set(PLATFORM_DEVICE "aiacc")
     elseif(BOARD STREQUAL "mdp_aiacc_hil")
         set(BOARD_ID 5)
         set(PLATFORM_DEVICE_TREE "device_tree_mdp_aiacc.h")
+        set(PLATFORM_DEVICE "aiacc")
     else()
         message(FATAL_ERROR "Invalid BOARD: ${BOARD}.")
     endif()
@@ -253,6 +258,8 @@ target_include_directories(freertos_bsp
         $<BUILD_INTERFACE:${POSIX_DIR}/FreeRTOS-Plus-POSIX/include/portable>
         # LOGGING
         $<BUILD_INTERFACE:${LOGGING_DIR}>
+        # COMMON
+        $<BUILD_INTERFACE:${BSP_DIR}/common/include/${PLATFORM_DEVICE}>
         
         $<INSTALL_INTERFACE:include/kernel/include>
         $<INSTALL_INTERFACE:include>
@@ -303,6 +310,11 @@ install(
 # Specify device tree header depend on BOARD_ID
 install(
     FILES ${BSP_DIR}/include/${PLATFORM_DEVICE_TREE}
+    DESTINATION include
+)
+
+install(
+    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/device_tree.h
     DESTINATION include
 )
 

@@ -38,13 +38,7 @@
 
 #include "pfc/r_pfc_api.h"
 
-#if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
-
-#include "device_tree_x5h.h"
-#else   // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
-
-#include "device_tree_mdp_aiacc.h"
-#endif  // (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+#include "device_tree.h"
 
 #include "smmu/smmu.h"
 #include "ucie/r_ucie.h"

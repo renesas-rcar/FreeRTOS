@@ -15,13 +15,7 @@ extern "C" {
 #include <stdbool.h>
 #include "board.h"
 
-#if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
-
-#include "device_tree_x5h.h"
-#else   // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
-
-#include "device_tree_mdp_aiacc.h"
-#endif  // (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+#include "device_tree.h"
 
 /**
 * @defgroup PFC_Module Pin Function Control Module

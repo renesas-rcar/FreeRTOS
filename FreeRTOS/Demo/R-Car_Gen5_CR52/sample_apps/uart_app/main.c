@@ -39,13 +39,7 @@
 #include "serial/r_serial.h"
 #include "pfc/r_pfc_api.h"
 
-#if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
-
-#include "device_tree_x5h.h"
-#else   // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
-
-#include "device_tree_mdp_aiacc.h"
-#endif  // (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+#include "device_tree.h"
 
 #define main_LOG_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
