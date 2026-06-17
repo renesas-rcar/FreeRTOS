@@ -9,6 +9,8 @@
 #ifndef R_UCIE_COMMON_H
 #define R_UCIE_COMMON_H
 
+#include "ucie/r_ucie.h"
+
 #define UCIE_AXI_BASE(n)    (0xD8000000U + (n) * 0x1000000)
 #define UCIE_APB_BASE(n)    (0xDC000000U + (n) * 0x1000000)
 
@@ -40,6 +42,15 @@
 #define HSCS_APB_PLL9_1SCR  (uintptr_t)(HSCS_APB  + 0x1310  )
 #define HSCS_APB_PLL9_1DCR  (uintptr_t)(HSCS_APB  + 0x1314  )
 #define HSCS_APB_CLKHSCSPKCPROT0    (uintptr_t)(HSCS_APB  + 0x1370  )
+
+/**
+ * @brief Struct for config UCIe
+*/
+typedef struct st_ucie_ctrl {
+    e_ucie_mode_t mode;         /* UCIe mode */
+    e_ucie_linkspeed_t speed;   /* UCIe transfer speed */
+    bool init_with_system;      /* Init and linkup when system available */
+} st_ucie_ctrl_t;
 
 typedef struct{
     uint32_t PLL9_CR0;
@@ -125,5 +136,20 @@ typedef struct
 #define IATU_UPPR_LIMIT_ADDR_OFF    (0x20)
 
 #define IATU_ADDR_MASK              (0xFFF)
+
+void Ucie_PowerOFF(e_ucie_ch_t ch);
+void Ucie_PowerOn(e_ucie_ch_t ucie_ch);
+void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode);
+void Ucie_Start_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode, e_ucie_linkspeed_t speed);
+uint32_t Ucie_Wait_FreqChange_Req(e_ucie_ch_t ch);
+uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed);
+uint32_t Ucie_Wait_Linkup(e_ucie_ch_t ch);
+void Ucie_Setup_PCIE_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode);
+void Ucie_Setup_PCIE_Start_LinkUp(e_ucie_ch_t ch, e_ucie_mode_t mode);
+uint32_t Ucie_Setup_PCIE_Wait_LinkUp(e_ucie_ch_t ch);
+void Ucie_Setup_PCIE_Post(e_ucie_ch_t ch, e_ucie_mode_t mode);
+
+st_ucie_ctrl_t ucie_get_config(e_ucie_ch_t ch);
+void ucie_set_setup_flag(e_ucie_ch_t ch);
 
 #endif /* R_UCIE_COMMON_H */

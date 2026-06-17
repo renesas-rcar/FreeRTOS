@@ -21,6 +21,8 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
 /**
  * @brief Enum representing different UCIe channel.
  *
@@ -188,6 +190,20 @@ typedef struct st_ucie_iatu_cfg {
     uint32_t size;              /**< Region size >*/
 } st_ucie_iatu_cfg_t;
 
+/**
+ * @brief Config UCIe protocol.
+ *
+ * This function using for config UCIe protocol.
+ *
+ * @param[in] ch                UCIe channel.
+ * @param[in] mode              UCIe mode.
+ * @param[in] speed             UCIe transfer speed.
+ * @param[in] init_with_system  Init and linkup when system available.
+ *
+ * @return 0 if success, other is error.
+ */
+uint32_t R_UCIE_Config(e_ucie_ch_t ch, e_ucie_mode_t mode,
+                       e_ucie_linkspeed_t speed, bool init_with_system);
 
 /**
  * @brief Setup UCIe protocol.
@@ -218,6 +234,17 @@ e_ucie_linkup_status_t R_UCIE_Setup(e_ucie_ch_t ch, e_ucie_mode_t mode,
  */
 e_ucie_linkup_status_t R_UCIE_Retry_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode,
                                            e_ucie_linkspeed_t speed, uint16_t retry);
+
+/**
+ * @brief Get UCIe status.
+ *
+ * This function using for get UCIe status.
+ *
+ * @param[in] ch        UCIe channel.
+ *
+ * @return Linkup status.
+ */
+e_ucie_linkup_status_t R_UCIE_Get_Linkup_Status(e_ucie_ch_t ch);
 
 /**
  * @brief UCIe HDMA start.

@@ -27,6 +27,12 @@
  *
  */
 
+/**
+ * @brief This sample is for demonstrate linkup, HDMA and PIO of UCIe
+ *        between CR core and CR core of two chiplet. This is for
+ *        UCIe channel 1 with mode EP.
+ */
+
 /* Scheduler include files. */
 #include "FreeRTOS.h"
 #include "task.h"
@@ -60,10 +66,17 @@
 
 #define DBSC01_HDMA_PA(n)       (DRAM_DBSC01_ADDR_PA + (n) * DMA_SIZE_PER_CHAN)
 
+/*----- UCIe test parameter -----*/
+#define UCIE_CH     UCIE_CH1
+
+// depend on D2D Region of UCIE_CH of RC.
+#define UCIE_PIO_MEM    (0x24000000000ULL)
+/*---------------------------------*/
+
 // For EP write RC read test data
 st_ucie_hdma_cfg_t hdma_tbl_wrtest_dt[] = {    // UCIE1 WRCHx1
     /*  ucie_ch     hdma_ch     mSrcAddr            mDestAddr           size                rw */
-    {   UCIE_CH1,   HDMA_CH0,   DBSC01_HDMA_PA(0),  DBSC01_HDMA_PA(1),  DMA_SIZE_PER_CHAN,  0,  },
+    {   UCIE_CH,   HDMA_CH0,   DBSC01_HDMA_PA(0),  DBSC01_HDMA_PA(1),  DMA_SIZE_PER_CHAN,  0,  },
     {   0,          0,          0x0,                0x0,                0x0,                0,  },  // End Of Table
 };
 
@@ -158,6 +171,8 @@ static void prvSetupHardware( void )
     Irq_Setup();
 
     (void)pfcInitModules(getModuleConfigs());
+
+    R_UCIE_Config(UCIE_CH, UCIE_MODE_EP, LINKSPEED_4GTPS, true);
 }
 
 /*-----------------------------------------------------------*/
@@ -174,14 +189,11 @@ static void ucie_comm_task(void *pvParameters)
     uint32_t val;
     uint8_t index;
     *(st_ucie_trigger_sig_t*)UCIE_LOOPCHECK_ADDR = (st_ucie_trigger_sig_t){0};
-    
-    /* ucie_chan = 1 - Endpoint */
+
     printf("<----- [EP] TC1: UCIE LINKUP ----->\n");
     
-    ret = R_UCIE_Setup(UCIE_CH1, UCIE_MODE_EP, LINKSPEED_16GTPS);
-    if (ret == LINKUP_TIMEOUT) {
-        printf("The first time linkup timeout. Retry 30 times\n");
-        ret = R_UCIE_Retry_Linkup(UCIE_CH1, UCIE_MODE_EP, LINKSPEED_16GTPS, 30);
+    while (R_UCIE_Get_Linkup_Status(UCIE_CH) != LINKUP_SUCCESS){
+        __asm__ volatile("nop");
     }
 
     if (ret) {
@@ -263,11 +275,11 @@ static void ucie_comm_task(void *pvParameters)
     }
 
     printf("<----- [EP] TC 4: PIO TRANSFER ----->\n");
-    uint64_t ucie1_mem = 0x24000000000;
+    uint64_t ucie1_mem = UCIE_PIO_MEM;
     uint32_t ucie1_in = 0x9B000000;
 
     st_ucie_iatu_cfg_t cfg = {
-        .ucie_ch = UCIE_CH1,
+        .ucie_ch = UCIE_CH,
         .rgn = IATU_RGN0,
         .type = IATU_INBOUND,
         .mSrcAddr = ucie1_mem,
@@ -277,6 +289,9 @@ static void ucie_comm_task(void *pvParameters)
 
     R_UCIE_IATU_SetRegion(&cfg);
     
+    /* EP Write RC Read */
+    *((volatile uint32_t*)ucie1_in) = PIO_EP_WRITE_DATA;
+
     /* RC Write EP Read */
     ret = 1;
     start = R_UTILS_GetTimerCounter();
@@ -294,9 +309,6 @@ static void ucie_comm_task(void *pvParameters)
     else {
         printf("Result: PASSED\n");
     }
-
-    /* EP Write RC Read */
-    *((volatile uint32_t*)ucie1_in) = PIO_EP_WRITE_DATA;
 
     printf("<APP_END>\n");
 

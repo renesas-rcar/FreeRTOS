@@ -10,17 +10,25 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "FreeRTOS.h"
-#include "task.h"
-
 #include "ucie/r_ucie.h"
 #include "ucie_private.h"
 #include "ucie_common.h"
+#include "r_ucie_conf_private.h"
 
 #include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_power_domain_id.h"
 #include "state-manager/r_reset_domain_id.h"
 #include "state-manager/r_state_manager.h"
+
+#define NOT_SCP_SUPPORT 1 // SCP firmware not support.
+#if (NOT_SCP_SUPPORT == 1)
+#include "clock_controller/clock_controller.h"
+#endif
+
+static bool ucie_is_setup[] = {
+    [UCIE_CH0] = false,
+    [UCIE_CH1] = false
+};
 
 static void wait_time(uint32_t count)
 {
@@ -194,7 +202,7 @@ uint32_t R_UCIE_HDMA_Stop(st_ucie_hdma_cfg_t *cfg)
     return 0;
 }
 
-static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
+void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
 {
     uintptr_t ucie_axi_base;
     uintptr_t ucie_apb_base;
@@ -215,9 +223,6 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     {
         //; UCIEFMIS
         mem_write32(ucie_apb_base + 0xE00308, 0x019A0000); // UCIEFMIS
-
-        // NOTE: EVB code originally had this line:
-        // *(volatile uint32_t *)UCIE_APB_UCIECNFGINFO2(Ch) = 0x00000070;  // set BDF, Bus number 0x70
 
         mem_write32(ucie_apb_base + 0xE00000, 0x00000010); // UCIE0 -> RC
 
@@ -300,28 +305,28 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
 
     mem_write32(ucie_axi_base + DVSEC_UNIT_DSP_DVSEC_UCIE_LINK_CONTROL_ADD, 0x00004000);
 
-    #ifdef RCAR_UCIE_V100
+#ifdef RCAR_UCIE_V100
     mem_write32( ucie_axi_base + CXL_DVSEC_UNIT_DSP_CXL_DVSEC_FLEX_CTL_STATUS_ADD, 0x00000027 );
-    #endif
-    #if defined(RCAR_UCIE_V101) || defined(RCAR_UCIE_V102)
+#endif
+#if defined(RCAR_UCIE_V101) || defined(RCAR_UCIE_V102)
     // VTB_adr : 0x0000042c, C code adr : 0xd8000420
     mem_write32( ucie_axi_base + RCAR_UCIE_BASE_ADD(0x42C), 0x00000027 ); // from UT result
-    #endif
+#endif
     //; UCIe0 axi setting 02
     //;  axi addres ON
     mem_write32(ucie_apb_base + 0xE005E8, 0x00004141);
 
-    #if defined(RCAR_UCIE_V101) || defined(RCAR_UCIE_V102)
+#if defined(RCAR_UCIE_V101) || defined(RCAR_UCIE_V102)
     mem_write32( ucie_axi_base + IMP_SPECIFIC_MB_UNIT_IMP_MB_CONFIG11_ADD, 0x00103001 );
 
     mem_write32( ucie_axi_base + IMP_SPECIFIC_MB_UNIT_IMP_MB_CONFIG11_ADD, 0x00103001 );
-    #endif
-    #ifdef RCAR_UCIE_V100
+#endif
+#ifdef RCAR_UCIE_V100
     mem_write32( ucie_axi_base + IMP_SPECIFIC_MB_UNIT_IMP_MB_CONFIG11_ADD, 0x00103000 );
     mem_write32( ucie_axi_base + IMP_SPECIFIC_MB_UNIT_IMP_MB_CONFIG11_ADD, 0x00103000 ); // X5H: bit[0] = 0 
-    #endif
+#endif
 
-    #ifdef RCAR_UCIE_V100
+#ifdef RCAR_UCIE_V100
     mem_write32(ucie_axi_base + MMPL_MMTRKCTRL_ADD, 0x00000002);
 
     mem_write32(ucie_axi_base + MMPL_MODULEDEGRADESTATUS_ADD, 0x0000FFFC);
@@ -406,10 +411,25 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     mem_write32( ucie_axi_base + DWORD_1_DWMISCCTRL0_ADD, 0x3D00A001 );
 
     mem_write32(ucie_axi_base + DWORD_1_DWMISCCTRL1_ADD, 0x01240800);
-    
+   
+#if (defined(RCAR_UCIE_V102) && defined( CONW_RCAR_UCIE_V102))
+    if (UCIE_CH1 == ch)
+    {
+        mem_write32( ucie_axi_base + DWORD_0_DWMISCCTRL0_ADD, 0x3D002001U );
+        mem_write32( ucie_axi_base + DWORD_1_DWMISCCTRL0_ADD, 0x3D002001U );
+    }
+    else
+    {
+        mem_write32( ucie_axi_base + DWORD_0_DWMISCCTRL0_ADD, 0x3D00A001U );
+        mem_write32( ucie_axi_base + DWORD_1_DWMISCCTRL0_ADD, 0x3D00A001U );
+    }
+#else
+	mem_write32( ucie_axi_base + DWORD_0_DWMISCCTRL0_ADD, 0x3D00A001U );
+    mem_write32( ucie_axi_base + DWORD_1_DWMISCCTRL0_ADD, 0x3D00A001U );
+#endif
     
     uint32_t reg_val;
-    #if defined(RCAR_UCIE_V101_W_V100) || defined(RCAR_UCIE_V102_W_V100)
+#if (defined(RCAR_UCIE_V102) && defined(CONW_RCAR_UCIE_V100))
     // Setting CSR for reversalMB
     mem_write32( ucie_axi_base + ACSMIM_ACSMINSTRREG25_ADD, 0x83000061U);
     mem_write32( ucie_axi_base + ACSM_ACSMLTSMMSK0VAR4_ADD, 0x48E23803);
@@ -454,9 +474,7 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     reg_val = reg_val & ACSM_ACSMTRAINVAR1I1_MASK;
     reg_val = reg_val & 0xFFFFFEFF;
     mem_write32(ucie_axi_base + ACSM_ACSMTRAINVAR1I1_ADD, reg_val);
-#endif
-    
-#if defined(RCAR_UCIE_V101_W_V100) || defined(RCAR_UCIE_V102_W_V100)
+
     // Setting PLL clock for X5H connection
     mem_write32(ucie_axi_base + MMPL_PLLCTRL0_P0_ADD, 0x3F3F100C);
     mem_write32(ucie_axi_base + MMPL_PLLCTRL0_P1_ADD, 0x3F3F100C);
@@ -798,10 +816,10 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     reg_val = reg_val &       ~( ACSM_ACSMCTRL_ACSMSTOPADDR_MASK  << ACSM_ACSMCTRL_ACSMSTOPADDR_SHIFT);
     reg_val = reg_val | (((uint32_t)0x28 & ACSM_ACSMCTRL_ACSMSTOPADDR_MASK) << ACSM_ACSMCTRL_ACSMSTOPADDR_SHIFT);
     mem_write32( ucie_axi_base + ACSM_ACSMCTRL_ADD, reg_val );
-    #endif
+#endif
 }
 
-static void Ucie_Start_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode, e_ucie_linkspeed_t speed)
+void Ucie_Start_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode, e_ucie_linkspeed_t speed)
 {
     uint32_t ucie_axi_base;
     uint32_t ucie_apb_base;
@@ -812,7 +830,7 @@ static void Ucie_Start_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode, e_ucie_linkspe
     //;  axi0 addres OFF
     mem_write32( ucie_apb_base + 0xE005E8, 0x00000000 );
 
-    uint32_t dvsecLinkControl = ((speed & LINKSPEED_MASK) << LINKSPEED_OFFSET) | 0x0000400C;
+    uint32_t dvsecLinkControl = ((speed & LINKSPEED_MASK) << LINKSPEED_OFFSET) | 0x00004000;
     mem_write32( ucie_axi_base + DVSEC_UNIT_DSP_DVSEC_UCIE_LINK_CONTROL_ADD, dvsecLinkControl);
 
     if(mode == UCIE_MODE_RC){
@@ -820,39 +838,28 @@ static void Ucie_Start_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode, e_ucie_linkspe
    }
 }
 
-static uint32_t Ucie_Wait_FreqChange_Req(e_ucie_ch_t ch)
+uint32_t Ucie_Wait_FreqChange_Req(e_ucie_ch_t ch)
 {
     uint32_t ret = 0;
     uint32_t mask, expect;
-    uint32_t timeout;
 
-    uint32_t ucie_axi_base;
     uint32_t ucie_apb_base;
 
-    ucie_axi_base = UCIE_AXI_BASE(ch);
     ucie_apb_base = UCIE_APB_BASE(ch);
 
     mask	= 0x000002;
     expect	= 0x000002;
-    timeout = 4500000; // ~3sec
 
-    while ((mem_read32(ucie_apb_base + 0xE1003C) & mask) != expect) {
-    //	mem_read32(ucie_axi_base + ACSM_ACSMLTSMSTATUS_ADD); // for debug
-        timeout--;
-        if (timeout == 0) {
+    if ((mem_read32(ucie_apb_base + 0xE1003C) & mask) != expect) {
             ret = 1;
-            break;
-        }
     }
 
     return ret;
 }
 
-static uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed)
+uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed)
 {
     uint32_t ret = 0;
-    uint32_t mask, expect;
-    uint32_t timeout;
     uint32_t ucie_apb_base;
     uint32_t ucie_axi_base;
     uint32_t clock_div;
@@ -885,18 +892,7 @@ static uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed)
     ucie_apb_base = UCIE_APB_BASE(ch);
     ucie_axi_base = UCIE_AXI_BASE(ch);
 
-    mask	= 0x000002;
-    expect	= 0x000000;
-    timeout = 4500000; // ~3sec
-
     mem_write32( ucie_apb_base + 0xE005E8, 0x00004141 );
-
-    if (ch == UCIE_CH0) {
-        set_pll9_0(speed);
-    }
-    else {
-        set_pll9_1(speed);
-    }
 
     mem_write32(ucie_axi_base + ACSM_ACSMWAITDLY0_ADD, freqdepprm.AcsmWaitDly0 * (speed + 1));
     mem_write32(ucie_axi_base + ACSM_ACSMWAITDLY1_ADD, freqdepprm.AcsmWaitDly1 * (speed + 1));
@@ -910,32 +906,22 @@ static uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed)
     mem_write32(ucie_axi_base + ACSM_ACSMTIMEOUTCTRL0_ADD, freqdepprm.acsmpmaborttimeout * (speed + 1) | (freqdepprm.acsmpmentrytimeout * (speed + 1) << 8));
     mem_write32(ucie_axi_base + ACSM_ACSMTIMEOUTCTRL1_ADD, freqdepprm.acsmltsmstatetimeout * (speed + 1) | (freqdepprm.acsmltsmmsgtimeout * (speed + 1) << 9) | (freqdepprm.acsmlinkerrtimeout * (speed + 1) << 18));
 
+#ifdef RCAR_UCIE_V100
     mem_write32(ucie_axi_base + MMPL_PLLCTRL1_ADD, pllprm[speed].div_sel | (pllprm[speed].v2i_mode << 10) | (pllprm[speed].vco_low_freq << 13));
     mem_write32(ucie_axi_base + MMPL_PLLCTRL0_ADD, (pllprm[speed].cp_prop_cntrl << 8) | (pllprm[speed].cp_int_cntrl) | (pllprm[speed].cp_prop_gs_cntrl << 24) | (pllprm[speed].cp_int_gs_cntrl << 16));
+#endif
     mem_write32(ucie_axi_base + MMPL_PLLCTRL3_ADD, pllprm[speed].upll_prog);
     mem_write32(ucie_axi_base + MMPL_PLLCTRL4_ADD, pllprm[speed].upll_prog >> 32);
 
     mem_write32( ucie_apb_base + 0xE21004, 0x00000001 ); // ack=1 -> req will negate after 1clk cycle
-    mem_read32(ucie_apb_base + 0xE21004);
-    while ((mem_read32(ucie_apb_base + 0xE1003C) & mask) != expect) {
-        timeout--;
-        if (timeout == 0) {
-            ret = 1;
-            break;
-        }
-    }
-
-    mem_write32( ucie_apb_base + 0xE21004, 0x00000000 ); // ack=0
-    mem_read32(ucie_apb_base + 0xE21004);
 
     return ret;
 }
 
-static uint32_t Ucie_Wait_Linkup(e_ucie_ch_t ch)
+uint32_t Ucie_Wait_Linkup(e_ucie_ch_t ch)
 {
-    uint32_t ret = 0;
+    e_ucie_linkup_status_t ret = LINKUP_SUCCESS;
     uint32_t mask, expect;
-    uint32_t timeout;
     uint32_t ucie_axi_base;
     uint32_t ucie_apb_base;
 
@@ -947,22 +933,16 @@ static uint32_t Ucie_Wait_Linkup(e_ucie_ch_t ch)
 
     mask = 0x00001F;
     expect = 0x000016;
-    timeout = 4500000; // ~3sec
-    
-    while ((mem_read32(ucie_axi_base + ACSM_ACSMLTSMSTATUS_ADD) & mask) != expect)
+
+    if ((mem_read32(ucie_axi_base + ACSM_ACSMLTSMSTATUS_ADD) & mask) != expect)
     {   
-        timeout--;
-        if (timeout == 0)
-        {
-            ret = 1;
-            break;
-        }
+            return LINKUP_TIMEOUT;
     }
 
     return ret;
 }
 
-static void Ucie_Setup_PCIE_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
+void Ucie_Setup_PCIE_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
 {
     uint32_t ucie_axi_base;
     uint32_t ucie_apb_base;
@@ -1031,7 +1011,7 @@ static void Ucie_Setup_PCIE_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
 
 }
 
-static void Ucie_Setup_PCIE_Start_LinkUp(e_ucie_ch_t ch, e_ucie_mode_t mode)
+void Ucie_Setup_PCIE_Start_LinkUp(e_ucie_ch_t ch, e_ucie_mode_t mode)
 {
     uint32_t ucie_apb_base;
     
@@ -1052,13 +1032,12 @@ static void Ucie_Setup_PCIE_Start_LinkUp(e_ucie_ch_t ch, e_ucie_mode_t mode)
     }
 }
 
-static uint32_t Ucie_Setup_PCIE_Wait_LinkUp(e_ucie_ch_t ch)
+uint32_t Ucie_Setup_PCIE_Wait_LinkUp(e_ucie_ch_t ch)
 {
-    uint32_t ret = 0;
+    e_ucie_linkup_status_t ret = LINKUP_SUCCESS;
     uint32_t ucie_apb_base;
     uint32_t val;
     uint32_t mask, expect;
-    uint32_t timeout;
 
     if (ch != UCIE_CH0 && ch != UCIE_CH1) {
         printf("ERROR: Invalid UCIe channel\n");
@@ -1072,34 +1051,23 @@ static uint32_t Ucie_Setup_PCIE_Wait_LinkUp(e_ucie_ch_t ch)
     */
     mask = 0x000010;
     expect = 0x000010;
-    timeout = 4500000; // ~ 3s
 
-    while (1)
-    {
-        //;UCIEICR00b
+    //;UCIEICR00b
 #ifdef RCAR_UCIE_V100
-        val = mem_read32(ucie_apb_base + 0xE10004);
+    val = mem_read32(ucie_apb_base + 0xE10004);
 #else
-        val = mem_read32(ucie_apb_base + 0xE10010);
+    val = mem_read32(ucie_apb_base + 0xE10010);
 #endif
 
-        if ((val & mask) == expect) {
-            break;
-        }
-
-        timeout--;
-        if (timeout == 0)
-        {
-            ret = 1;
-            break;
-        }
+    if ((val & mask) != expect) {
+        ret = LINKUP_TIMEOUT;
     }
 
     return ret;
 }
 
 
-static void Ucie_Setup_PCIE_Post(e_ucie_ch_t ch, e_ucie_mode_t mode)
+void Ucie_Setup_PCIE_Post(e_ucie_ch_t ch, e_ucie_mode_t mode)
 {
     uint32_t ucie_axi_base;
     uint32_t ucie_apb_base;
@@ -1215,7 +1183,6 @@ static void set_pll9_0(uint32_t f_Speed){
             break;
         }
     }
-
     *(volatile uint32_t *)HSCS_APB_PLL9_0SCR = 0x00000000;
 
     while(1){
@@ -1234,7 +1201,6 @@ static void set_pll9_0(uint32_t f_Speed){
 
     // Freq. = 1/(1+0) = 1/1 = PHY_CLK 2000MHz, CLOCK = OFF
     *(volatile uint32_t *)HSCS_APB_UCI0CORECKCR = 0x00000100;
-
     // Freq. = 1/(1+3) = 1/4 = PHY_CLK 500MHz, CLOCK = ON
     *(volatile uint32_t *)HSCS_APB_UCI0CORECKCR = 0x00000000;
 }
@@ -1305,7 +1271,55 @@ static void set_pll9_1(uint32_t f_Speed)
     *(volatile uint32_t *)HSCS_APB_UCI1CORECKCR = 0x00000000;
 }
 
-static void Ucie_PowerOn(e_ucie_ch_t ch)
+#if (NOT_SCP_SUPPORT == 1)
+void Ucie_PowerOn(e_ucie_ch_t ucie_ch)
+{
+    uint32_t ucixcoreclkcr;
+    uint32_t pll_num;
+    uint32_t ucie_ms_core_bit;
+    uint32_t ucie_ms_peri_bit;
+    volatile uintptr_t uciepwrmngctrl;
+    uint32_t ucie_apb_base;
+    uint32_t val;
+    if (ucie_ch == UCIE_CH0){
+        ucixcoreclkcr = 0xDE201080U;
+        pll_num = 19;
+        ucie_ms_peri_bit=2;
+        ucie_ms_core_bit=0;
+        ucie_apb_base=0xDC000000;
+    } else {
+        ucixcoreclkcr = 0xDE201084U;
+        pll_num = 20;
+        ucie_ms_peri_bit=6;
+        ucie_ms_core_bit=4;
+        ucie_apb_base=0xDD000000;
+    }
+
+    /* ms ucie core reset*/
+    mdlc_transition_ms(16, 2, ucie_ms_core_bit, 0x1);
+    mdlc_check_ms_status(16, 2, ucie_ms_core_bit);
+
+    /* ms ucie peri reset */
+    mdlc_transition_ms(16, 2, ucie_ms_peri_bit, 0x1);
+    mdlc_check_ms_status(16, 2, ucie_ms_peri_bit);
+    /* ms ucie peri run */
+    mdlc_transition_ms(16, 2, ucie_ms_peri_bit, 0x3);
+    mdlc_check_ms_status(16, 2, ucie_ms_peri_bit);
+
+    uciepwrmngctrl=ucie_apb_base+0x00E00070U;
+    val = mem_read32(uciepwrmngctrl);
+    val &= ~(1U<<4);                 // Clear sys_aux_pwr_det bit (bit 4 )
+    val |=  (1U<<6);                 // Set app_ready_entr_l23 bit (bit 6)
+    mem_write32(uciepwrmngctrl, val);
+
+    switch_clock_source_pll(pll_num);
+
+    /* ms ucie core run */
+    mdlc_transition_ms(16, 2, ucie_ms_core_bit, 0x3);
+    mdlc_check_ms_status(16, 2, ucie_ms_core_bit);
+}
+#else
+void Ucie_PowerOn(e_ucie_ch_t ch)
 {
     e_x5h_clock_id_t ucie_peri_clk_id;
     e_x5h_clock_id_t ucie_core_clk_id;
@@ -1349,8 +1363,40 @@ static void Ucie_PowerOn(e_ucie_ch_t ch)
     R_StateManager_ResetAssert(ucie_core_reset_id);
     R_StateManager_ResetDeassert(ucie_core_reset_id);
 }
+#endif
 
-static void Ucie_PowerOFF(e_ucie_ch_t ch)
+#if (NOT_SCP_SUPPORT == 1)
+void Ucie_PowerOFF(e_ucie_ch_t ch)
+{
+    uint32_t ucixcoreclkcr;
+    uint32_t pll_num;
+    uint32_t ucie_ms_core_bit;
+    uint32_t ucie_ms_peri_bit;
+    volatile uintptr_t uciepwrmngctrl;
+    uint32_t ucie_apb_base;
+    uint32_t val;
+
+    if (ch == UCIE_CH0){
+        ucixcoreclkcr = 0xDE201080U;
+        pll_num = 19;
+        ucie_ms_peri_bit=2;
+        ucie_ms_core_bit=0;
+        ucie_apb_base=0xDC000000;
+    } else {
+        ucixcoreclkcr = 0xDE201084U;
+        pll_num = 20;
+        ucie_ms_peri_bit=6;
+        ucie_ms_core_bit=4;
+        ucie_apb_base=0xDD000000;
+    }
+
+    mdlc_transition_ms(16, 2, ucie_ms_core_bit, 0x1);
+    mdlc_transition_ms(16, 2, ucie_ms_peri_bit, 0x1);
+    mdlc_transition_ms(16, 2, ucie_ms_core_bit, 0x0);
+    mdlc_transition_ms(16, 2, ucie_ms_peri_bit, 0x0);
+}
+#else
+void Ucie_PowerOFF(e_ucie_ch_t ch)
 {
     e_x5h_clock_id_t ucie_peri_clk_id;
     e_x5h_clock_id_t ucie_core_clk_id;
@@ -1376,12 +1422,22 @@ static void Ucie_PowerOFF(e_ucie_ch_t ch)
     R_StateManager_ResetAssert(ucie_peri_reset_id);
     R_StateManager_ClockOff(ucie_peri_clk_id);
 }
+#endif
+
+uint32_t R_UCIE_Config(e_ucie_ch_t ch, e_ucie_mode_t mode,
+                       e_ucie_linkspeed_t speed, bool init_with_system)
+{
+    ucie_ctrl_arr[ch].mode = mode;
+    ucie_ctrl_arr[ch].speed = speed;
+    ucie_ctrl_arr[ch].init_with_system = init_with_system;
+    return 0;
+}
 
 e_ucie_linkup_status_t R_UCIE_Setup(e_ucie_ch_t ch, e_ucie_mode_t mode, 
                                                     e_ucie_linkspeed_t speed)
 {
     e_ucie_linkup_status_t ret;
-    
+
     if (ch != UCIE_CH0 && ch != UCIE_CH1) {
         printf("ERROR: Invalid UCIe channel\n");
         return LINKUP_ERROR;
@@ -1397,6 +1453,19 @@ e_ucie_linkup_status_t R_UCIE_Setup(e_ucie_ch_t ch, e_ucie_mode_t mode,
         return LINKUP_ERROR;
     }
 
+    ret = Ucie_Setup_PCIE_Wait_LinkUp(ch);
+    if (ret == LINKUP_SUCCESS) {
+        if (ucie_is_setup[ch] == true)
+        {
+            return ret;
+        }
+
+        /* Power off UCIe linkup by IPL and relinkup */
+        Ucie_PowerOFF(ch);
+    }
+
+    ucie_is_setup[ch] = true;
+
     /* [Step 0] UCIe Power ON */
     Ucie_PowerOn(ch);
 
@@ -1409,23 +1478,14 @@ e_ucie_linkup_status_t R_UCIE_Setup(e_ucie_ch_t ch, e_ucie_mode_t mode,
     Ucie_Start_Linkup(ch, mode, speed);
 
     /* [Step 3] UCIe Wait FreqChange Req */
-    ret = Ucie_Wait_FreqChange_Req(ch);
-    if (ret) {
-        Ucie_PowerOFF(ch);
-        return LINKUP_TIMEOUT;
-    }
+    Ucie_Wait_FreqChange_Req(ch);
 
     /* [Step 4] UCIe Ack FreqChange */
     Ucie_Ack_FreqChange(ch, speed);
 
     wait_time(0x8000);
     /* [Step 5] UCIe Wait Linkup */
-    ret = Ucie_Wait_Linkup(ch);
-    if (ret != 0)
-    {
-        Ucie_PowerOFF(ch);
-        return LINKUP_TIMEOUT;
-    }
+    Ucie_Wait_Linkup(ch);
     wait_time(0x8000);
 
     /*  PCIE linkup */
@@ -1439,19 +1499,13 @@ e_ucie_linkup_status_t R_UCIE_Setup(e_ucie_ch_t ch, e_ucie_mode_t mode,
     wait_time(0x8000);
     /* [Step 8] UCIe PCIe Wait LinkUp */
     ret = Ucie_Setup_PCIE_Wait_LinkUp(ch);
-    if (ret != 0)
-    {
-        Ucie_PowerOFF(ch);
-        return LINKUP_TIMEOUT;
-    }
-
     wait_time(0x8000);
 
     /* [Step 9] UCIe PCIe Post */
     Ucie_Setup_PCIE_Post(ch, mode);
     wait_time(0x8000);
 
-    return LINKUP_SUCCESS;
+    return ret;
 }
 
 e_ucie_linkup_status_t R_UCIE_Retry_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode, 
@@ -1467,6 +1521,15 @@ e_ucie_linkup_status_t R_UCIE_Retry_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode,
     }
 
     return LINKUP_TIMEOUT;
+}
+
+e_ucie_linkup_status_t R_UCIE_Get_Linkup_Status(e_ucie_ch_t ch)
+{
+    if (ucie_is_setup[ch])
+    {
+        return Ucie_Setup_PCIE_Wait_LinkUp(ch);
+    }
+    return LINKUP_ERROR;
 }
 
 uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg)
@@ -1542,4 +1605,14 @@ uint32_t R_UCIE_IATU_UnsetRegion(st_ucie_iatu_cfg_t *cfg)
                                    (type * IATU_INBOUND_OFFSET) + (rgn * IATU_BLOCK_SIZE);
 
     mem_write32(base + IATU_REGION_CTRL_2_OFF, 0x00000000U);
+}
+
+st_ucie_ctrl_t ucie_get_config(e_ucie_ch_t ch)
+{
+    return ucie_ctrl_arr[ch];
+}
+
+void ucie_set_setup_flag(e_ucie_ch_t ch)
+{
+    ucie_is_setup[ch] = true;
 }

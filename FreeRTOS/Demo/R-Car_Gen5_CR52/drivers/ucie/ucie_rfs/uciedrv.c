@@ -199,3 +199,14 @@ uint32_t R_UCIE_IATU_UnsetRegion(st_ucie_iatu_cfg_t *cfg)
 
     return 0;
 }
+
+uint32_t R_UCIE_Config(e_ucie_ch_t ch, e_ucie_mode_t mode,
+                       e_ucie_linkspeed_t speed, bool init_with_system)
+{
+    return 0;
+}
+
+e_ucie_linkup_status_t R_UCIE_Get_Linkup_Status(e_ucie_ch_t ch)
+{
+    return LINKUP_SUCCESS;
+}

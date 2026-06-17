@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "FreeRTOS.h"
+#include "task.h"
 #include "portmacro.h"
 #include "interrupts.h"
 #include "board.h"
@@ -18,6 +20,8 @@
 #include "tcm.h"
 #include "serial/r_serial.h"
 #include "pfc/r_pfc_api.h"
+#include "ucie/r_ucie.h"
+#include "ucie_common.h"
 
 #define CNTCR_ADDR   ((volatile uint32_t *)0x1C000000) // Counter Control Register
 #define SILENT_CONSOLE_ON (1U)
@@ -220,6 +224,94 @@ static void EnablePMU(void)
     __asm__ volatile ("mcr p15, 0, %0, c9, c12, 1" :: "r"(value));
 }
 
+#if (BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
+void ucie0_setup_task( void *pvParameters )
+{
+    (void)pvParameters;
+    e_ucie_linkup_status_t ret;
+
+    st_ucie_ctrl_t ucie_conf = ucie_get_config(UCIE_CH0);
+
+    if (ucie_conf.init_with_system)
+    {
+        if (ucie_conf.mode == UCIE_MODE_RC)
+        {
+            vTaskDelay(2000);
+        }
+
+        ret = Ucie_Setup_PCIE_Wait_LinkUp(UCIE_CH0);
+        if (ret == LINKUP_SUCCESS) {
+            /* Power off UCIe linkup by IPL and relinkup */
+            Ucie_PowerOFF(UCIE_CH0);
+        }
+
+        ucie_set_setup_flag(UCIE_CH0);
+
+        Ucie_PowerOn(UCIE_CH0);
+        Ucie_Setup_Pre(UCIE_CH0, ucie_conf.mode);
+        Ucie_Start_Linkup(UCIE_CH0, ucie_conf.mode, ucie_conf.speed);
+        Ucie_Wait_FreqChange_Req(UCIE_CH0);
+        Ucie_Ack_FreqChange(UCIE_CH0, ucie_conf.speed);
+        while(Ucie_Wait_Linkup(UCIE_CH0))
+        {
+            vTaskDelay(10);
+        }
+        Ucie_Setup_PCIE_Pre(UCIE_CH0, ucie_conf.mode);
+        Ucie_Setup_PCIE_Start_LinkUp(UCIE_CH0, ucie_conf.mode);
+        while(Ucie_Setup_PCIE_Wait_LinkUp(UCIE_CH0))
+        {
+            vTaskDelay(10);
+        }
+        Ucie_Setup_PCIE_Post(UCIE_CH0, ucie_conf.mode);
+    }
+
+    vTaskDelete(NULL);
+}
+
+void ucie1_setup_task( void *pvParameters )
+{
+    (void)pvParameters;
+    e_ucie_linkup_status_t ret;
+
+    st_ucie_ctrl_t ucie_conf = ucie_get_config(UCIE_CH1);
+
+    if (ucie_conf.init_with_system)
+    {
+        if (ucie_conf.mode == UCIE_MODE_RC)
+        {
+            vTaskDelay(2000);
+        }
+
+        ret = Ucie_Setup_PCIE_Wait_LinkUp(UCIE_CH1);
+        if (ret == LINKUP_SUCCESS) {
+            /* Power off UCIe linkup by IPL and relinkup */
+            Ucie_PowerOFF(UCIE_CH1);
+        }
+
+        ucie_set_setup_flag(UCIE_CH1);
+
+        Ucie_PowerOn(UCIE_CH1);
+        Ucie_Setup_Pre(UCIE_CH1, ucie_conf.mode);
+        Ucie_Start_Linkup(UCIE_CH1, ucie_conf.mode, ucie_conf.speed);
+        Ucie_Wait_FreqChange_Req(UCIE_CH1);
+        Ucie_Ack_FreqChange(UCIE_CH1, ucie_conf.speed);
+        while(Ucie_Wait_Linkup(UCIE_CH1))
+        {
+            vTaskDelay(10);
+        }
+        Ucie_Setup_PCIE_Pre(UCIE_CH1, ucie_conf.mode);
+        Ucie_Setup_PCIE_Start_LinkUp(UCIE_CH1, ucie_conf.mode);
+        while(Ucie_Setup_PCIE_Wait_LinkUp(UCIE_CH1))
+        {
+            vTaskDelay(10);
+        }
+        Ucie_Setup_PCIE_Post(UCIE_CH1, ucie_conf.mode);
+    }
+
+    vTaskDelete(NULL);
+}
+#endif
+
 void SystemInit(void)
 {
     bss_init((unsigned int *)&__bss_start__, (unsigned int *)&__bss_end__);
@@ -266,6 +358,13 @@ void SystemInit(void)
         printf("Error: Failed to init State Manager.\r\n");
         return;
     }
+
+#if (BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
+    xTaskCreate(ucie0_setup_task, "ucie0_setup_task", configMINIMAL_STACK_SIZE,
+                NULL, configMAX_PRIORITIES - 1, NULL);
+    xTaskCreate(ucie1_setup_task, "ucie1_setup_task", configMINIMAL_STACK_SIZE,
+                NULL, configMAX_PRIORITIES - 1, NULL);
+#endif
 }
 
 void assert_func(const char *file, int line, const char *func)

@@ -117,10 +117,21 @@ endif()
 
 if (BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_x5h_hil")
     set(UCIE_VER "RCAR_UCIE_V100")
-elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
+    if (UCIE_CONW STREQUAL "aiacc")
+        set (UCIE_CONW "CONW_RCAR_UCIE_V102")
+    else()
+        set (UCIE_CONW "CONW_RCAR_UCIE_V100")
+    endif()
+elseif(BOARD STREQUAL "mdp_aiacc_hil")
     set(UCIE_VER "RCAR_UCIE_V102")
+    if (UCIE_CONW STREQUAL "aiacc")
+        set (UCIE_CONW "CONW_RCAR_UCIE_V102")
+    else()
+        set (UCIE_CONW "CONW_RCAR_UCIE_V100")
+    endif()
 else()
     set(UCIE_VER "NONE")
+    set(UCIE_CONW "NONE")
 endif()
 
 
@@ -147,7 +158,7 @@ add_compile_options(
     -DCACHE=${CACHE}
     -DTCM_ENABLE=${TCM_ENABLE}
     ${global_definition}
-    -D${UCIE_VER}=1
+    -D${UCIE_VER}=2 -D${UCIE_CONW}=1
     -ffile-prefix-map=${FREERTOS_DIR}/=
 )
 
@@ -172,9 +183,11 @@ file(GLOB SCMI_SRC_LIST
     ${BSP_DIR}/drivers/firmware/scmi/src/*.c
     )
 
-if (BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil")
+if (BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil" OR BOARD STREQUAL "mdp_aiacc_hil")
     set(UCIE_SRC_LIST
         ${BSP_DIR}/drivers/ucie/uciedrv.c
+        ${BSP_DIR}/drivers/ucie/clock_controller/clock_controller.c
+        ${BSP_DIR}/drivers/ucie/module_controller/module_controller.c
     )
 elseif (BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2")
     set(UCIE_SRC_LIST 
@@ -626,6 +639,7 @@ elseif(BOARD STREQUAL "mdp_aiacc_hil")
         gic_app
         generic_timer_app
         mfis_app
+        ucie
     )
 else()
     message(FATAL_ERROR "Invalid BOARD: ${BOARD}. Cannot add apps!")
