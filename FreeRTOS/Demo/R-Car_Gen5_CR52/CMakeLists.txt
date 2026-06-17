@@ -305,14 +305,8 @@ install(
 install(
     DIRECTORY ${BSP_DIR}/include
     DESTINATION .
-    PATTERN "device_tree_*.h" EXCLUDE
 )
 # Specify device tree header depend on BOARD_ID
-install(
-    FILES ${BSP_DIR}/include/${PLATFORM_DEVICE_TREE}
-    DESTINATION include
-)
-
 install(
     FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/device_tree.h
     DESTINATION include
