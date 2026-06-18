@@ -99,7 +99,7 @@ static void prvWWDTTask( void *pvParameters )
 		if (err != 0) break;
 	}
 
-	printf_delay("----------- PROGRAM END ----------- \r\n");
+    printf("<APP_END>\n");
 	for( ;; )
 	{
 	}

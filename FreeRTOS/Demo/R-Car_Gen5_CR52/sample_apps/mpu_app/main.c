@@ -118,6 +118,7 @@ static void prvTestMPURegions( void *pvParameters )
     uint32_t dev_value = *dev_ptr;
     printf("Read Value = 0x%X\n\n", dev_value);
     vTaskDelay(100);
+    printf("<APP_END>\n");
 
     /* Test Region RO (Read-Only) */ 
     /*printf("Testing Region Read-Only ...\n");

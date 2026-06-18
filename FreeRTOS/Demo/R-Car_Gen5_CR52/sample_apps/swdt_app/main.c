@@ -135,6 +135,8 @@ static void prvSWDTTask( void *pvParameters )
 	ping_count, init_timeout);
 	printf("\n[NOTE] Waiting for system reset...\n");
 
+    printf("<APP_END>\n");
+
 	for( ;; )
 	{
 		vTaskDelay(1);

@@ -296,7 +296,7 @@ static void ucie_comm_task(void *pvParameters)
     /* EP Write RC Read */
     *((volatile uint32_t*)ucie1_in) = PIO_EP_WRITE_DATA;
 
-    printf("<----- [EP] END TEST ----->\n");
+    printf("<APP_END>\n");
 
     for(;;) {
         __asm__ volatile("nop");

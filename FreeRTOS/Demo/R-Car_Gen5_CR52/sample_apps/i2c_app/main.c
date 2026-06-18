@@ -529,7 +529,7 @@ static void prvI2CTask( void *pvParameters )
 	
 	/* Delete semaphore */
 	vSemaphoreDelete(xI2C_Semaphore);
-	printf("------------- End -------------\r\n");
+    printf("<APP_END>\n");
 	for( ;; )
 	{
 	};

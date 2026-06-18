@@ -99,8 +99,10 @@ static void prvLoggingTask( void *pvParameters )
         vTaskDelay(100);
         LogDebug(("Logging enable [ON] ..."));
         vTaskDelay(100);
+        printf("<APP_END>\n");
     #else
         printf("Logging enable [OFF] ...\n");
+        printf("<APP_END>\n");
     #endif
 
     for( ;; );

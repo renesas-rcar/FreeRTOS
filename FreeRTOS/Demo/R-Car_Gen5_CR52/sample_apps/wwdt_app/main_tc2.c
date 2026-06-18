@@ -106,7 +106,7 @@ static void prvWWDTTask( void *pvParameters )
 		err = R_WWDT_Refresh(R_WWDT20);
 		if (err != 0) break;
 	}
-	printf_delay("----------- PROGRAM END ----------- \r\n");
+    printf("<APP_END>\n");
 	for( ;; )
 	{
 	}

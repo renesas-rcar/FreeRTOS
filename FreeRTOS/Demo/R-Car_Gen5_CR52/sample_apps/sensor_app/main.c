@@ -58,6 +58,7 @@ static void prvSensorAppTask(void *pvParameters )
 
     SENSOR_LOG("SensorApp FreeRTOS starting...\n");
     sensorAppExample();
+    printf("<APP_END>\n");
 
     for( ;; )
     {

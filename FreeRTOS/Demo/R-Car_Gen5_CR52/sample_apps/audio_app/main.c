@@ -169,6 +169,7 @@ static void prvAudioTestTask( void *pvParameters )
 		printf("Result: Failed!\n");
 	}
 	printf("***********************************************\r\n");
+	printf("<APP_END>\n");
 	
     for( ;; )
     {

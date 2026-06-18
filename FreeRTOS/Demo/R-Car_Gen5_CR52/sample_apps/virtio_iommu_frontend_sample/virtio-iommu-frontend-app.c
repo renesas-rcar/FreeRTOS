@@ -308,6 +308,7 @@ static void prvVIOMMUFETask( void *pvParameters )
 
     
     printf("VIRTIO IOMMU Frontend:  **********************************************\r\n");
+    printf("<APP_END>\n");
 
     for( ;; )
     {

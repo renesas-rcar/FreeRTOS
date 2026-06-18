@@ -166,7 +166,7 @@ static void prvEcmTask( void *pvParameters )
         printf("Result: Failed\n");
     }
 
-    printf("---------- ECM TEST END ----------- \r\n");
+    printf("<APP_END>\n");
     
     for( ;; )
     {

@@ -629,6 +629,7 @@ static void prvSYSDMACTask( void *pvParameters )
     }
     R_SYSDMAC_RcarDmacStop(SYS_DMAC0, DMAC_CH1);
     printf("*************************************************************\r\n");
+    printf("<APP_END>\n");
 
     for( ;; )
     {

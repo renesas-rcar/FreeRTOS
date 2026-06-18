@@ -231,6 +231,7 @@ static void prvDMACTask( void *pvParameters )
         }
     }
     printf("**********************************************\r\n");
+    printf("<APP_END>\n");
 
     for (;;)
     {

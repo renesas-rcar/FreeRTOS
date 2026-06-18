@@ -60,6 +60,8 @@ static void prvPmAppTask(void *pvParameters )
 	PM_LOG("PowerManagement FreeRTOS starting...\n");
 	pmAppExample();
 
+    printf("<APP_END>\n");
+
     for( ;; )
     {
         PM_LOG("prvPmAppTask...\n");

@@ -448,6 +448,7 @@ static void prvCRCTask( void *pvParameters )
     }
 
     printf("TC3 Result: %s\n", pass ? "Passed" : "Failed");
+    printf("<APP_END>\n");
 
     for( ;; )
     {

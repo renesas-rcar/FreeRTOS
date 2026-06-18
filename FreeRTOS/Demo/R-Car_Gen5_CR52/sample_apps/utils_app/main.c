@@ -132,7 +132,7 @@ static void prvUtilsTask( void *pvParameters )
     printf("CPU cycles: %u\n", cycle_cnt);
     printf("<---------- END TC4 ---------->\n");
 
-    printf("<---------- END TEST OSAL UTILS API ---------->\n");
+    printf("<APP_END>\n");
     
     for(;;) {}
 }

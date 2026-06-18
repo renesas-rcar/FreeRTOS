@@ -316,7 +316,7 @@ static void ucie_comm_task(void *pvParameters)
         printf("Result: PASSED\n");
     }
 
-    printf("<----- [RC] END TEST ----->\n");
+    printf("<----- [RC] <APP_END> ----->\n");
     for(;;) {
         __asm__ volatile("nop");
     }

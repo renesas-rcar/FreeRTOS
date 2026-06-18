@@ -210,7 +210,7 @@ static void ucie_comm_task(void *pvParameters)
     printf("<----- [AIACC1] TC10: UCIE1 interrupt ----->\n");
     printf("Result: FAILED\n");
 
-    printf("<----- [AIACC1] END TEST ----->\n");
+    printf("<----- [AIACC1] <APP_END> ----->\n");
 
     for(;;) {
         __asm__ volatile("nop");

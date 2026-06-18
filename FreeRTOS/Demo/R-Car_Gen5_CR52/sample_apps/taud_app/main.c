@@ -155,6 +155,7 @@ static void prvTaudPwmTask( void *pvParameters )
     {
         printf("TC3: Stop: Passed\n");
     }
+    printf("<APP_END>\n");
 
     for( ;; )
     {

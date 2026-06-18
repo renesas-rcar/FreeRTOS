@@ -242,6 +242,8 @@ static void prvGPIOTask( void *pvParameters )
     ret = R_GPIO_Close(&g_gpio_instance_ctrl_irq);
     printf("Close: ret = %d\n", ret);
 
+    printf("<APP_END>\n");
+
     for( ;; )
     {
     }

@@ -195,6 +195,7 @@ static void prvLogTask( void *pvParameters )
 
     R_SERIAL_ReConfigure(UART_ID); /* Restore console to default port for the main loop (SCIF1) */
     printf("=== All Test Cases Completed. Returning to Default Console (SCIF1) ===\n");
+    printf("<APP_END>\n");
     for( ;; )
     {
         printf("\nUART Interrupt is ready - Please type to RX terminal for testing\n");
