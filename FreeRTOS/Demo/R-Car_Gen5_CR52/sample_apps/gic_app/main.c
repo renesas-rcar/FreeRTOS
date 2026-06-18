@@ -38,12 +38,14 @@
 #include "device_tree_x5h.h"
 #include "gic.h"
 #include "cmsis_cp15.h"
-#include "mfis/mfis.h"
+#include "dmac/dmac_common.h"
+#include "dmac/rtdmac_ctrl.h"
+#include "rcar_utils.h"
 /*-----------------------------------------------------------*/
 #define INTERRUPT_FLAG_UNSET        0
 #define INTERRUPT_FLAG_SET          1
 #define COUNT_PER_TICK (GENERIC_TIMER_CLK / configTICK_RATE_HZ)
-
+#define DMA_WAIT_TIMEOUT_MS   (1000U)
 /*
  * Configure the hardware as necessary to run this demo.
  */
@@ -54,17 +56,28 @@ void SPI_handler(void *data);
 /*-----------------------------------------------------------*/
 
 static volatile int g_spi_irq_flag = INTERRUPT_FLAG_UNSET;
-static struct mfis_channel mfis_tx = {
-    .ch = 0,
-    .type = MFIS_TYPE_SENDER,
-    .cb_function = NULL,
-    .arg = NULL,
+/*------------------------- Configure mem-to-mem with Normal mode ----------------------------------*/
+/* Define configure DMA Controller */
+rDmacCfg_t cfg0 =
+{
+    // Fill in the configuration details
+    .mSrcAddr = 0,
+    .mDestAddr = 0,
+    .mTransferCount = 1,
+    .mDMAMode = DRV_DMAC_DMA_NO_DESCRIPTOR,       // Assuming DRV_DMAC_DMA_NO_DESCRIPTOR is defined
+    .mSrcAddrMode = DRV_RTDMAC_ADDR_FIXED,        // Assuming ADDR_MODE_FIXED is defined
+    .mDestAddrMode = DRV_RTDMAC_ADDR_FIXED,       // Assuming ADDR_MODE_FIXED is defined
+    .mTransferUnit = DRV_RTDMAC_TRANS_UNIT_4BYTE, // Assuming DRV_RTDMAC_TRANS_UNIT_4BYTE is defined
+    .mResource = DRV_RTDMAC_MEMORY,               // Assuming DRV_RTDMAC_MEMORY is defined
+    .mLowSpeed = DRV_RTDMAC_SPEED_NORMAL,         // Assuming DRV_RTDMAC_SPEED_NORMAL is defined
+    .mPrioLevel = 0
 };
-static struct mfis_channel mfis_rx = {
-    .ch = 0,
-    .type = MFIS_TYPE_RECEVER,
-    .cb_function = SPI_handler,
-    .arg = (void *)&g_spi_irq_flag,
+
+rDmacIrqCfg_t rDmacIrqHandler_t_irq =
+{
+	.Unit = RT_DMAC0,
+	.SubCh = DMAC_CH1,
+	.irq_channel = INTID_RTDMA0_CH1,
 };
 
 void PPI_handler(void *data)
@@ -91,15 +104,47 @@ void vConfigurePPIInterrupt(volatile int *irq_flag)
 
 void SPI_handler(void *data)
 {
-    volatile int *flag = (volatile int *)data;
-    *flag = INTERRUPT_FLAG_SET;
+    (void)data;
+    g_spi_irq_flag = INTERRUPT_FLAG_SET;
 }
 
-void vConfigureSPIInterrupt(void)
+int vConfigureSPIInterrupt(void)
 {
-    mfis_init(&mfis_tx);
-    mfis_init(&mfis_rx);
-    mfis_trigger_interrupt(&mfis_tx, 0x55);
+    Context_t usr_context =
+    {
+		.ctx = &rDmacIrqHandler_t_irq,
+    };
+    /* Get memory region first */
+    st_memory_t region = R_UTILS_GetMemoryRegionInfo(OSAL, 0);
+    cfg0.mSrcAddr = region.base_address;
+    cfg0.mDestAddr = region.base_address + 0x01000000;
+    if (cfg0.mDestAddr > region.base_address + region.size)
+    {
+        printf_raw("Failed: Destination address 0x%08X exceeds memory region (end at 0x%08X)\n", cfg0.mDestAddr, region.base_address + region.size);
+        return -1;
+    }
+    /* Device Driver Part */
+    R_RTDMAC_RcarDmacCtrlInit(rDmacIrqHandler_t_irq.Unit, DRV_RTDMAC_PRIO_FIX);
+    R_RTDMAC_RcarCallBackSet(&rDmacIrqHandler_t_irq, SPI_handler, &usr_context);
+    *(volatile uint32_t *)cfg0.mDestAddr = 0x9;
+    *(volatile uint32_t *)cfg0.mSrcAddr  = 0x3;
+    int dmaStatus = R_RTDMAC_RcarDmacExec(rDmacIrqHandler_t_irq.Unit, rDmacIrqHandler_t_irq.SubCh, &cfg0, NULL);
+
+    // Check DMA execution status
+    if (dmaStatus != 0)
+    {
+        return -1;
+    }
+    /* Wait DMA done */
+    for (uint32_t i = 0; i < 30000000; i++)
+    {
+        if (g_spi_irq_flag == INTERRUPT_FLAG_SET)
+        {
+            break;
+        }
+    };
+    R_RTDMAC_RcarDmacStop(rDmacIrqHandler_t_irq.Unit, rDmacIrqHandler_t_irq.SubCh);
+    return 0;
 }
 
 void SGI_handler(void *data)
@@ -171,16 +216,8 @@ int main(void)
     }
 
     printf_raw(">> TC3: Shared Peripheral Interrupt (SPI) testing <<\n");
-    vConfigureSPIInterrupt();
-    for (uint32_t i = 0; i < 30000000; i++)
-    {
-        if (g_spi_irq_flag == INTERRUPT_FLAG_SET)
-        {
-            break;
-        }
-    };
-    
-    if (g_spi_irq_flag == INTERRUPT_FLAG_SET)
+    int ret = vConfigureSPIInterrupt();
+    if ((ret == 0) && (g_spi_irq_flag == INTERRUPT_FLAG_SET))
     {
         printf_raw("TC 3 result: PASS\n");
     }
@@ -188,6 +225,7 @@ int main(void)
     {
         printf_raw("TC 3 result: FAIL\n");
     }
+
     printf_raw("<APP_END>");
     for (;;)
     {
