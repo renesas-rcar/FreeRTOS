@@ -28,38 +28,6 @@ __get_CP(15, 0, value, 12, 12, 5); // Read ICC_SRE into value
 return value;
 }
 
-void R_GIC_SetICC_HSRE(unsigned int value)
-{
-__set_CP(15, 4, value, 12, 9, 5); // Write value to ICC_HSRE
-
-__ISB();
-}
-
-uint32_t R_GIC_GetICC_HSRE(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 9, 5); // Read ICC_HSRE into value
-
-    return value;
-}
-
-void R_GIC_SetICC_MSRE(unsigned int value)
-{
-    __set_CP(15, 6, value, 12, 12, 5); // Write value to ICC_MSRE
-
-    __ISB();
-}
-
-uint32_t R_GIC_GetICC_MSRE(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 6, value, 12, 12, 5); // Read ICC_MSRE into value
-
-    return value;
-}
-
 void R_GIC_EnableGroup0Ints(void) 
 {
     uint32_t ICC_IGRPEN0 = 1;
@@ -94,41 +62,6 @@ void R_GIC_DisableGroup1Ints(void)
     __set_CP(15, 0, ICC_IGRPEN1, 12, 12, 7); // Write value to ICC_IGRPEN1
 
     __ISB();
-}
-
-void R_GIC_EnableNSGroup1Ints(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 6, value, 12, 12, 7); // Read ICC_MGRPEN1 into value
-
-    value |= 0x1;
-
-    __set_CP(15, 6, value, 12, 12, 7); // Write value to ICC_MGRPEN1
-
-    __ISB();
-}
-
-void R_GIC_DisableNSGroup1Ints(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 6, value, 12, 12, 7); // Read ICC_MGRPEN1 into value
-
-    value &= ~0x1;
-
-    __set_CP(15, 6, value, 12, 12, 7); // Write value to ICC_MGRPEN1
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICC_MCTLR(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 6, value, 12, 12, 4); // Read ICC_MCTLR into value
-
-    return value;
 }
 
 unsigned int R_GIC_GetICC_CTLR(void)
@@ -268,187 +201,15 @@ void R_GIC_sendOtherGroup1SGI(unsigned int ID, unsigned int mode, unsigned targe
     __set_CP64(15, 1, value, 12); // Write value_L to ICC_ASGI1R[31:0] and value_H to ICC_ASGI1R[63:32]
 }
 
-void R_GIC_SetICH_HCR(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 11, 0); // Write value to ICH_HCR
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_HCR(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 11, 0); // Read ICH_HCR into value
-
-    return value;
-}
-
-void R_GIC_SetICH_AP0R0(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 8, 0); // Write value to ICH_AP0R0
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_AP0R0(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 8, 0); // Read ICH_AP0R0 into value
-
-    return value;
-}
-
-void R_GIC_SetICH_AP1R0(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 9, 0); // Write value to ICH_AP1R0
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_AP1R0(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 9, 0); // Read ICH_AP1R0 into value
-
-    return value;
-}
-
-void R_GIC_SetICH_LR0(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 12, 0); // Write value to ICH_LR0
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_LR0(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 12, 0); // Read ICH_LR0 into value
-
-    return value;
-}
-
-void R_GIC_SetICH_LRC0(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 14, 0); // Write value to ICH_LRC0
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_LRC0(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 14, 0); // Read ICH_LRC0 into value
-
-    return value;
-}
-
-void R_GIC_SetICH_LR1(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 12, 1); // Write value to ICH_LR1
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_LR1(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 12, 1); // Read ICH_LR1 into value
-
-    return value;
-}
-
-void R_GIC_SetICH_LRC1(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 14, 1); // Write value to ICH_LRC1
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_LRC1(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 14, 1); // Read ICH_LRC1 into value
-
-    return value;
-}
-
-void R_GIC_SetICH_LR2(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 12, 2); // Write value to ICH_LR2
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_LR2(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 12, 2); // Read ICH_LR2 into value
-
-    return value;
-}
-
-void R_GIC_SetICH_LRC2(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 14, 2); // Write value to ICH_LRC2
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_LRC2(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 14, 2); // Read ICH_LRC2 into value
-
-    return value;
-}
-
-void R_GIC_SetICH_LR3(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 12, 3); // Write value to ICH_LR3
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_LR3(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 12, 3); // Read ICH_LR3 into value
-
-    return value;
-}
-
-void R_GIC_SetICH_LRC3(unsigned int value)
-{
-    __set_CP(15, 4, value, 12, 14, 3); // Write value to ICH_LRC3
-
-    __ISB();
-}
-
-unsigned int R_GIC_GetICH_LRC3(void)
-{
-    uint32_t value;
-
-    __get_CP(15, 4, value, 12, 14, 3); // Read ICH_LRC3 into value
-
-    return value;
-}
-
-void R_GIC_SetAddr(void* dist, void* rdist) {
+int R_GIC_SetAddr(void* dist, void* rdist) {
     uint32_t index = 0;
 
     gic_dist = (GICD_Type *)dist;
     gic_rdist = (GICR_Type *)rdist;
+
+    if ((gic_dist == NULL) || (gic_rdist == NULL)) {
+      return -1;
+    }
 
     while((gic_rdist[index].target_ctrl.GICR_TYPER[0] & (1<<4)) == 0)
     {
@@ -456,8 +217,7 @@ void R_GIC_SetAddr(void* dist, void* rdist) {
     }
 
     gic_max_rd = index;
-    return;
-
+    return 0;
 }
 
 uint32_t R_GIC_Enable(void) {

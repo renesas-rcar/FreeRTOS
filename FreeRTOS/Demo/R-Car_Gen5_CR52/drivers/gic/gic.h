@@ -157,7 +157,7 @@ unsigned int R_GIC_GetICH_LRC3(void);
  * @param dist Pointer to the Distributor base address.
  * @param rdist Pointer to the Redistributor base address.
  */
-void R_GIC_SetAddr(void* dist, void* rdist);
+int R_GIC_SetAddr(void* dist, void* rdist);
 
 /**
  * @brief Enables and configures the GIC Distributor Interface.
