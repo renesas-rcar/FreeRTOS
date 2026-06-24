@@ -389,7 +389,14 @@ int R_SMMU_InvalidateTLB(e_smmu_domain_t smmu_domain, bool is_secure) {
     }
 
     R_SMMU_IssueCommand(smmu_domain, is_secure, (st_smmu_cmd_t*)cmd_inv_cfg, 0);
-    cmd_inv_tlb.opcode = CMDQ_OP_TLBI_NSNH_ALL;
+    if (is_secure == true)
+    {
+        cmd_inv_tlb.opcode = CMD_TLBI_NH_ALL;
+    }
+    else
+    {
+        cmd_inv_tlb.opcode = CMDQ_OP_TLBI_NSNH_ALL;
+    }
     ret = R_SMMU_IssueCommand(smmu_domain, is_secure, &cmd_inv_tlb, 1);
 
     return ret;

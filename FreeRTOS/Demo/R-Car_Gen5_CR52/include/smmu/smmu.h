@@ -144,6 +144,7 @@ typedef struct st_smmu_cmd {
          * @brief Command for SMMU TLBI (Translation Lookaside Buffer Invalidate).
          */
         #define CMDQ_OP_TLBI_NSNH_ALL   0x30
+        #define CMD_TLBI_NH_ALL         0x10
         struct { // CMD_TLBI_NSNH_ALL
             volatile uint64_t res11 : 64; /**< [71:8] Reserved */
             volatile uint64_t res12 : 56; /**< [127:72] Reserved */
