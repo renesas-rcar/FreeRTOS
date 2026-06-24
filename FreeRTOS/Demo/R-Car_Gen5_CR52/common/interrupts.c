@@ -40,7 +40,7 @@ static IvtEntry HandlerTable[MAX_IRQ_NUMBER];
 #define STAT_VIN(x)             (0x18A00000U + 0x854CU + ((x) * 0x4U))
 #define MASK_VIN(x)             (0x18A00000U + 0x954CU + ((x) * 0x4U))
 
-#else	// (BOARD == X5H_VDK || BOARD == MDP_AIACC_RFS2 || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+#else	// (BOARD == X5H_VDK || BOARD == MDP_AIACC_RFS2 || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
 #define MASK_DMA_RT(x,y)        (0x18A00000U + 0x93C8U + ((x) * 0x20U) + ((y) * 0x4U))
 #define STAT_DMA_RT(x,y)        (0x18A00000U + 0x83C8U + ((x) * 0x20U) + ((y) * 0x4U))
 #define MASK_SYS_DMA(x,y)       (0x18A00000U + 0x9468U + ((x) * 0x20U) + ((y) * 0x4U))
@@ -120,7 +120,7 @@ static const irq_table merged_irq_table[] = {
         { 0x1FF, 0x1FF, STAT_UCIE_ERROR(1), MASK_UCIE_ERROR(1) },
 };
 
-#else	// (BOARD == X5H_VDK || BOARD == MDP_AIACC_RFS2 || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+#else	// (BOARD == X5H_VDK || BOARD == MDP_AIACC_RFS2 || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
 static const irq_table merged_irq_table[] = {
 	{ 0x112, 0x3, STAT_DMA_RT(0,0), MASK_DMA_RT(0,0) },
         { 0x113, 0x3, STAT_DMA_RT(0,1), MASK_DMA_RT(0,1) },

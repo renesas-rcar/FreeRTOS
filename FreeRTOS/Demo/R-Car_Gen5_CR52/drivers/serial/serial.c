@@ -75,7 +75,7 @@ int32_t R_SERIAL_ReConfigure(e_serial_devices_t device)
 	return ret;
 }
 
-#if (BOARD == X5H_IRONHIDE)
+#if (BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL)
 static int uart_set_pfc(e_serial_devices_t device)
 {
     int ret = 0;

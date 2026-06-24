@@ -162,7 +162,7 @@ static void uart_rcar_irq_rx_enable(void)
 }
 
 uint32_t console_init(uint32_t port) {
-#if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+#if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
     const uint32_t serial_channels_arr[] = {
         0xc0700000, // SCIF0
         0xc0704000, // SCIF1

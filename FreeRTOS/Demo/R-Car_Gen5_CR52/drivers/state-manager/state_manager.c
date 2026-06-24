@@ -212,7 +212,7 @@ int R_StateManager_Reset_Status_Get(int domain_id, e_reset_domain_status_t *stat
 	return 0;
 }
 
-#else	// (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE)
+#else	// (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL)
 int R_StateManager_Init(void)
 {
 	int ret;

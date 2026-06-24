@@ -21,7 +21,7 @@ int R_Audio_Init(st_audio_instance_ctrl_t * const p_instance_ctrl, st_audio_cfg_
 		return ret;
 	}
 
-	#if (BOARD == X5H_IRONHIDE)
+	#if (BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL)
 	ret = r_ak4619_init(p_cfg);
 	if(ret < 0)
 	{
@@ -175,7 +175,7 @@ int R_Audio_Deinit(st_audio_instance_ctrl_t * const p_instance_ctrl)
 	
 	p_instance_ctrl->p_cfg = NULL;
 	
-	#if (BOARD == X5H_IRONHIDE)
+	#if (BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL)
 	ret = ak4619_module_deinit();
 	#endif
 	ret = r_deinit();

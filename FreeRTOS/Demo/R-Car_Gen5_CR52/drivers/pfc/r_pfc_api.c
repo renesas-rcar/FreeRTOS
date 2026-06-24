@@ -23,7 +23,7 @@
 /* PFC base adrress */
 #define PFC_BASE_OFFSET    0x000
 
-#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
 
 #define PFC_GR_0           (0xC1080000U + PFC_BASE_OFFSET)
 #define PFC_GR_1           (0xC1080800U + PFC_BASE_OFFSET)
@@ -184,7 +184,7 @@ typedef struct {
     int *group;
 } st_driver_group_t;
 
-#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
 
 #define HTX0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_05, RCAR_PFC_PIN_00, RCAR_PFC_FUNC_0)
 #define HRX0                GEN_ID(REG_ALTSEL, RCAR_PFC_GROUP_05, RCAR_PFC_PIN_01, RCAR_PFC_FUNC_0)
@@ -423,7 +423,7 @@ static void clearbit_l(uint32_t addr, uint32_t pos)
     writel(val &= ~BIT(pos), addr);
 }
 
-#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
 static uint32_t getPfcRegister(rcar_pfc_group_t grp, uint32_t offset)
 {
     uint32_t base_addr;
@@ -799,7 +799,7 @@ int pfcInitModules(st_module_config_t* module_list)
 {
 #if (BOARD == X5H_RFS2 || BOARD == MDP_AIACC_RFS2)
     ( void ) module_list;
-#else	// (BOARD == X5H_VDK || BOARD == MDP_AIACC_HIL || BOARD == X5H_IRONHIDE)
+#else	// (BOARD == X5H_VDK || BOARD == MDP_AIACC_HIL || BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL)
     int module_indx = 0, ret = 0;
     st_module_config_t module;
 

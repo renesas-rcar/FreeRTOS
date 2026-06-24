@@ -31,7 +31,7 @@ extern "C" {
  * 
  * Defines groups of pins for pin function control.
  */
-#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
+#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
 typedef enum e_rcar_pfc_group
 {
     RCAR_PFC_GROUP_00 = 0x00,           ///< PFC Group 00

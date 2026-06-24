@@ -49,7 +49,7 @@ target_link_options(${ep_main}
         -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/${ep_main}.map
 )
 
-if(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2")
+if(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_x5h_hil")
     set(app_name "ucie_mdp_x5h")
     
     add_executable(${app_name}

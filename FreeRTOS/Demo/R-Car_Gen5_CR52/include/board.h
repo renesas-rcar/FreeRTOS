@@ -18,6 +18,7 @@ extern "C" {
 #define X5H_IRONHIDE        3
 #define X5H_RFS2            4
 #define MDP_AIACC_HIL       5
+#define MDP_X5H_HIL         6
 
 #ifdef __cplusplus
 }

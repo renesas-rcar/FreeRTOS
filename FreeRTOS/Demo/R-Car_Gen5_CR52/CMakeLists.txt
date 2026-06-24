@@ -29,7 +29,7 @@ if(NOT DEFINED RAM_REGION)
     set(RAM_REGION 1)
 endif()
 set(LDFILE ${BSP_DIR}/common/linker/lscript_sram.ld)
-if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2" OR BOARD STREQUAL "mdp_aiacc_hil")
+if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2" OR BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_x5h_hil")
     if(BOARD STREQUAL "x5h_vdk")
         set(BOARD_ID 1)
         set(PLATFORM_DEVICE "x5h")
@@ -45,6 +45,9 @@ if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "
     elseif(BOARD STREQUAL "mdp_aiacc_hil")
         set(BOARD_ID 5)
         set(PLATFORM_DEVICE "aiacc")
+    elseif(BOARD STREQUAL "mdp_x5h_hil")
+        set(BOARD_ID 6)
+        set(PLATFORM_DEVICE "x5h")
     else()
         message(FATAL_ERROR "Invalid BOARD: ${BOARD}.")
     endif()
@@ -82,7 +85,7 @@ else()
     message(STATUS "UART_ID not defined in build options. Using default from header.")
 endif()
 
-if (BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2")
+if (BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_x5h_hil")
     set(UCIE_VER "RCAR_UCIE_V100")
 elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
     set(UCIE_VER "RCAR_UCIE_V102")
@@ -99,7 +102,7 @@ message(STATUS "BOARD_ID: ${BOARD_ID}")
 set(CACHE 1 CACHE BOOL "Enable cache for CPU CR52")
 message(STATUS "CACHE option: ${CACHE}")
 
-if(BOARD STREQUAL "x5h_ironhide")
+if(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil")
     set(TCM_ENABLE 1 CACHE BOOL "Enable TCM for CPU CR52")
 else()
     set(TCM_ENABLE 0 CACHE BOOL "Disable TCM for CPU CR52")
@@ -139,7 +142,7 @@ file(GLOB SCMI_SRC_LIST
     ${BSP_DIR}/drivers/firmware/scmi/src/*.c
     )
 
-if (BOARD STREQUAL "x5h_ironhide")
+if (BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil")
     set(UCIE_SRC_LIST
         ${BSP_DIR}/drivers/ucie/uciedrv.c
     )
@@ -409,7 +412,7 @@ if(BOARD STREQUAL "x5h_vdk")
         cxl_app
         audio_app
     )
-elseif(BOARD STREQUAL "x5h_ironhide")
+elseif(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil")
     set(SAMPLE_APPS
         hello_world
         uart_app
