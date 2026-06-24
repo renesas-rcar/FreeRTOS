@@ -6,6 +6,7 @@ MEMORY
    vram3_base_addr : ORIGIN = 0x1160000, LENGTH = 0xA00000
    dram_base_addr : ORIGIN = 0x40000000, LENGTH = 0xA00000
    dram2_base_addr : ORIGIN = 0x4B000000, LENGTH = 0x100000
+   dram3_base_addr : ORIGIN = 0x41000000, LENGTH = 0x1400000
 
    remote_proc_rsc_table : ORIGIN = 0x96600000, LENGTH = 0x1000
    remote_proc_rsc_table_1 : ORIGIN = 0x96650000, LENGTH = 0x1000
