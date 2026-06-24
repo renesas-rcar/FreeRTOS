@@ -174,18 +174,16 @@ static void prvSMMU_RT_Task( void *pvParameters )
         smmu_ctrl.stream_id = streamId[coreid][i];
 
         R_SMMU_Unmap(&smmu_ctrl, 0x70000000, 0x90000000, 0x1000000);
-        R_SMMU_Unmap(&smmu_ctrl, 0x90000000, 0x90000000, 0x1000000);
     }
-
-
+    printf("Unmap 0x70000000 and remap to a new PA. Expect it no longer maps to 0x90000000\n");
+    R_SMMU_Map(&smmu_ctrl, 0x70000000, 0x8E200000, 0x00100000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
     *(uint32_t *)0x90000000 = 0x1111;
     *(uint32_t *)0x70000000 = 0x2222;
-
     vTaskDelay(10);
-    printf("Value at VA 0x70000000 - PA 0x90000000:   0x%x\n", *(uint32_t *)0x70000000);
-    printf("Value at VA 0x90000000 - PA 0x90000000:   0x%x\n", *(uint32_t *)0x90000000);
+    printf("Value at VA 0x70000000 - new PA 0x8E200000: 0x%x\n", *(uint32_t *)0x70000000);
+    printf("Value at VA 0x90000000 - PA 0x90000000:     0x%x\n", *(uint32_t *)0x90000000);
 
-    if (*(uint32_t *)0x70000000 == *(uint32_t *)0x90000000) {
+    if (*(uint32_t *)0x70000000 != *(uint32_t *)0x90000000) {
         printf("Result: Passed\r\n");
     }
     else {
@@ -195,8 +193,9 @@ static void prvSMMU_RT_Task( void *pvParameters )
     printf("**********************************************\r\n");
 
     printf("* Test case 8: Test Read only permission *\r\n");
+    printf("TC8: Pass if no further logs after <APP_END>\r\n<APP_END>\n");
     *(uint32_t *)0xA0000000 = 0xBEFFBEFF;
-    printf("Result: Failed\r\n");
+    printf("TC8 result: FAIL\n");
     printf("**********************************************\r\n");
 
     for(;;);
