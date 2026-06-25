@@ -28,7 +28,7 @@ typedef enum {
     R_I2C_LAST      /**< delimiter */
 } r_i2c_Unit_t;
 
-#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK)
+#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK || BOARD == MDP_X5H_HIL)
 #define R_I2C_IF0_BASE    0xc11d0000
 #define R_I2C_IF1_BASE    0xc06c0000
 #define R_I2C_IF2_BASE    0xc06c8000

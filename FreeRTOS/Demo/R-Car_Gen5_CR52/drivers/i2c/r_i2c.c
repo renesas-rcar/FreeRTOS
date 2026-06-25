@@ -19,7 +19,7 @@
 #include "r_i2c_regs.h"
 
 /* ==================== DEFINE FUNCTIONS ==================== */
-#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK)
+#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK || BOARD == MDP_X5H_HIL)
 #include "dmac/sysdmac_ctrl.h"
 #define RCAR_DMAC_CTRL_INIT     R_SYSDMAC_RcarDmacCtrlInit
 #define RCAR_DMAC_CALLBACK_SET  R_SYSDMAC_RcarCallBackSet

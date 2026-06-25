@@ -37,7 +37,7 @@ extern uintptr_t R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit)
     case R_I2C_IF3:
         ret = R_I2C_IF3_BASE;
         break;
-#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK)
+#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK || BOARD == MDP_X5H_HIL)
     case R_I2C_IF4:
         ret = R_I2C_IF4_BASE;
         break;
