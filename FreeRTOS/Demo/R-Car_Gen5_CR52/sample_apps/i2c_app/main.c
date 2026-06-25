@@ -94,7 +94,7 @@ static void prvSetupHardware( void )
 	(void)pfcInitModules(getModuleConfigs());
 }
 
-#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK)
+#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK || BOARD == MDP_X5H_HIL)
 
 static void prvI2CTask( void *pvParameters )
 {
@@ -227,7 +227,6 @@ static void prvI2CTask( void *pvParameters )
 	R_I2C_Close(&g_i2c_device_ctrl_2);
 	printf("------------- TC2: END TEST I2C CHANNEL %d -------------\r\n", g_i2c_device_cfg_2.channel);
 
-
 	/* Device driver part for channel 3*/
 	i2c_instance_ctrl_t g_i2c_device_ctrl_3;
 	i2c_master_cfg_t        g_i2c_device_cfg_3 =
@@ -248,6 +247,11 @@ static void prvI2CTask( void *pvParameters )
 	uint8_t  send_byte[no_bytes];
 	uint8_t write_data[3];
 
+	#if (BOARD == MDP_X5H_HIL)
+	printf("TC3 result: NA. Cannot test channel3 on MDP X5H board currently\n");
+	R_I2C_Close(&g_i2c_device_ctrl_3);
+	printf("------------- TC3: END TEST I2C CHANNEL %d -------------\r\n", g_i2c_device_cfg_3.channel);
+	#else
 	send_byte[0] = Addr >> 8;
 	send_byte[1] = Addr & 0xff;
 	R_I2C_Write(&g_i2c_device_ctrl_3, &send_byte[0], no_bytes, false);
@@ -287,7 +291,7 @@ static void prvI2CTask( void *pvParameters )
 
 	R_I2C_Close(&g_i2c_device_ctrl_3);
 	printf("------------- TC3: END TEST I2C CHANNEL %d -------------\r\n", g_i2c_device_cfg_3.channel);
-
+	#endif
 
 	/* Coding for channel 4*/
 	i2c_instance_ctrl_t g_i2c_device_ctrl_4;
