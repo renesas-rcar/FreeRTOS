@@ -56,6 +56,9 @@ void mfis_interrupt_cb(void* data)
         ch->cb_function(ch->arg);
     }
 
+    /* Unlock MFIS register write protection */
+    *(volatile uint32_t *)(MFIS_UNLOCK_WRITE) = 0xACC00001U;
+    
     /* Clear interrupt flag */
     uint32_t value;
     if(ch->type == MFIS_TYPE_RECEVER)
@@ -106,6 +109,9 @@ int mfis_trigger_interrupt(struct mfis_channel *ch, uint16_t int_number)
     {
         return -1;
     }
+
+    /* Unlock MFIS register write protection */
+    *(volatile uint32_t *)(MFIS_UNLOCK_WRITE) = 0xACC00001U;
 
     if (ch->type == MFIS_TYPE_RECEVER)
     {
