@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-if(BOARD STREQUAL "ai_acc")
+if(BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_aiacc_rfs2")
     set(app_name "hello_world")
 
     add_executable(${app_name}
