@@ -103,7 +103,7 @@ else()
         )
 endif()
 
-set(app_name "rpmsg_echo_aiacc")
+set(app_name "rpmsg_echo_aiacc0_0")
 
 add_executable(${app_name}
     rpmsg_echo_aiacc.c
@@ -129,7 +129,115 @@ target_link_libraries(${app_name}
 
 target_link_options(${app_name}
     PRIVATE
-    -T${BSP_DIR}/common/linker/lscript_rsc_table_vram4.ld
+    -T${BSP_DIR}/common/linker/lscript_rsc_table_aiacc0_0.ld
+)
+
+target_link_options(${app_name} BEFORE
+    PRIVATE
+    -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/${app_name}.map
+)
+
+convert_bin_to_srec(${app_name})
+
+set(app_name "rpmsg_echo_aiacc0_1")
+
+add_executable(${app_name}
+    rpmsg_echo_aiacc.c
+    platform_rcar.c
+    remoteproc_rcar.c
+    rsc_table.c
+)
+
+target_include_directories(${app_name}
+    PRIVATE
+    ${BSP_DIR}
+    ${BSP_DIR}/CMSIS_5
+    ${BSP_DIR}/CMSIS_5/CMSIS/Core_R/Include
+)
+
+# Essential libraries to link with
+target_link_libraries(${app_name}
+    freertos_bsp
+    openamp
+    libmetal
+    m
+)
+
+target_link_options(${app_name}
+    PRIVATE
+    -T${BSP_DIR}/common/linker/lscript_rsc_table_aiacc0_1.ld
+)
+
+target_link_options(${app_name} BEFORE
+    PRIVATE
+    -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/${app_name}.map
+)
+
+convert_bin_to_srec(${app_name})
+
+set(app_name "rpmsg_echo_aiacc1_0")
+
+add_executable(${app_name}
+    rpmsg_echo_aiacc.c
+    platform_rcar.c
+    remoteproc_rcar.c
+    rsc_table.c
+)
+
+target_include_directories(${app_name}
+    PRIVATE
+    ${BSP_DIR}
+    ${BSP_DIR}/CMSIS_5
+    ${BSP_DIR}/CMSIS_5/CMSIS/Core_R/Include
+)
+
+# Essential libraries to link with
+target_link_libraries(${app_name}
+    freertos_bsp
+    openamp
+    libmetal
+    m
+)
+
+target_link_options(${app_name}
+    PRIVATE
+    -T${BSP_DIR}/common/linker/lscript_rsc_table_aiacc1_0.ld
+)
+
+target_link_options(${app_name} BEFORE
+    PRIVATE
+    -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/${app_name}.map
+)
+
+convert_bin_to_srec(${app_name})
+
+set(app_name "rpmsg_echo_aiacc1_1")
+
+add_executable(${app_name}
+    rpmsg_echo_aiacc.c
+    platform_rcar.c
+    remoteproc_rcar.c
+    rsc_table.c
+)
+
+target_include_directories(${app_name}
+    PRIVATE
+    ${BSP_DIR}
+    ${BSP_DIR}/CMSIS_5
+    ${BSP_DIR}/CMSIS_5/CMSIS/Core_R/Include
+)
+
+# Essential libraries to link with
+target_link_libraries(${app_name}
+    freertos_bsp
+    openamp
+    libmetal
+    m
+)
+
+target_link_options(${app_name}
+    PRIVATE
+    -T${BSP_DIR}/common/linker/lscript_rsc_table_aiacc1_1.ld
 )
 
 target_link_options(${app_name} BEFORE

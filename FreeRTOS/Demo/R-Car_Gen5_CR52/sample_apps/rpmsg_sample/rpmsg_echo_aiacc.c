@@ -26,8 +26,6 @@
 
 #define RPMSG_SERVICE_NAME         "rpmsg-client-sample"
 #define SHUTDOWN_MSG    0xEF56A55A
-#define SHARE_MEM_ADDR  0x90100000
-#define SHARE_MEM_SIZE  0x01000000
 
 static struct rpmsg_endpoint lept;
 static int shutdown_req = 0;
@@ -94,10 +92,17 @@ void echoTask( void *pvParameters )
     void *platform;
     struct rpmsg_device *rpdev;
 
-    printf("Waiting verify mapping ucie.....\n");
-    printf("Run on Linux: devmem2 0x90100200 w 0x1234 \n");
+    void *rsc_table;
+    int len;
 
-    while (*((volatile uint32_t *)(uintptr_t)(0x90100200)) != 0x1234)
+    rsc_table = get_resource_table(0, &len);
+
+    uint32_t address_check = (uint32_t)rsc_table + 0x200;
+
+    printf("Waiting verify mapping ucie.....\n");
+    printf("Run on Linux: devmem2 0x%8x w 0x1234 \n", address_check);
+
+    while (*((volatile uint32_t *)(uintptr_t)(address_check)) != 0x1234)
     {
         vTaskDelay(1);
     }
