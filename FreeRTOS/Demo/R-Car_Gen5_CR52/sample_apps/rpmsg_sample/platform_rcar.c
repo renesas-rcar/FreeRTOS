@@ -204,7 +204,7 @@ int platform_poll(void *platform)
     }
     else
     {
-        if ((*((volatile uint32_t*)rproc_tx_addr) == 0x1)) {
+        if ((*((volatile uint32_t*)rproc_tx_addr) & 0x1) == 0x1) {
             remoteproc_get_notification(rproc, RSC_NOTIFY_ID_ANY);
             *(volatile uint32_t*)rproc_tx_addr = 0x0;
             ret = 0;
