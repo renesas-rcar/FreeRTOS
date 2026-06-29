@@ -57,7 +57,7 @@ uint8_t  R_TAUD_RegRead8(uintptr_t Addr)
 uint16_t R_TAUD_CH_Set(uintptr_t reg_addr, uint8_t ch)
 {
     uint16_t data = R_TAUD_RegRead16(reg_addr);
-    data |= (1U << ch);
+    data |= (uint16_t)(1U << ch);
     R_TAUD_RegWrite16(reg_addr, data);
     return 0;
 }

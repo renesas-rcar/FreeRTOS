@@ -44,9 +44,9 @@
 #define GP_DMPR2            0x028
 #define GP_DMPR3            0x02C
 #define GP_GPSR             0x040
-#define GP_ALTSEL(id)       (0x060 + (id*0x004))
-#define GP_DRVCTRL(id)      (0x080 + (id*0x004))
-#define GP_TDSEL(id)        (0x094 + (id*0x004))
+#define GP_ALTSEL(id)       (0x060 + ((uint32_t)(id) * 0x004))
+#define GP_DRVCTRL(id)      (0x080 + ((uint32_t)(id) * 0x004))
+#define GP_TDSEL(id)        (0x094 + ((uint32_t)(id) * 0x004))
 #define GP_PULLEN           0x0C0
 #define GP_PUDSEL           0x0C4
 #define GP_MODSEL           0x100

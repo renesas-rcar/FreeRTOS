@@ -872,8 +872,8 @@ __STATIC_INLINE uint32_t GIC_DistributorImplementer(GICD_Type* GICDistributor)
 */
 __STATIC_INLINE void GIC_SetTarget(GICD_Type* GICDistributor, IRQn_Type IRQn, uint32_t cpu_target)
 {
-  uint32_t mask = GICDistributor->GICD_ITARGETSR[IRQn / 4U] & ~(0xFFUL << ((IRQn % 4U) * 8U));
-  GICDistributor->GICD_ITARGETSR[IRQn / 4U] = mask | ((cpu_target & 0xFFUL) << ((IRQn % 4U) * 8U));
+  uint32_t mask = GICDistributor->GICD_ITARGETSR[IRQn / 4U] & (uint32_t)(~(0xFFUL << (((unsigned long)IRQn % 4UL) * 8UL)));
+  GICDistributor->GICD_ITARGETSR[IRQn / 4U] = mask | (uint32_t)(((unsigned long)cpu_target & 0xFFUL) << (((unsigned long)IRQn % 4UL) * 8UL));
 }
 
 /** \brief Read the GIC's ITARGETSR register.
@@ -998,8 +998,8 @@ __STATIC_INLINE uint32_t GIC_GetConfiguration(GICD_Type* GICDistributor, IRQn_Ty
 */
 __STATIC_INLINE void GIC_SetPriority(GICD_Type* GICDistributor, IRQn_Type IRQn, uint32_t priority)
 {
-  uint32_t mask = GICDistributor->GICD_IPRIORITYR[IRQn / 4U] & ~(0xFFUL << ((IRQn % 4U) * 8U));
-  GICDistributor->GICD_IPRIORITYR[IRQn / 4U] = mask | ((priority & 0xFFUL) << ((IRQn % 4U) * 8U));
+  uint32_t mask = GICDistributor->GICD_IPRIORITYR[IRQn / 4U] & (uint32_t)(~(0xFFUL << (((unsigned long)IRQn % 4UL) * 8UL)));
+  GICDistributor->GICD_IPRIORITYR[IRQn / 4U] = mask | (uint32_t)(((unsigned long)priority & 0xFFUL) << (((unsigned long)IRQn % 4UL) * 8UL));
 }
 
 /** \brief Read the current interrupt priority from GIC's IPRIORITYR register.

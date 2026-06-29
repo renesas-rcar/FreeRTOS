@@ -1707,16 +1707,16 @@ static int crc_setting(wcrc_unit_t unit, crc_module_cfg_t const * const p_cfg)
 
     switch (p_cfg->out_byteswap) {
     case BYTE_SWAP_00:
-        crc_features |= byteswapmode_00;
+        crc_features |= (unsigned int)byteswapmode_00;
         break;
     case BYTE_SWAP_01:
-        crc_features |= byteswapmode_01;
+        crc_features |= (unsigned int)byteswapmode_01;
         break;
     case BYTE_SWAP_10:
-        crc_features |= byteswapmode_10;
+        crc_features |= (unsigned int)byteswapmode_10;
         break;
     case BYTE_SWAP_11:
-        crc_features |= byteswapmode_11;
+        crc_features |= (unsigned int)byteswapmode_11;
         break;
     default:
         printf("%s: Out ByteSwap INVALID\n", __func__);
@@ -1725,16 +1725,16 @@ static int crc_setting(wcrc_unit_t unit, crc_module_cfg_t const * const p_cfg)
 
     switch (p_cfg->in_byteswap) {
     case BYTE_SWAP_00:
-        crc_features |= byteswapinmode_00;
+        crc_features |= (unsigned int)byteswapinmode_00;
         break;
     case BYTE_SWAP_01:
-        crc_features |= byteswapinmode_01;
+        crc_features |= (unsigned int)byteswapinmode_01;
         break;
     case BYTE_SWAP_10:
-        crc_features |= byteswapinmode_10;
+        crc_features |= (unsigned int)byteswapinmode_10;
         break;
     case BYTE_SWAP_11:
-        crc_features |= byteswapinmode_11;
+        crc_features |= (unsigned int)byteswapinmode_11;
         break;
     default:
         printf("%s: In ByteSwap INVALID\n", __func__);
@@ -1872,7 +1872,7 @@ static int kcrc_setting(wcrc_unit_t unit, kcrc_module_cfg_t const * const p_cfg)
         kcrc_cmd &= ~CMD2;
         break;
     case LSB_SHIFT:
-        kcrc_cmd |= CMD2;
+        kcrc_cmd |= (unsigned int)CMD2;
         break;
     default:
         printf("%s: CMD2 mode INVALID\n", __func__);

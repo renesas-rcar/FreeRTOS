@@ -273,7 +273,7 @@ static inline void ARM_MPU_BackgroundRegionDisable(void) {
 static inline void ARM_MPU_InsBackgroundRegionEnable(void) {
 	uint32_t SCTLR_value;
 	__get_CP(15, 0, SCTLR_value, 1, 0, 0);
-	SCTLR_value |= (ARM_MPU_INS_CACHE_Msk);
+	SCTLR_value |= (uint32_t)(ARM_MPU_INS_CACHE_Msk);
 	__set_CP(15, 0, SCTLR_value, 1, 0, 0);
 }
 
@@ -293,7 +293,7 @@ static inline void ARM_MPU_InsBackgroundRegionDisable(void) {
 static inline void ARM_MPU_DataBackgroundRegionEnable(void) {
 	uint32_t SCTLR_value;
 	__get_CP(15, 0, SCTLR_value, 1, 0, 0);
-	SCTLR_value |= (ARM_MPU_DATA_CACHE_Msk);
+	SCTLR_value |= (uint32_t)(ARM_MPU_DATA_CACHE_Msk);
 	__set_CP(15, 0, SCTLR_value, 1, 0, 0);
 }
 

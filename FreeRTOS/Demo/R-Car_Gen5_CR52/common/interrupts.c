@@ -30,20 +30,20 @@ typedef struct
 
 static IvtEntry HandlerTable[MAX_IRQ_NUMBER];
 
-#define MASK_DMA_RT(x,y)        (0x18A00000U + 0x93C8U + ((x) * 0x20U) + ((y) * 0x4U))
-#define STAT_DMA_RT(x,y)        (0x18A00000U + 0x83C8U + ((x) * 0x20U) + ((y) * 0x4U))
-#define MASK_SYS_DMA(x,y)       (0x18A00000U + 0x9468U + ((x) * 0x20U) + ((y) * 0x4U))
-#define STAT_SYS_DMA(x,y)       (0x18A00000U + 0x8468U + ((x) * 0x20U) + ((y) * 0x4U))
-#define STAT_UCIE(x)            (0x18A00000U + 0x8770U + ((x) * 0x4U))
-#define STAT_UCIE_ERROR(x)      (0x18A00000U + 0x8778U + ((x) * 0x4U))
-#define MASK_UCIE(x)            (0x18A00000U + 0x9770U + ((x) * 0x4U))
-#define MASK_UCIE_ERROR(x)      (0x18A00000U + 0x9778U + ((x) * 0x4U))
-#define STAT_VIN(x)             (0x18A00000U + 0x854CU + ((x) * 0x4U))
-#define MASK_VIN(x)             (0x18A00000U + 0x954CU + ((x) * 0x4U))
-#define STAT_UMF(x)             (0x18A00000U + 0x874CU + ((x) * 0x4U))
-#define MASK_UMF(x)             (0x18A00000U + 0x974CU + ((x) * 0x4U))
-#define STAT_DOC(x)             (0x18A00000U + 0x8650U + ((x) * 0x4U))
-#define MASK_DOC(x)             (0x18A00000U + 0x9650U + ((x) * 0x4U))
+#define MASK_DMA_RT(x,y)        (0x18A00000U + 0x93C8U + ((uint32_t)(x) * 0x20U) + ((uint32_t)(y) * 0x4U))
+#define STAT_DMA_RT(x,y)        (0x18A00000U + 0x83C8U + ((uint32_t)(x) * 0x20U) + ((uint32_t)(y) * 0x4U))
+#define MASK_SYS_DMA(x,y)       (0x18A00000U + 0x9468U + ((uint32_t)(x) * 0x20U) + ((uint32_t)(y) * 0x4U))
+#define STAT_SYS_DMA(x,y)       (0x18A00000U + 0x8468U + ((uint32_t)(x) * 0x20U) + ((uint32_t)(y) * 0x4U))
+#define STAT_UCIE(x)            (0x18A00000U + 0x8770U + ((uint32_t)(x) * 0x4U))
+#define STAT_UCIE_ERROR(x)      (0x18A00000U + 0x8778U + ((uint32_t)(x) * 0x4U))
+#define MASK_UCIE(x)            (0x18A00000U + 0x9770U + ((uint32_t)(x) * 0x4U))
+#define MASK_UCIE_ERROR(x)      (0x18A00000U + 0x9778U + ((uint32_t)(x) * 0x4U))
+#define STAT_VIN(x)             (0x18A00000U + 0x854CU + ((uint32_t)(x) * 0x4U))
+#define MASK_VIN(x)             (0x18A00000U + 0x954CU + ((uint32_t)(x) * 0x4U))
+#define STAT_UMF(x)             (0x18A00000U + 0x874CU + ((uint32_t)(x) * 0x4U))
+#define MASK_UMF(x)             (0x18A00000U + 0x974CU + ((uint32_t)(x) * 0x4U))
+#define STAT_DOC(x)             (0x18A00000U + 0x8650U + ((uint32_t)(x) * 0x4U))
+#define MASK_DOC(x)             (0x18A00000U + 0x9650U + ((uint32_t)(x) * 0x4U))
 
 typedef struct
 {

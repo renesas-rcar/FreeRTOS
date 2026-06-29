@@ -20,7 +20,7 @@
 /* Definition of TAUD base address */
 #define DRV_REG_BASE_ADDR_TAUD0             (0xC1392000U)      /* TAUD0 */
 #define DRV_REG_BASE_ADDR_TAUD1             (0xC1393000U)      /* TAUD1 */
-#define DRV_REG_BASE_ADDR_TAUD(unit)        ((unit == 1) ? DRV_REG_BASE_ADDR_TAUD1 : DRV_REG_BASE_ADDR_TAUD0)      /* TAUD1 */
+#define DRV_REG_BASE_ADDR_TAUD(unit)        (((uint32_t)(unit) == 1U) ? DRV_REG_BASE_ADDR_TAUD1 : DRV_REG_BASE_ADDR_TAUD0)      /* TAUD1 */
 
 
 #define DRV_REG_OFFSET_CH_TAUD              (0x00000004u)
@@ -59,12 +59,12 @@
 /* Definition of TAUD reg address */
 #define DRV_REG_ADDR_TAUD_TPS(unit)         (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_TPS)
 #define DRV_REG_ADDR_TAUD_BRS(unit)         (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_BRS)
-#define DRV_REG_ADDR_TAUD_CDR(unit, ch)     (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CDR  + (DRV_REG_OFFSET_CH_TAUD * (ch)))
-#define DRV_REG_ADDR_TAUD_CNT(unit, ch)     (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CNT  + (DRV_REG_OFFSET_CH_TAUD * (ch)))
-#define DRV_REG_ADDR_TAUD_CMOR(unit, ch)    (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CMOR + (DRV_REG_OFFSET_CH_TAUD * (ch)))
-#define DRV_REG_ADDR_TAUD_CMUR(unit, ch)    (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CMUR + (DRV_REG_OFFSET_CH_TAUD * (ch)))
-#define DRV_REG_ADDR_TAUD_CSR(unit, ch)     (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CSR  + (DRV_REG_OFFSET_CH_TAUD * (ch)))
-#define DRV_REG_ADDR_TAUD_CSC(unit, ch)     (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CSC  + (DRV_REG_OFFSET_CH_TAUD * (ch)))
+#define DRV_REG_ADDR_TAUD_CDR(unit, ch)     (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CDR  + (DRV_REG_OFFSET_CH_TAUD * (uint32_t)(ch)))
+#define DRV_REG_ADDR_TAUD_CNT(unit, ch)     (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CNT  + (DRV_REG_OFFSET_CH_TAUD * (uint32_t)(ch)))
+#define DRV_REG_ADDR_TAUD_CMOR(unit, ch)    (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CMOR + (DRV_REG_OFFSET_CH_TAUD * (uint32_t)(ch)))
+#define DRV_REG_ADDR_TAUD_CMUR(unit, ch)    (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CMUR + (DRV_REG_OFFSET_CH_TAUD * (uint32_t)(ch)))
+#define DRV_REG_ADDR_TAUD_CSR(unit, ch)     (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CSR  + (DRV_REG_OFFSET_CH_TAUD * (uint32_t)(ch)))
+#define DRV_REG_ADDR_TAUD_CSC(unit, ch)     (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_CSC  + (DRV_REG_OFFSET_CH_TAUD * (uint32_t)(ch)))
 #define DRV_REG_ADDR_TAUD_TS(unit)          (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_TS)
 #define DRV_REG_ADDR_TAUD_TE(unit)          (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_TE)
 #define DRV_REG_ADDR_TAUD_TT(unit)          (uintptr_t)(DRV_REG_BASE_ADDR_TAUD(unit) + DRV_REG_OFFSET_TAUD_TT)

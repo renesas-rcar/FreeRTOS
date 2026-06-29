@@ -340,7 +340,7 @@ static uint8_t r_taud_irq_setup(e_taud_unit_t unit, e_taud_ch_t ch, st_taud_irq_
 static unsigned int taud_get_irq_id(uint8_t unit, uint8_t channel)
 {
     unsigned int id;
-    id = INTID_TAUD0_CH0 + (unsigned int)channel + (unit * 0x10);
+    id = INTID_TAUD0_CH0 + (unsigned int)channel + (unsigned int)(unit * 0x10);
 
     return id;
 }

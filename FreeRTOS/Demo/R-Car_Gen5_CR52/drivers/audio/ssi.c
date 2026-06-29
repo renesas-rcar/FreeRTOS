@@ -16,21 +16,21 @@ int ssi_init(ssi_conf_t *p_conf)
 	uint32_t wsr = p_conf->wsr;
 	uint32_t reg_val;
 	
-	cr_own |= FORCE;
+	cr_own |= (uint32_t)FORCE;
 	cr_own &= ~DEL; // delay between SSI_WS and SSI_SDATA
 	// Disable DMA
 	cr_own &= ~(DMEN);
 	
 	// Data interrupt
 	cr_mode &= ~(UIEN | OIEN | IIEN | DIEN);
-	cr_mode |= DIEN;
+	cr_mode |= (uint32_t)DIEN;
 	
 	// Serial bit clock freq = oversampling clock freq / 2
 	cr_clk &= ~(7 << 4);
-	cr_clk |= (1 << 4);
+	cr_clk |= (uint32_t)(1 << 4);
 	
 	// WS Continue function is enabled
-	wsr |= CONT; // this bit can only be set in master mode
+	wsr |= (uint32_t)CONT; // this bit can only be set in master mode
 	
 	reg_val = cr_role;
 	*((volatile uint32_t *)(SSICR0(p_conf->chan))) = reg_val;
@@ -53,7 +53,7 @@ int ssi_init(ssi_conf_t *p_conf)
 void ssi_start(ssi_conf_t *p_conf)
 {
 	uint32_t cr_own = p_conf->cr_own;
-	cr_own |= (EN);
+	cr_own |= (uint32_t)(EN);
 	*((volatile uint32_t *)(SSICR0(p_conf->chan))) |= (EN);
 	p_conf->cr_own = cr_own;
 }
