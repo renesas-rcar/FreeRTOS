@@ -256,7 +256,10 @@ static void prvSMMUTask( void *pvParameters )
         if ((*(volatile uint32_t *)cfg.mSrcAddr == *(volatile uint32_t *)cfg.mDestAddr) && *(volatile uint32_t *)cfg.mSrcAddr != 0) {
             printf("After DMA: va src address: 0x%lx, src data: 0x%lx\n", cfg.mSrcAddr, *(volatile uint32_t *)cfg.mSrcAddr );
             printf("After DMA: va dst address: 0x%lx, dst data: 0x%lx\n", cfg.mDestAddr, *(volatile uint32_t *)cfg.mDestAddr);
-            printf ("DMAC worked without SMMU.\n");
+            printf("Result: Failed\n");
+        }
+        else
+        {
             printf("Result: Passed\n");
         }
     }
