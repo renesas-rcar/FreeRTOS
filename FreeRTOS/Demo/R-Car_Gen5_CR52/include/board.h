@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef _BOARD_H_
-#define _BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,4 +22,4 @@ extern "C" {
 }
 #endif
 
-#endif // _BOARD_H_
+#endif // BOARD_H

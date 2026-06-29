@@ -4,8 +4,8 @@
 * http://opensource.org/licenses/mit-license.php
 * SPDX-License-Identifier: MIT
 *************************************************************************************************************/
-#ifndef _R_WWDT_API_H
-#define _R_WWDT_API_H_
+#ifndef R_WWDT_API_H
+#define R_WWDT_API_H
 
 /**
  * @defgroup WWDT_Module WWDT Module
@@ -114,4 +114,4 @@ uint32_t R_WWDT_Refresh(wwdt_unit_t unit);
 
 /** @} */ // end of GPIO_Module
 
-#endif /* R_WWDT_API_H_ */
+#endif /* R_WWDT_API_H */

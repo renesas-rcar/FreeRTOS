@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef R_UCIE_PRIVATE_H_
-#define R_UCIE_PRIVATE_H_
+#ifndef R_UCIE_PRIVATE_H
+#define R_UCIE_PRIVATE_H
 
 #define RCAR_UCIE_BASE_ADD(a) ((a)&0x00ffffff)
 #define RCAR_UCIE_FN_OFS(f) (((f)&0x7)<<16)
@@ -29,4 +29,4 @@
 #include "rcar_ucie_v102/rcar_ucie_misc.h"
 #endif /* AI_ACC UCIe */
 
-#endif // R_UCIE_PRIVATE_H_
+#endif // R_UCIE_PRIVATE_H

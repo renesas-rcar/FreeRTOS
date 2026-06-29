@@ -4,8 +4,8 @@
 * SPDX-License-Identifier: MIT
  *************************************************************************************************************/
 
-#ifndef _SYSDMAC_CTRL_H_
-#define _SYSDMAC_CTRL_H_
+#ifndef SYSDMAC_CTRL_H
+#define SYSDMAC_CTRL_H
 
 /**
  * @defgroup SYSDMAC_Module SYS-DMAC Module
@@ -74,4 +74,4 @@ uint16_t R_SYSDMAC_RcarCallBackSet(dmac_ctrl_t * const p_ctrl, void ( *p_callbac
 
 /** @} */ // end of SYSDMAC_Module
 
-#endif  /* _SYSDMAC_CTRL_H_ */
+#endif  /* SYSDMAC_CTRL_H */

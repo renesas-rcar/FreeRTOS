@@ -4,8 +4,8 @@
 * SPDX-License-Identifier: MIT
 */
 
-#ifndef _PCIE_EP
-#define _PCIE_EP
+#ifndef PCIE_EP
+#define PCIE_EP
 
 /**
  * @defgroup PCIe_EP_Module PCIe Endpoint Module

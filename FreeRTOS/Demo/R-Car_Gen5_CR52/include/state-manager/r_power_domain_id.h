@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef _R_POWER_DOMAIN_ID_H_
-#define _R_POWER_DOMAIN_ID_H_
+#ifndef R_POWER_DOMAIN_ID_H
+#define R_POWER_DOMAIN_ID_H
 
 /**
  * @defgroup X5H_Power_Domain_ID X5H Power Domain ID

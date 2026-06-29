@@ -5,8 +5,8 @@
 *
 */
 
-#ifndef _R_TAUD_REG_H
-#define _R_TAUD_REG_H
+#ifndef R_TAUD_REG_H
+#define R_TAUD_REG_H
 
 /***********************************************************************************************************************
  * Includes
@@ -712,4 +712,4 @@ uint16_t R_TAUD_CH_Set(uintptr_t reg_addr, uint8_t ch);
 
 uint16_t R_TAUD_CH_Clear(uintptr_t reg_addr, uint8_t ch);
 
-#endif /* _R_TAUD_REG_H */ 
+#endif /* R_TAUD_REG_H */

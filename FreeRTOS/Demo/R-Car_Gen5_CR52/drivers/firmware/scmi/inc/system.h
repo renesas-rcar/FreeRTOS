@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-#ifndef _SCMI_PROTOCOL_SYSTEM_H_
-#define _SCMI_PROTOCOL_SYSTEM_H_
+#ifndef SCMI_PROTOCOL_SYSTEM_H
+#define SCMI_PROTOCOL_SYSTEM_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -99,5 +99,5 @@ int scmi_system_power_state_set(uint32_t flags, uint32_t state);
 
 /** @} */ // end of group SCMI_Protocol_System_Module
 
-#endif // _SCMI_PROTOCOL_SYSTEM_H_
+#endif // SCMI_PROTOCOL_SYSTEM_H
 

@@ -9,8 +9,8 @@
  * Base protocol describes the properties of the implementation
  * and provides generic error management.
  */
-#ifndef _SCMI_PROTOCOL_BASE_H_
-#define _SCMI_PROTOCOL_BASE_H_
+#ifndef SCMI_PROTOCOL_BASE_H
+#define SCMI_PROTOCOL_BASE_H
 
 /**
  * @defgroup SCMI_Protocol_Base_Module SCMI Protocol Base Module
@@ -89,5 +89,5 @@ int scmi_base_discover_agent_get(uint32_t request_agent_id,
 
 /** @} */ // end of group SCMI_PROTOCOL_BASE_API
 
-#endif // _SCMI_PROTOCOL_BASE_H_
+#endif // SCMI_PROTOCOL_BASE_H
 

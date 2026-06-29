@@ -15,8 +15,8 @@
  * and managing interrupt contexts.
  */
 
-#ifndef __INTERRUPTS_H_
-#define __INTERRUPTS_H_
+#ifndef INTERRUPTS_H
+#define INTERRUPTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -451,4 +451,4 @@ int Irq_SetIntType(unsigned int id, r_irq_type type);
 
 /** @} */ // end of Interrupt_Controller
 
-#endif /* __INTERRUPTS_H_*/
+#endif /* INTERRUPTS_H*/

@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef __TCM_H__
-#define __TCM_H__
+#ifndef TCM_H
+#define TCM_H
 
 /** RCAR TCM regions */
 typedef enum e_rcar_tcm_region_t
@@ -61,4 +61,4 @@ void ConfigureTCM(rcar_tcm_region_t region, uint32_t base_addr, rcar_tcm_size_t 
  */
 void ControlTCM(rcar_tcm_region_t region, rcar_tcm_el_t el_level, rcar_tcm_state_t state);
 
-#endif /* __TCM_H__*/
+#endif /* TCM_H*/

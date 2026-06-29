@@ -10,8 +10,8 @@
  * @brief SCMI reset protocol helpers
  */
 
-#ifndef _SCMI_PROTOCOL_RESET_DOMAIN_H_
-#define _SCMI_PROTOCOL_RESET_DOMAIN_H_
+#ifndef SCMI_PROTOCOL_RESET_DOMAIN_H
+#define SCMI_PROTOCOL_RESET_DOMAIN_H
 
 #include "util.h"
 #include "protocol.h"
@@ -94,4 +94,4 @@ int scmi_reset_domain_attributes(uint32_t domain_id, uint32_t *attributes,
  */
 int scmi_reset_domain_request(struct scmi_reset_domain_request_config cfg);
 
-#endif /* _SCMI_PROTOCOL_RESET_DOMAIN_H_ */
+#endif /* SCMI_PROTOCOL_RESET_DOMAIN_H */

@@ -11,8 +11,8 @@
  * @brief Public APIs for the SCMI transport layer drivers
  */
 
-#ifndef _SCMI_TRANSPORT_H_
-#define _SCMI_TRANSPORT_H_
+#ifndef SCMI_TRANSPORT_H
+#define SCMI_TRANSPORT_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -279,4 +279,4 @@ static inline int scmi_transport_channel_free_set(const struct scmi_dev *transpo
 	return api->channel_free_set(transport, chan);
 }
 
-#endif /* _SCMI_TRANSPORT_H_ */
+#endif /* SCMI_TRANSPORT_H */

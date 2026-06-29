@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef MFIS_INTERNAL_H_
-#define MFIS_INTERNAL_H_
+#ifndef MFIS_INTERNAL_H
+#define MFIS_INTERNAL_H
 
 #include <stdint.h>
 
@@ -35,4 +35,4 @@
 #define INTID_R_S(i)    (0x0057 + i * 2) // Common INTID ch[i] from Receiver to Sender
 #define MFIS_INTID(i,type)    (0x0057 + i * 2 - type) // Common INTID ch[i] from Sender to Receiver, unused
 
-#endif // MFIS_INTERNAL_H_
+#endif // MFIS_INTERNAL_H

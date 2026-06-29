@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef __arm_generic_timer_h
-#define __arm_generic_timer_h
+#ifndef arm_generic_timer_h
+#define arm_generic_timer_h
 
 #include "cmsis_rcar_gen5.h"
 #define CNTFRQ_READ()         __get_CNTFRQ()
@@ -27,4 +27,4 @@ It means the counter operate at 1066.667MHz in equivalent */
 
 #endif
 
-#endif // __arm_generic_timer_h
+#endif // arm_generic_timer_h

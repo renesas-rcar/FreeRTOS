@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef R_UCIE_COMMON_H_
-#define R_UCIE_COMMON_H_
+#ifndef R_UCIE_COMMON_H
+#define R_UCIE_COMMON_H
 
 #define UCIE_AXI_BASE(n)    (0xD8000000U + (n) * 0x1000000)
 #define UCIE_APB_BASE(n)    (0xDC000000U + (n) * 0x1000000)
@@ -94,4 +94,4 @@ typedef struct{
 
 #define IATU_ADDR_MASK              (0xFFF)
 
-#endif /* R_UCIE_COMMON_H_ */
+#endif /* R_UCIE_COMMON_H */

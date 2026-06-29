@@ -14,8 +14,8 @@
  * @{
  */
 
-#ifndef R_UCIE_H_
-#define R_UCIE_H_
+#ifndef R_UCIE_H
+#define R_UCIE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -278,5 +278,5 @@ uint32_t R_UCIE_IATU_UnsetRegion(st_ucie_iatu_cfg_t *cfg);
 }
 #endif
 
-#endif /* R_UCIE_H_ */
+#endif /* R_UCIE_H */
 /** @} */  // end of file-level defgroup

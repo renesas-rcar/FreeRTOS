@@ -11,8 +11,8 @@
  * @brief SCMI SHMEM API
  */
 
-#ifndef _SCMI_SHMEM_H_
-#define _SCMI_SHMEM_H_
+#ifndef SCMI_SHMEM_H
+#define SCMI_SHMEM_H
 
 #include "cmsis_rcar_gen5.h"
 #include <stdbool.h>
@@ -75,4 +75,4 @@ int scmi_shmem_channel_free_set(const struct scmi_dev *shmem,
 
 int scmi_shmem_init(struct scmi_dev *dev);
 
-#endif /* _SCMI_SHMEM_H_ */
+#endif /* SCMI_SHMEM_H */

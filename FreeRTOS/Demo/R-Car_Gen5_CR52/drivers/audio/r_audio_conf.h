@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _R_AUDIO_CONF_H_
-#define _R_AUDIO_CONF_H_
+#ifndef R_AUDIO_CONF_H
+#define R_AUDIO_CONF_H
 
 /***********************************************************************************************************************
  * Macro definitions

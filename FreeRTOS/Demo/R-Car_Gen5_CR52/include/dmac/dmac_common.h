@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _RDMAC_COMMON_H_
-#define _RDMAC_COMMON_H_
+#ifndef RDMAC_COMMON_H
+#define RDMAC_COMMON_H
 
 /**
 *  @defgroup      RDMAC_Module Configuration Module of RDMAC Module

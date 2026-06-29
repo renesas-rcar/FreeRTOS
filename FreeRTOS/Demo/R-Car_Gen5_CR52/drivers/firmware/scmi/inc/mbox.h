@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _MBOX_H_
-#define _MBOX_H_
+#ifndef MBOX_H
+#define MBOX_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -353,4 +353,4 @@ static inline uint32_t mbox_max_channels_get(const struct scmi_dev *dev)
 }
 #endif
 
-#endif /* _MBOX_H_ */
+#endif /* MBOX_H */

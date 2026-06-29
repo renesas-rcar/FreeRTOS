@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef _DEVICE_TREE_X5H_H_
-#define _DEVICE_TREE_X5H_H_
+#ifndef DEVICE_TREE_X5H_H
+#define DEVICE_TREE_X5H_H
 
 #ifdef __cplusplus
 extern "C" {

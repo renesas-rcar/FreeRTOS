@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef R_SMMU_H_
-#define R_SMMU_H_
+#ifndef R_SMMU_H
+#define R_SMMU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -299,4 +299,4 @@ int R_SMMU_Enable(e_smmu_domain_t smmu_domain, bool is_secure);
 }
 #endif
 
-#endif /* R_SMMU_H_ */
+#endif /* R_SMMU_H */

@@ -11,8 +11,8 @@
  * @brief SCMI protocol generic functions and structures
  */
 
-#ifndef _SCMI_PROTOCOL_H_
-#define _SCMI_PROTOCOL_H_
+#ifndef SCMI_PROTOCOL_H
+#define SCMI_PROTOCOL_H
 
 #include <stdint.h>
 #include <errno.h>
@@ -186,4 +186,4 @@ int scmi_status_to_errno(int scmi_status);
 int scmi_send_message(struct scmi_protocol *proto,
 		      struct scmi_message *msg, struct scmi_message *reply);
 
-#endif /* _SCMI_PROTOCOL_H_ */
+#endif /* SCMI_PROTOCOL_H */

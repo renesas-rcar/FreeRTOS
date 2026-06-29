@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef _SCMI_MAILBOX_H_
-#define _SCMI_MAILBOX_H_
+#ifndef SCMI_MAILBOX_H
+#define SCMI_MAILBOX_H
 
 #include "transport.h"
 #include "util.h"
@@ -27,4 +27,4 @@ struct scmi_mbox_channel {
 
 int scmi_mbox_init(struct scmi_dev *transport);
 
-#endif /* _SCMI_MAILBOX_H_ */
+#endif /* SCMI_MAILBOX_H */

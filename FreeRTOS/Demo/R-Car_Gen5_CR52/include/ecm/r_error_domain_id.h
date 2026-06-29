@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef _R_ERROR_ID_H_
-#define _R_ERROR_ID_H_
+#ifndef R_ERROR_ID_H
+#define R_ERROR_ID_H
 
 /**
  * @defgroup Error_Domain_ID Error Domain ID
@@ -87,4 +87,4 @@ typedef enum {
 
 /** @} */ // end
 
-#endif /* _R_ERROR_ID_H_ */
+#endif /* R_ERROR_ID_H */

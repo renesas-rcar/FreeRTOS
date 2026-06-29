@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: MIT
  *
  */
-#ifndef FREERTOSCONFIG_H_
-#define FREERTOSCONFIG_H_
+#ifndef FREERTOSCONFIG_H
+#define FREERTOSCONFIG_H
 /*-----------------------------------------------------------
  * Application specific definitions.
  *

@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: MIT
  *
  */
-#ifndef R_I2C_H_
-#define R_I2C_H_
+#ifndef R_I2C_H
+#define R_I2C_H
 
 /**
  * @defgroup I2C_Module I2C Module

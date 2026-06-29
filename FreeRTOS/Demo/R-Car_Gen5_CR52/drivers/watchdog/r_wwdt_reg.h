@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef R_WWDT_REGS_H_
-#define R_WWDT_REGS_H_
+#ifndef R_WWDT_REGS_H
+#define R_WWDT_REGS_H
 
 #include <stdint.h>
 #include "watchdog/r_wwdt_api.h"
@@ -55,4 +55,4 @@ void r_wwdt_write8(uintptr_t Addr, uint8_t val);
 uint32_t r_wwdt_read(uintptr_t Addr);
 uint8_t r_wwdt_read8(uintptr_t Addr);
 
-#endif /* R_WWDT_REGS_H_ */
+#endif /* R_WWDT_REGS_H */

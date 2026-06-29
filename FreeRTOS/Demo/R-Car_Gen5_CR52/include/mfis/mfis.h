@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef MFIS_H_
-#define MFIS_H_
+#ifndef MFIS_H
+#define MFIS_H
 
 #include<stdint.h>
 
@@ -36,5 +36,5 @@ int mfis_send_message(struct mfis_channel *ch, uint32_t value);
 uint16_t mfis_get_int_source_num(struct mfis_channel *ch);
 uint16_t mfis_get_message(struct mfis_channel *ch);
 
-#endif // MFIS_H_
+#endif // MFIS_H
 

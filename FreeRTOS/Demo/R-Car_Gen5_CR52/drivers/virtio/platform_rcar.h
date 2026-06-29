@@ -7,8 +7,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef PLATFORM_RCAR_H_
-#define PLATFORM_RCAR_H_
+#ifndef PLATFORM_RCAR_H
+#define PLATFORM_RCAR_H
 
 #include <openamp/remoteproc.h>
 #include <openamp/virtio.h>
@@ -111,4 +111,4 @@ void platform_cleanup(struct remoteproc *platform);
 }
 #endif
 
-#endif /* PLATFORM_RCAR_H_ */
+#endif /* PLATFORM_RCAR_H */

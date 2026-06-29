@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-#ifndef __TRANSLATION_TABLE_H__
-#define __TRANSLATION_TABLE_H__
+#ifndef TRANSLATION_TABLE_H
+#define TRANSLATION_TABLE_H
 
 #include "smmu/smmu.h"
 
@@ -33,4 +33,4 @@ typedef struct st_mm_region
 e_smmu_map_fault_code_t CreateTranslationTable(uint64_t **ttb, st_mm_region_t region_mem);
 void freeMemoryRegion(uint64_t *ttb, uint64_t va, uint64_t pa, uint64_t size);
 
-#endif /* __TRANSLATION_TABLE_H__ */
+#endif /* TRANSLATION_TABLE_H */

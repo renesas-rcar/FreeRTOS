@@ -4,8 +4,8 @@
 * SPDX-License-Identifier: MIT
 *************************************************************************************************************/
 
-#ifndef R_PFC_API_H_
-#define R_PFC_API_H_
+#ifndef R_PFC_API_H
+#define R_PFC_API_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -153,4 +153,4 @@ int pfcSetNoPull(rcar_pfc_group_t grp, rcar_pfc_pin_t pin);
 }
 #endif
 /** @} */
-#endif /* R_PFC_API_H_ */
+#endif /* R_PFC_API_H */

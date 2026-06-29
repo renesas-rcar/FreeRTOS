@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef _R_CLOCK_ID_H_
-#define _R_CLOCK_ID_H_
+#ifndef R_CLOCK_ID_H
+#define R_CLOCK_ID_H
 
 #ifdef __cplusplus
 extern "C" {

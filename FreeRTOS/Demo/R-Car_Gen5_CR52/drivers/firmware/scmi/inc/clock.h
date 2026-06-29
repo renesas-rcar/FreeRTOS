@@ -11,8 +11,8 @@
  * @brief SCMI clock protocol helpers
  */
 
-#ifndef _SCMI_PROTOCOL_CLOCK_H_
-#define _SCMI_PROTOCOL_CLOCK_H_
+#ifndef SCMI_PROTOCOL_CLOCK_H
+#define SCMI_PROTOCOL_CLOCK_H
 
 #include "util.h"
 #include "protocol.h"
@@ -179,4 +179,4 @@ int scmi_clock_parent_get(uint32_t clk_id, uint32_t *parent_id);
  */
 int scmi_clock_parent_set(uint32_t clk_id, uint32_t parent_id);
 
-#endif /* _SCMI_PROTOCOL_CLOCK_H_ */
+#endif /* SCMI_PROTOCOL_CLOCK_H */

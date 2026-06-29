@@ -14,8 +14,8 @@
  * transport "registration".
  */
 
-#ifndef _SCMI_UTIL_H_
-#define _SCMI_UTIL_H_
+#ifndef SCMI_UTIL_H
+#define SCMI_UTIL_H
 
 #include <stdint.h>
 
@@ -172,5 +172,5 @@ extern struct scmi_dev transport_dev;
 	SCMI_TRANSPORT_CHANNELS_DECLARE()			\
 	SCMI_PROTOCOL_DATA_DEFINE(proto, data)
 
-#endif /* _SCMI_UTIL_H_ */
+#endif /* SCMI_UTIL_H */
 

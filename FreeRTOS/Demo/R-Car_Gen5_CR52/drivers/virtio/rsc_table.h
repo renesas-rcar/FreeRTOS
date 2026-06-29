@@ -13,8 +13,8 @@
  * for use by the Linux host
  */
 
-#ifndef RSC_TABLE_H_
-#define RSC_TABLE_H_
+#ifndef RSC_TABLE_H
+#define RSC_TABLE_H
 
 #include <stddef.h>
 #include <openamp/open_amp.h>
@@ -44,4 +44,4 @@ void *get_resource_table (int rsc_id, int *len);
 }
 #endif
 
-#endif /* RSC_TABLE_H_ */
+#endif /* RSC_TABLE_H */

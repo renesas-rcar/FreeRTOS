@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _AK4619_MODULE_H_
-#define _AK4619_MODULE_H_
+#ifndef AK4619_MODULE_H
+#define AK4619_MODULE_H
 
 #include <stdint.h>
 #include <stdbool.h>

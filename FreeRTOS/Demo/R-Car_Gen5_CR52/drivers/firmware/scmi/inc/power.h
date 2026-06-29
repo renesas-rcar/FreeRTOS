@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef _SCMI_PROTOCOL_POWER_H_
-#define _SCMI_PROTOCOL_POWER_H_
+#ifndef SCMI_PROTOCOL_POWER_H
+#define SCMI_PROTOCOL_POWER_H
 
 /**
  * @defgroup SCMI_Protocol_Power_Module SCMI Protocol Power Module
@@ -106,5 +106,5 @@ int scmi_power_state_get(struct scmi_power_state_config *cfg);
 
 /** @} */ // end of SCMI_Protocol_Power_Module
 
-#endif /* _SCMI_PROTOCOL_POWER_H_ */
+#endif /* SCMI_PROTOCOL_POWER_H */
 

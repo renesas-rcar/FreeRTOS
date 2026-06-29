@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _RCAR_AUDIO_H_
-#define _RCAR_AUDIO_H_
+#ifndef RCAR_AUDIO_H
+#define RCAR_AUDIO_H
 
 #ifdef __cplusplus
 extern "C" {

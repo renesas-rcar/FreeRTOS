@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef _SCMI_COMMON_H_
-#define _SCMI_COMMON_H_
+#ifndef SCMI_COMMON_H
+#define SCMI_COMMON_H
 
 #include <stdint.h>
 
@@ -109,5 +109,5 @@ typedef void (*scmi_notifier_callback_t)(void *data);
 void scmi_notifier_callback_register(struct scmi_protocol *proto,
                                      scmi_notifier_callback_t cb);
 
-#endif /* _SCMI_COMMON_H_ */
+#endif /* SCMI_COMMON_H */
 

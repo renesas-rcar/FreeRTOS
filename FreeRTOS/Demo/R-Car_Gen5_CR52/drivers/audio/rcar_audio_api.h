@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _RCAR_AUDIO_API_H_
-#define _RCAR_AUDIO_API_H_
+#ifndef RCAR_AUDIO_API_H
+#define RCAR_AUDIO_API_H
 
 #include "FreeRTOS.h"
 #include "task.h"

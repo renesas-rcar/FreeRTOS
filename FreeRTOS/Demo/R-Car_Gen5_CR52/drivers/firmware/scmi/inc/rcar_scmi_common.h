@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-#ifndef __RCAR_SCMI_COMMON_H_
-#define __RCAR_SCMI_COMMON_H_
+#ifndef RCAR_SCMI_COMMON_H
+#define RCAR_SCMI_COMMON_H
 
 #include "cmsis_rcar_gen5.h"
 //#define S2R_DRAFT_FLOW
@@ -65,5 +65,5 @@
 		CURRENT_CORE_MPIDR : \
 		CURRENT_CORE_MPIDR + 4 * CURRENT_CLUSTER_MPIDR)
 
-#endif /* __RCAR_SCMI_COMMON_H_ */
+#endif /* RCAR_SCMI_COMMON_H */
 

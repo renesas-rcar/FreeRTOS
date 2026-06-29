@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _RDMAC_REG_H_
-#define _RDMAC_REG_H_
+#ifndef RDMAC_REG_H
+#define RDMAC_REG_H
 
 /* Definition of RTDMAC address */
 #define DRV_RTDMAC_REG_ADDR_DMAC0           (0x18900000U)      /* RTDMAC0 */
@@ -406,4 +406,4 @@ extern void R_RTDMAC_Update_RDMRS_ID(uint8_t dev,uint8_t ch, uint8_t Value);
 extern void R_RTDMAC_Update_RDMDPBASE(uint8_t dev,uint8_t ch, uint64_t Value);
 extern void R_RTDMAC_Update_RDMDPCR(uint8_t dev,uint8_t ch, uint8_t Value);
 
-#endif  /* _RDMAC_REG_H_ */
+#endif  /* RDMAC_REG_H */

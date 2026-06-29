@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef __RCAR_UCIE_UCIE_CONTROLLER_H__
-#define __RCAR_UCIE_UCIE_CONTROLLER_H__
+#ifndef RCAR_UCIE_UCIE_CONTROLLER_H
+#define RCAR_UCIE_UCIE_CONTROLLER_H
 
 /*-----  Registers Address-Block Base Address  -----*/
 #define IMP_SPECIFIC_SB_UNIT_BASE_ADD     RCAR_UCIE_BASE_ADD(0x41782000) //0x282000
@@ -32,4 +32,4 @@
 /*-----  CXL_DVSEC_UNIT_DSP detail register offset  -----*/
 #define CXL_DVSEC_UNIT_DSP_CXL_DVSEC_FLEX_CTL_STATUS_ADD    (CXL_DVSEC_UNIT_DSP_BASE_ADD + 0xc)
 
-#endif /* __RCAR_UCIE_UCIE_CONTROLLER_H__ */
+#endif /* RCAR_UCIE_UCIE_CONTROLLER_H */

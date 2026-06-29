@@ -4,8 +4,8 @@
 * SPDX-License-Identifier: MIT
  *************************************************************************************************************/
 
-#ifndef R_GICV3_H_
-#define R_GIC_H_
+#ifndef R_GICV3_H
+#define R_GIC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -255,4 +255,4 @@ uint32_t R_GIC_ClearIntPending(uint32_t ID, uint32_t rd);
 }
 #endif 
 
-#endif /* R_GIC_H_ */
+#endif /* R_GIC_H */

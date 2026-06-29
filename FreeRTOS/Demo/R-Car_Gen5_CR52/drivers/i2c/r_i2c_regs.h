@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef R_I2C_REGS_H_
-#define R_I2C_REGS_H_
+#ifndef R_I2C_REGS_H
+#define R_I2C_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,4 +96,4 @@ uintptr_t   R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit);
 }
 #endif
 
-#endif /* R_I2C_REGS_H_ */
+#endif /* R_I2C_REGS_H */

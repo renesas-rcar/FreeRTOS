@@ -4,8 +4,8 @@
 * SPDX-License-Identifier: MIT
 *************************************************************************************************************/
 
-#ifndef R_GPIO_API_H_
-#define R_GPIO_API_H_
+#ifndef R_GPIO_API_H
+#define R_GPIO_API_H
 
 #include "interrupts.h"
 
@@ -229,4 +229,4 @@ int R_GPIO_SetInterruptCallback(rcar_gpio_group_t grp, IrqHandlerFn handler, voi
 }
 #endif
 
-#endif /* R_GPIO_API_H_ */
+#endif /* R_GPIO_API_H */

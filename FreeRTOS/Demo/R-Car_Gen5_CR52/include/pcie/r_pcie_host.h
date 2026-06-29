@@ -3,8 +3,8 @@
 *
 * SPDX-License-Identifier: MIT
 */
-#ifndef _PCIE_HOST
-#define _PCIE_HOST
+#ifndef PCIE_HOST
+#define PCIE_HOST
 
 /**
  * @defgroup PCIe_Host_Module PCIe Host Module

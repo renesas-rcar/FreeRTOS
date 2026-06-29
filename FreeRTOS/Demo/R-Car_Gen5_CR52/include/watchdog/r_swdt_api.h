@@ -4,8 +4,8 @@
 * http://opensource.org/licenses/mit-license.php
 * SPDX-License-Identifier: MIT
 *************************************************************************************************************/
-#ifndef _R_SWDT_API_H
-#define _R_SWDT_API_H_
+#ifndef R_SWDT_API_H
+#define R_SWDT_API_H
 
 /**
  * @defgroup SWDT_Module SWDT Module
@@ -79,4 +79,4 @@ uint32_t R_SWDT_Stop();
 
 /** @} */ // end of SWDT_Module
 
-#endif /* R_SWDT_API_H_ */
+#endif /* R_SWDT_API_H */

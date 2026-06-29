@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef __SERIAL_H__
-#define __SERIAL_H__
+#ifndef SERIAL_H
+#define SERIAL_H
 
 /**
  * @defgroup Serial_Module Serial Module
@@ -153,4 +153,4 @@ int32_t R_SERIAL_ReConfigure(e_serial_devices_t device);
 
 /** @} */ // end of Serial_Module
 
-#endif	/* __SERIAL_H__ */
+#endif	/* SERIAL_H */

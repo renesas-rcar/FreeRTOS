@@ -3,8 +3,8 @@
 *
 * SPDX-License-Identifier: MIT
 */
-#ifndef _PCIE_CTRL
-#define _PCIE_CTRL
+#ifndef PCIE_CTRL
+#define PCIE_CTRL
 
 /**
  * @defgroup PCIe_Module PCIe Module

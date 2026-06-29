@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _RENESAS_CRC_WRAPPER_H_
-#define _RENESAS_CRC_WRAPPER_H_
+#ifndef RENESAS_CRC_WRAPPER_H
+#define RENESAS_CRC_WRAPPER_H
 
 #include "wcrc/r_wcrc_common.h"
 
@@ -25,4 +25,4 @@ int wcrcGetCrcSize(wcrc_sub_module_t module, wcrc_instance_ctrl_t * const p_inst
 int wcrcSetBufferAddress(uint8_t module, wcrc_instance_ctrl_t * const p_instance_ctrl,
                         uint32_t addr);
 
-#endif /* _RENESAS_CRC_WRAPPER_H_ */
+#endif /* RENESAS_CRC_WRAPPER_H */

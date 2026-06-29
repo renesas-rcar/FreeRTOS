@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _SSI_H_
-#define _SSI_H_
+#ifndef SSI_H
+#define SSI_H
 
 #include <stdint.h>
 #include <stddef.h>

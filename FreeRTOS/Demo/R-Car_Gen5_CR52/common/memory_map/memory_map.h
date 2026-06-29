@@ -8,7 +8,7 @@
 #define _MEMORY_MAP_H
 
 #include "board.h"
-#ifndef _BOARD_H_
+#ifndef BOARD_H
     #error "board.h must be included before using statement with macro BOARD"
 #elif (BOARD == X5H_VDK)
 #include "memory_map_x5h_vdk.h"

@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef R_UCIE_COMMON_H_
-#define R_UCIE_COMMON_H_
+#ifndef R_UCIE_COMMON_H
+#define R_UCIE_COMMON_H
 
 #define UCIE_APB_BASE(n)    (0xDC000000U + (n) * 0x1000000)
 
@@ -31,4 +31,4 @@
 
 #define IATU_RGN_OFFSET         (0x80000)
 
-#endif /* R_UCIE_COMMON_H_ */
+#endif /* R_UCIE_COMMON_H */

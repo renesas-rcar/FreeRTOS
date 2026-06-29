@@ -5,8 +5,8 @@
 *
 */
 
-#ifndef _R_TAUD_H
-#define _R_TAUD_H
+#ifndef R_TAUD_H
+#define R_TAUD_H
 
 #ifdef __cplusplus
 extern "C" {

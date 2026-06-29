@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef __MPU_H__
-#define __MPU_H__
+#ifndef MPU_H
+#define MPU_H
 
 #include "armv8r_mpu.h"
 
@@ -199,4 +199,4 @@ uint8_t MPU_SetRegion(ARM_MPU_Region_t region_attr);
  */
 uint8_t MPU_ClrRegion_ByIndex(e_region_index_t rnr);
 
-#endif /* __MPU_H__*/
+#endif /* MPU_H*/

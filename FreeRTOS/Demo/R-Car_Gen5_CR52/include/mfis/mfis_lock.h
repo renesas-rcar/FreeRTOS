@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef MFIS_LOCK_H_
-#define MFIS_LOCK_H_
+#ifndef MFIS_LOCK_H
+#define MFIS_LOCK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -122,4 +122,4 @@ e_mfis_lock_status_t R_MFIS_LockRelease(e_mfis_lock_id_t mfis_id);
 }
 #endif
 
-#endif // MFIS_LOCK_H_
+#endif // MFIS_LOCK_H

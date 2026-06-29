@@ -6,12 +6,12 @@
  *
  */
 
-#ifndef _MBOX_MFIS_MAILBOX_H_
-#define _MBOX_MFIS_MAILBOX_H_
+#ifndef MBOX_MFIS_MAILBOX_H
+#define MBOX_MFIS_MAILBOX_H
 
 #include "mbox.h"
 
 int mfis_mailbox_init(struct mbox_spec *spec);
 
-#endif /* _MBOX_MFIS_MAILBOX_H_ */
+#endif /* MBOX_MFIS_MAILBOX_H */
 
