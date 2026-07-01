@@ -37,6 +37,7 @@ extern uintptr_t R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit)
     case R_I2C_IF3:
         ret = R_I2C_IF3_BASE;
         break;
+#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK)
     case R_I2C_IF4:
         ret = R_I2C_IF4_BASE;
         break;
@@ -52,6 +53,7 @@ extern uintptr_t R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit)
     case R_I2C_IF8:
         ret = R_I2C_IF8_BASE;
         break;
+#endif
     default:
         printf("[R_I2C_PRV_GetRegbase] : Wrong I2C Unit %d\r\n", I2cUnit);
         break;
