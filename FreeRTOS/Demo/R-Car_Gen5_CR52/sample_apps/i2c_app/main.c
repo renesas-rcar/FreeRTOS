@@ -49,6 +49,7 @@
 #define RC21214		0x09
 #define RC21214_REG_ADDR 0xFC
 #define TCAL9539_REG_ADDR   0x03
+#define PTN3222_REG_ADDR 	0x02
 
 #define I2C_APP_SIZE (configMINIMAL_STACK_SIZE * 2)
 /*-----------------------------------------------------------*/
@@ -120,9 +121,6 @@ static void prvI2CTask( void *pvParameters )
 			vTaskDelay(1000);
 		};
     }
-
-	/* Remove compiler warning about unused parameter. */
-	( void ) pvParameters;
 
 	/* Device driver part for ch1 */
 	i2c_instance_ctrl_t g_i2c_device_ctrl_1;
@@ -406,6 +404,132 @@ static void prvI2CTask( void *pvParameters )
 	R_I2C_Close(&g_i2c_device_ctrl_5);
 	printf("------------- TC5: END TEST I2C CHANNEL %d -------------\r\n", g_i2c_device_cfg_5.channel);
 
+	#if (BOARD == MDP_X5H_HIL)
+	send_data_dma[0] = PTN3222_REG_ADDR;
+	/* Device driver part for channel 5 DMA */
+    i2c_instance_ctrl_t g_i2c_device_ctrl_6;
+	i2c_master_cfg_t g_i2c_device_cfg_6 =
+	{
+		.channel       = 5,
+		.rate          = I2C_MASTER_RATE_FAST,
+		.slave         = PTN3222,
+		.addr_mode     = I2C_MASTER_ADDR_MODE_7BIT,
+		.dma_single    = true,
+		.p_context     = &g_i2c_device_ctrl_6,
+		.dmac_unit      = SYS_DMAC2,
+		.dmac_channel   = DMAC_CH4,
+		.dmac_irq_id    = INTID_SYSDMA2_CH4
+	};
+
+    printf("------------- TC6: START TEST I2C CHANNEL %d DMA MODE (MDP) -------------\r\n", g_i2c_device_cfg_6.channel);
+	
+	/* Open I2C */
+	R_I2C_Open(&g_i2c_device_ctrl_6, &g_i2c_device_cfg_6);
+
+	/* Set interrupt I2C */
+	R_I2C_CallbackSet(&g_i2c_device_ctrl_6, (void *)i2cUserCallback, &g_i2c_device_ctrl_6, NULL);
+
+	/* Read default value */
+	R_I2C_ReadRegMap(&g_i2c_device_ctrl_6, send_data_dma[0], default_value_dma, sizeof(default_value_dma));
+	if (xSemaphoreTake(xI2C_Semaphore, portMAX_DELAY) == pdTRUE)
+	{
+		if (transfer_success == true)
+		{
+			R_UTILS_ReadMemForDMA(default_value_dma, sizeof(default_value_dma));
+			printf("DEFAULT VALUE: ");
+			for (uint8_t i = 0; i < sizeof(default_value_dma); i++)
+				printf("0x%02x\t", default_value_dma[i]);
+			printf("\r\n");
+			transfer_success = false;
+		}
+		else 
+		{
+			printf("ERROR: I2C transfer failed\n");
+			for (;;) {};
+		}
+	}
+
+	send_data_dma[1] = 0x40;
+	send_data_dma[2] = default_value_dma[1];
+	send_data_dma[3] = default_value_dma[2];
+	/* Write data */
+	printf("WRITE DATA\r\n");
+	R_I2C_Write(&g_i2c_device_ctrl_6, send_data_dma, sizeof(send_data_dma), 0);
+	if (xSemaphoreTake(xI2C_Semaphore, portMAX_DELAY) == pdTRUE)
+	{
+		printf("WRITE DONE\r\n");
+	}
+
+	/* Read again to check write OK or not */
+	R_I2C_ReadRegMap(&g_i2c_device_ctrl_6, send_data_dma[0], (uint8_t *)&result_dma, sizeof(result_dma));
+	if (xSemaphoreTake(xI2C_Semaphore, portMAX_DELAY) == pdTRUE)
+	{
+		if (transfer_success == true)
+		{
+			R_UTILS_ReadMemForDMA(result_dma, sizeof(result_dma));
+			printf("READ DATA: ");
+			for (uint8_t i = 0; i < sizeof(result_dma); i++)
+				printf("0x%02x\t", result_dma[i]);
+			printf("\r\n");
+			transfer_success = false;
+		}
+		else 
+		{
+			printf("ERROR: I2C transfer failed\n");
+			for (;;) {};
+		}
+	}
+
+	bool test_passed = true;
+	for (uint8_t i = 0; i < 3; i++) { 
+		if (result_dma[i] != send_data_dma[i+1]) { // result_dma[0,1,2] compare send_data_dma[1,2,3]
+			test_passed = false;
+			break;
+		}
+	}
+	if (test_passed) {
+		printf(">>> TEST OK <<<\r\n");
+	} else {
+		printf(">>> TEST FAILED <<<\r\n");
+	}
+
+	/* Restore default value */
+	restore_data_dma[0] = PTN3222_REG_ADDR; // Register address
+	restore_data_dma[1] = default_value_dma[0];
+	restore_data_dma[2] = default_value_dma[1];
+	restore_data_dma[3] = default_value_dma[2];
+	restore_data_dma[4] = default_value_dma[3];
+	printf("RESTORING ORIGINAL VALUES...\r\n");
+	R_I2C_Write(&g_i2c_device_ctrl_6, restore_data_dma, sizeof(restore_data_dma), 0);
+	if (xSemaphoreTake(xI2C_Semaphore, portMAX_DELAY) == pdTRUE)
+	{
+		printf("WRITE RESTORE VALUE DONE\n");
+	}
+
+	/* Print restore value */
+	R_I2C_ReadRegMap(&g_i2c_device_ctrl_6, send_data_dma[0], default_value_dma, sizeof(default_value_dma));
+	if (xSemaphoreTake(xI2C_Semaphore, portMAX_DELAY) == pdTRUE)
+	{
+		if (transfer_success == true)
+		{
+			R_UTILS_ReadMemForDMA(default_value_dma, sizeof(default_value_dma));
+			printf("RESTORED VALUE: ");
+			for (uint8_t i = 0; i < sizeof(default_value_dma); i++)
+				printf("0x%02x\t", default_value_dma[i]);
+			printf("\r\n");
+			transfer_success = false;
+		}
+		else 
+		{
+			printf("ERROR: I2C transfer failed\n");
+			for (;;) {};
+		}
+	}
+
+	/* Close instance */
+	R_I2C_Close(&g_i2c_device_ctrl_6);
+    printf("------------- TC6: END TEST I2C CHANNEL %d DMA MODE -------------\r\n", g_i2c_device_cfg_6.channel);
+	#else
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* Device driver part for channel 6*/
     i2c_instance_ctrl_t g_i2c_device_ctrl_6;
@@ -527,7 +651,7 @@ static void prvI2CTask( void *pvParameters )
 	/* Close instance */
 	R_I2C_Close(&g_i2c_device_ctrl_6);
     printf("------------- TC6: END TEST I2C CHANNEL %d DMA MODE -------------\r\n", g_i2c_device_cfg_6.channel);
-
+	#endif
 	/* Delete semaphore */
 	vSemaphoreDelete(xI2C_Semaphore);
 	printf("------------- End -------------\r\n");
