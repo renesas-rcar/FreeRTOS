@@ -15,9 +15,21 @@
 #include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_state_manager.h"
 #include "dmac/dmac_common.h"
-#include "dmac/sysdmac_ctrl.h"
 #include "i2c/r_i2c.h"
 #include "r_i2c_regs.h"
+
+/* ==================== DEFINE FUNCTIONS ==================== */
+#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK)
+#include "dmac/sysdmac_ctrl.h"
+#define RCAR_DMAC_CTRL_INIT     R_SYSDMAC_RcarDmacCtrlInit
+#define RCAR_DMAC_CALLBACK_SET  R_SYSDMAC_RcarCallBackSet
+#define RCAR_DMAC_EXEC          R_SYSDMAC_RcarDmacExec
+#else // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
+#include "dmac/rtdmac_ctrl.h"
+#define RCAR_DMAC_CTRL_INIT     R_RTDMAC_RcarDmacCtrlInit
+#define RCAR_DMAC_CALLBACK_SET  R_RTDMAC_RcarCallBackSet
+#define RCAR_DMAC_EXEC          R_RTDMAC_RcarDmacExec
+#endif
 
 /* ==================== DEFINES ==================== */
 #define I2C_OPEN                                (0x00000001ULL)
@@ -325,15 +337,15 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
             memset(p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg, 0, sizeof(rDmacCfg_t));
         }
 
-        ret = R_SYSDMAC_RcarDmacCtrlInit(p_instance_ctrl->p_cfg->sys_dmac_unit, DRV_RTDMAC_PRIO_FIX);
+        ret = RCAR_DMAC_CTRL_INIT(p_instance_ctrl->p_cfg->dmac_unit, DRV_RTDMAC_PRIO_FIX);
         if (ret != 0) 
         {
             return -1;
         }
 
-        p_instance_ctrl->p_dmac_handle_irq->Unit = p_instance_ctrl->p_cfg->sys_dmac_unit;
-        p_instance_ctrl->p_dmac_handle_irq->SubCh = p_instance_ctrl->p_cfg->sys_dmac_channel;
-        p_instance_ctrl->p_dmac_handle_irq->irq_channel = p_instance_ctrl->p_cfg->sys_dmac_irq_id;
+        p_instance_ctrl->p_dmac_handle_irq->Unit = p_instance_ctrl->p_cfg->dmac_unit;
+        p_instance_ctrl->p_dmac_handle_irq->SubCh = p_instance_ctrl->p_cfg->dmac_channel;
+        p_instance_ctrl->p_dmac_handle_irq->irq_channel = p_instance_ctrl->p_cfg->dmac_irq_id;
         p_instance_ctrl->p_dmac_handle_irq->p_context = p_instance_ctrl;
 
         // Allocate Context_t
@@ -345,7 +357,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
         }
         p_usr_context->ctx = p_instance_ctrl->p_dmac_handle_irq;
 
-        ret = R_SYSDMAC_RcarCallBackSet(p_instance_ctrl->p_dmac_handle_irq, (void *)rcar_i2c_dma_callback, p_usr_context);
+        ret = RCAR_DMAC_CALLBACK_SET(p_instance_ctrl->p_dmac_handle_irq, (void *)rcar_i2c_dma_callback, p_usr_context);
         if (ret != 0) {
             return -1;
         }
@@ -897,7 +909,7 @@ static void rcar_i2c_irq_recv(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         /* Enable DMAC for receive mode */
-        R_SYSDMAC_RcarDmacExec(p_instance_ctrl->p_dmac_handle_irq->Unit, p_instance_ctrl->p_dmac_handle_irq->SubCh, p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg, 0); 
+        RCAR_DMAC_EXEC(p_instance_ctrl->p_dmac_handle_irq->Unit, p_instance_ctrl->p_dmac_handle_irq->SubCh, p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg, 0);
         return;
     }
 
@@ -1012,7 +1024,7 @@ static void rcar_i2c_irq_send(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
         {
             /* Setting DMA */
             R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICDMAER, R_I2C_TMDMAE);
-            R_SYSDMAC_RcarDmacExec(p_instance_ctrl->p_dmac_handle_irq->Unit, p_instance_ctrl->p_dmac_handle_irq->SubCh, p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg, 0);
+            RCAR_DMAC_EXEC(p_instance_ctrl->p_dmac_handle_irq->Unit, p_instance_ctrl->p_dmac_handle_irq->SubCh, p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg, 0);
             return;
         }
 

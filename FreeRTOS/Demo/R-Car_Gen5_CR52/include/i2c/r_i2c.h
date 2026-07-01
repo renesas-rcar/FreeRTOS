@@ -108,9 +108,9 @@ typedef struct st_i2c_master_cfg
 
     void const * p_extend;                                    ///< Implementation-specific configuration, including any hardware-specific configuration data.
 
-    uint8_t sys_dmac_unit;       ///< SYS_DMAC2, SYS_DMAC3, etc.
-    uint8_t sys_dmac_channel;        ///< DMAC_CH0, DMAC_CH1, etc.
-    uint32_t sys_dmac_irq_id;   ///< INTID_SYSDMA2_CH0, etc.
+    uint8_t dmac_unit;      ///< RT_DMAC0, SYS_DMAC2, etc.
+    uint8_t dmac_channel;   ///< DMAC_CH3, DMAC_CH4, etc.
+    uint32_t dmac_irq_id;   ///< INTID_RTDMA0_CH3, INTID_SYSDMA2_CH4 etc.
 } i2c_master_cfg_t;
 
 /**
