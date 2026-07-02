@@ -47,7 +47,7 @@ if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "
         set(PLATFORM_DEVICE "aiacc")
     elseif(BOARD STREQUAL "mdp_x5h_hil")
         set(BOARD_ID 6)
-        set(PLATFORM_DEVICE "x5h")
+        set(PLATFORM_DEVICE "mdp_x5h")
     else()
         message(FATAL_ERROR "Invalid BOARD: ${BOARD}.")
     endif()
