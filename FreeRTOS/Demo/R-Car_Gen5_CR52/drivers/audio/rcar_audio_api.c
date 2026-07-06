@@ -297,14 +297,14 @@ int r_audio_clock_on(void)
 #if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 	int clock_id = X5H_CLOCK_ID_MDLC_ADG0;
 	res = R_StateManager_ClockOn(clock_id);
-    if (res)
+    if (res != 0)
     {
         printf("Error: Failed to set clock id %d ON.\r\n",
                 clock_id);
     }
 	clock_id = X5H_CLOCK_ID_MDLC_SSI0;
 	res = R_StateManager_ClockOn(clock_id);
-    if (res)
+    if (res != 0)
     {
         printf("Error: Failed to set clock id %d ON.\r\n",
                 clock_id);
@@ -312,7 +312,7 @@ int r_audio_clock_on(void)
 
 	clock_id = X5H_CLOCK_ID_MDLC_SSI05;
 	res = R_StateManager_ClockOn(clock_id);
-    if (res)
+    if (res != 0)
     {
         printf("Error: Failed to set clock id %d ON.\r\n",
                 clock_id);
@@ -328,7 +328,7 @@ int r_audio_clock_off(void)
 #if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 	int clock_id = X5H_CLOCK_ID_MDLC_ADG0;
 	res = R_StateManager_ClockOff(clock_id);
-    if (res)
+    if (res != 0)
     {
         printf("Error: Failed to set clock id %d ON.\r\n",
                 clock_id);
@@ -340,7 +340,7 @@ int r_audio_clock_off(void)
 
 	clock_id = X5H_CLOCK_ID_MDLC_SSI0;
 	res = R_StateManager_ClockOff(clock_id);
-    if (res)
+    if (res != 0)
     {
         printf("Error: Failed to set clock id %d ON.\r\n",
                 clock_id);
@@ -351,7 +351,7 @@ int r_audio_clock_off(void)
     }
 	clock_id = X5H_CLOCK_ID_MDLC_SSI05;
 	res = R_StateManager_ClockOff(clock_id);
-    if (res)
+    if (res != 0)
     {
         printf("Error: Failed to set clock id %d ON.\r\n",
                 clock_id);

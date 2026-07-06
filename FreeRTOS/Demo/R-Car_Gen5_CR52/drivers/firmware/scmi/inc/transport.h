@@ -108,7 +108,7 @@ scmi_transport_request_channel(const struct scmi_dev *transport,
 	const struct scmi_transport_api *api =
 		(const struct scmi_transport_api *)transport->api;
 
-	if (api->request_channel) {
+	if (api->request_channel != NULL) {
 		return api->request_channel(transport, proto, tx);
 	}
 
@@ -139,7 +139,7 @@ static inline int scmi_transport_init(const struct scmi_dev *transport)
 	const struct scmi_transport_api *api =
 		(const struct scmi_transport_api *)transport->api;
 
-	if (api->init) {
+	if (api->init != NULL) {
 		return api->init(transport);
 	}
 

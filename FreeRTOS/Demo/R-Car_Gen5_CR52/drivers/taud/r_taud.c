@@ -211,7 +211,7 @@ static e_taud_err_t r_taud_pwm_output_func_open(r_taud_ctrl_t * const p_ctrl)
 
     err = r_taud_pwm_hardware_initialize(p_instance_ctrl->unit, p_instance_ctrl->func, p_pwm_cfg);
 
-    if (p_pwm_cfg->cycle_end_irq.p_callback)
+    if (p_pwm_cfg->cycle_end_irq.p_callback != NULL)
     {
         if(p_pwm_cfg->master_ch >= TAUD_CH_MAX)
         {
@@ -222,7 +222,7 @@ static e_taud_err_t r_taud_pwm_output_func_open(r_taud_ctrl_t * const p_ctrl)
 
     for (uint8_t i = 0; i < p_pwm_cfg->slave_num; i++)
     {
-        if (p_pwm_cfg->p_slave[i].duty_end_irq.p_callback)
+        if (p_pwm_cfg->p_slave[i].duty_end_irq.p_callback != NULL)
         {
             if(p_pwm_cfg->p_slave[i].ch >= TAUD_CH_MAX)
             {

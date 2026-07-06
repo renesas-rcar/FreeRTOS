@@ -354,7 +354,7 @@ int scmi_sensor_description_get(uint32_t desc_index,
         off += 28u;
 
         /* Extended attributes: present only if attr_low[8] == 1 */
-        if (out[i].ext_attrs_supported) {
+        if (out[i].ext_attrs_supported != 0) {
 
             /* sensor_power always present when ext attrs supported */
             if (off + 4u > reply.len) {
@@ -631,7 +631,7 @@ int scmi_sensor_reading_get(uint32_t sensor_id,
                     /* For async read, SUCCESS means enqueued; no readings returned now.
                      * Spec: errors during actual read come via delayed response.
                      */
-                    if (async_read) {
+                    if (async_read != 0U) {
                         /* Do nothing */
                     } else {
                         /* Copy up to out_cap entries, as reply doesn't carry N explicitly.

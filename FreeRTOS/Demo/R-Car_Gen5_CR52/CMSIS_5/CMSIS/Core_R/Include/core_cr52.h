@@ -544,7 +544,7 @@ __STATIC_INLINE uint32_t __log_2_n_roundup(uint32_t val)
 {
   uint32_t ret = 0, additional = 0;
 
-  if (val & (val - 1))
+  if ((val & (val - 1U)) != 0U)
   {
     additional = 1;
   }
@@ -637,13 +637,13 @@ __STATIC_INLINE void __L1C_MaintainDCacheAddress(uint32_t level, uint32_t maint,
   ccsidr = __get_CCSIDR();
   line_size = (ccsidr & 0x00000007U);
   /* Convert to number of bytes */
-  while (line_size--)
+  while (line_size-- > 0)
   {
     pow *= 2;
   }
   line_size = 16 * pow;
   /* Calculate num lines which need to be maintained */
-  if (size % line_size)
+  if ((size % line_size) != 0U)
   {
     num_lines = (size / line_size) + 1;
   }
@@ -652,7 +652,7 @@ __STATIC_INLINE void __L1C_MaintainDCacheAddress(uint32_t level, uint32_t maint,
     num_lines = (size / line_size);
   }
 
-  while (num_lines--)
+  while (num_lines-- > 0)
   {
     switch (maint)
     {

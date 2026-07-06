@@ -264,7 +264,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
     }
 
     ret = R_StateManager_ClockOn(clock_id);
-    if (ret)
+    if (ret != 0U)
     {
         printf("Error: Failed to set clock id %d ON.\r\n", clock_id);
     }
@@ -726,7 +726,7 @@ static uint32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *By
 
     do {
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
-    } while (val & R_I2C_FSDA_BIT);
+    } while ((val & R_I2C_FSDA_BIT) != 0U);
 
     /* Set Master Control register (MDBS=1, MIE=1, ESG=1) */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x89);
@@ -745,7 +745,7 @@ static int RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl)
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, ICMCR_CLEAR);
 
     ret = R_StateManager_ClockOff(clock_id);
-    if (ret)
+    if (ret != 0U)
     {
         printf("Error: Failed to set clock id %d OFF.\r\n", clock_id);
         return ret;

@@ -118,7 +118,7 @@ uint8_t taud_pwm_channel_setup(taud_channel_config_t * p_ch_cfg)
     CMUR.BIT.TIS = 0B00;
     R_TAUD_RegWrite8(DRV_REG_ADDR_TAUD_CMUR(p_ch_cfg->unit, p_ch_cfg->channel), CMUR.INT);
 
-    if(p_ch_cfg->output_en)
+    if (p_ch_cfg->output_en != 0U)
     {
         // Channel Output Mode for Slave Channels
         R_TAUD_CH_Set(DRV_REG_ADDR_TAUD_TOE(p_ch_cfg->unit), p_ch_cfg->channel);

@@ -88,7 +88,7 @@ int R_GPIO_GroupWriteOutput(rcar_gpio_group_t grp, uint32_t group_level,
 
     for (pin_num = 0U; pin_num < PINS_EACH_GROUP; pin_num++) {
         mask_pos = ((uint32_t)1 << pin_num);
-        if (mask_pins & mask_pos) {
+        if ((mask_pins & mask_pos) != 0U) {
             pin_level = (group_level & mask_pos) >> pin_num;
             R_GPIO_PinWriteOutput(grp, pin_num, pin_level);
         }
@@ -102,7 +102,7 @@ bool R_GPIO_PinReadInput(rcar_gpio_group_t grp, rcar_pin_t pin)
     uint32_t bit = BIT(pin);
     bool pin_val;
 
-    if (readl(getGpioRegister(grp, GP_INOUTSEL)) & bit) {
+    if ((readl(getGpioRegister(grp, GP_INOUTSEL)) & bit) != 0U) {
             pin_val = !!(readl(getGpioRegister(grp, GP_OUTDT)) & bit);
     } else {
             pin_val = !!(readl(getGpioRegister(grp, GP_INDT)) & bit);
@@ -166,7 +166,7 @@ int R_GPIO_GroupConfigMode(rcar_gpio_group_t grp, uint32_t mask_directions,
 
     for (pin_num = 0U; pin_num < PINS_EACH_GROUP; pin_num++) {
         mask_pos = ((uint32_t)1 << pin_num);
-        if (mask_pins & mask_pos) {
+        if ((mask_pins & mask_pos) != 0U) {
             pin_option = (mask_directions & mask_pos) >> pin_num;
             (void) R_GPIO_PinConfigMode(grp, pin_num, pin_option);
         }

@@ -140,7 +140,7 @@ static void Init_MPU(void)
 			    break;
         }
 
-        if (ret) {
+        if (ret != 0U) {
 #if RAM_CONSOLE_ENABLE
             snprintf(ram_console + strlen(ram_console), sizeof(ram_console) - strlen(ram_console), "Set MPU region index %d FAIL. Exceeded number of MPU regions supported;", i + 1);
 #endif
@@ -262,7 +262,7 @@ void SystemInit(void)
     }
 
     Irq_Setup();
-    if (R_StateManager_Init()) {
+    if (R_StateManager_Init() != 0) {
         printf("Error: Failed to init State Manager.\r\n");
         return;
     }

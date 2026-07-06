@@ -330,7 +330,7 @@ static uint32_t ECM_GetErrorID(void)
         value = READ_REGISTER_32(DRV_REG_ADDR_ECM_ECMERRINTSTSR0);
         for (uint32_t bit = 0; bit < 32; bit++)
         {
-            if (value & (1U << bit))
+            if ((value & ((uint32_t)1 << bit)) != 0U)
             {
                 ecm_reg_num = bit;     
                 break;
@@ -342,7 +342,7 @@ static uint32_t ECM_GetErrorID(void)
             value = READ_REGISTER_32(DRV_REG_ADDR_ECM_ECMERRSTSR(ecm_reg_num));
             for (uint32_t bit = 0; bit < 32; bit++)
             {
-                if (value & (1U << bit))
+                if ((value & ((uint32_t)1 << bit)) != 0U)
                 {
                     ecm_reg_bit = bit;     
                     break;
@@ -367,7 +367,7 @@ static uint32_t ECM_GetErrorID(void)
         value = READ_REGISTER_32(DRV_REG_ADDR_ECM_ECMERRINTSTSR1);
         for (uint32_t bit = 0; bit < 32; bit++)
         {
-            if (value & (1U << bit))
+            if ((value & ((uint32_t)1 << bit)) != 0U)
             {
                 ecm_reg_num = bit + 32;     
                 break;
@@ -379,7 +379,7 @@ static uint32_t ECM_GetErrorID(void)
             value = READ_REGISTER_32(DRV_REG_ADDR_ECM_ECMERRSTSR(ecm_reg_num));
             for (uint32_t bit = 0; bit < 32; bit++)
             {
-                if (value & (1U << bit))
+                if ((value & ((uint32_t)1 << bit)) != 0U)
                 {
                     ecm_reg_bit = bit;     
                     break;

@@ -291,7 +291,7 @@ int scmi_clock_config_set(struct scmi_clock_config *cfg)
 	}
 
 	/* extended attributes currently not supported */
-	if (cfg->attributes & SCMI_CLK_CONFIG_EA_MASK) {
+	if ((cfg->attributes & SCMI_CLK_CONFIG_EA_MASK) != 0) {
 		return -ENOTSUP;
 	}
 

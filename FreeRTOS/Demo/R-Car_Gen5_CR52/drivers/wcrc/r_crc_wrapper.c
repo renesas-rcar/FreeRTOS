@@ -903,7 +903,7 @@ static int wcrc_set_e2e_mode(uint8_t module, wcrc_cfg_t const * const p_cfg)
     }
 
     ret = wcrc_check_rtdma_config(module, p_cfg, E2E_CRC_USE_2_DMA_CHAN);
-    if (ret) {
+    if (ret != 0) {
         printf("%s: Invalid rtdma_config\n", __func__);
         ret = -1;
         return ret;
@@ -1125,7 +1125,7 @@ static int wcrc_prepare_e2e(uint8_t module, wcrc_instance_ctrl_t * const p_insta
     p_crc_data                  = &p_instance_ctrl->crc_data[module];
 
     ret                         = wcrc_get_crc_data_size(module, p_cfg, &crc_data_size);
-    if(ret) {
+    if (ret != 0) {
         printf("%s: Get CRC size FAIL!\n", __func__);
         return -1;
     }

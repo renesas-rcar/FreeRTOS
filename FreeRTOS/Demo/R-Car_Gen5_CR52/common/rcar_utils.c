@@ -83,7 +83,7 @@ void * aligned_malloc(size_t align, size_t size)
         uint32_t hdr_size = PTR_OFFSET_SZ + (align - 1);
         void *p = pvPortMalloc(size + hdr_size);
 
-        if(p)
+        if (p != NULL)
         {
             ptr = (void *) align_up(((uintptr_t)p + PTR_OFFSET_SZ), align);
 

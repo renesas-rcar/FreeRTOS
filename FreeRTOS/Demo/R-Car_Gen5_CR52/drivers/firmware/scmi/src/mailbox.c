@@ -19,7 +19,7 @@ static void scmi_mbox_cb(const struct scmi_dev *mbox,
 {
 	struct scmi_channel *scmi_chan = user_data;
 
-	if (scmi_chan->cb) {
+	if (scmi_chan->cb != NULL) {
 		scmi_chan->cb(scmi_chan);
 	}
 }
@@ -139,7 +139,7 @@ int scmi_mbox_init(struct scmi_dev *transport)
 
 	/* Setup shmem */
 	ret = scmi_shmem_init(&shmem_dev);
-	if (ret) {
+	if (ret != 0) {
 		return -EINVAL;
 	}
 

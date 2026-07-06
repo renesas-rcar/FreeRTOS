@@ -236,7 +236,7 @@ __WEAK uint32_t IRQ_GetMode (IRQn_ID_t irqn) {
       mode |= IRQ_MODE_TRIG_LEVEL;
     }
 
-    if (val & 1U) {
+    if ((val & 1U) != 0U) {
       mode |= (uint32_t)IRQ_MODE_MODEL_1N;
     }
     // Get interrupt CPU targets

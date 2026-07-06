@@ -71,7 +71,7 @@ static int scmi_agent_respond(const struct scmi_dev *transport,
 	}
 
 	ret = scmi_transport_channel_free_set(transport, chan);
-	if (ret) {
+	if (ret != 0) {
 		SCMI_LOG_ERR("Failed to respond.");
 		return ret;
 	}
@@ -151,7 +151,7 @@ static void scmi_notification_process(void *unused)
 			/* Set channel for command */
 			chan->is_notification = false;
 			 xSemaphoreGive(chanModeMutex);
-			if (cb_list[protocol_id - SCMI_PROTOCOL_BASE]) {
+			if (cb_list[protocol_id - SCMI_PROTOCOL_BASE] != NULL) {
 				cb_list[protocol_id - SCMI_PROTOCOL_BASE](&notifier);
 			}
 		} else {
@@ -172,7 +172,7 @@ static int scmi_core_setup_chan(const struct scmi_dev *transport,
         return -EINVAL;
     }
 
-    if (chan->ready) {
+    if (chan->ready != 0U) {
         return 0;
     }
 
@@ -284,7 +284,7 @@ int scmi_driver_init(void)
 	int ret;
 
 	ret = scmi_core_transport_init(&transport_dev);
-	if (ret) {
+	if (ret != 0) {
 		SCMI_LOG_ERR("Failed to init scmi core transport.");
 		return ret;
 	}

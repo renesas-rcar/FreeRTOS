@@ -110,7 +110,7 @@ int32_t R_SERIAL_PutString(const unsigned char *buffer, unsigned short length)
     }
 
     /* Send each character in the string, one at a time. */
-    while (length--) {
+    while (length-- > 0) {
         if (*buffer == '\n') {
             console_putc('\r');
         }

@@ -150,7 +150,7 @@ int R_CRC_Wait_Operation(wcrc_ctrl_t * p_ctrl, uint32_t timeout)
         break;
     };
 
-    if (ret) {
+    if (ret != 0) {
         printf("%s: Waiting timeout\n", __func__);
     }
 
@@ -450,22 +450,22 @@ static int wcrc_enable_clock(wcrc_cfg_t const * const p_cfg)
 #endif
 
     ret = wcrc_get_clock_ids(p_cfg->unit, &wcrc_id, &crc_id, &kcrc_id);
-    if (ret) {
+    if (ret != 0) {
         return ret;
     }
 
     ret = R_StateManager_ClockOn(wcrc_id); 
-    if (ret) {
+    if (ret != 0) {
         return ret;
     }
 
     ret = R_StateManager_ClockOn(crc_id);  
-    if (ret) {
+    if (ret != 0) {
         return ret;
     }
 
     ret = R_StateManager_ClockOn(kcrc_id); 
-    if (ret) {
+    if (ret != 0) {
         return ret; 
     }
     

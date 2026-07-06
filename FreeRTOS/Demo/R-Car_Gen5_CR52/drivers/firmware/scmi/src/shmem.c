@@ -110,7 +110,7 @@ int scmi_shmem_read_message(const struct scmi_dev *shmem,
 		return -EINVAL;
 	}
 
-	if (msg->content) {
+	if (msg->content != NULL) {
 		scmi_shmem_memcpy(POINTER_TO_UINT(msg->content),
 				  regmap + sizeof(*layout), msg->len);
 	}
@@ -158,7 +158,7 @@ int scmi_shmem_write_message(const struct scmi_dev *shmem,
 	layout->len = sizeof(layout->msg_hdr) + msg->len;
 	layout->msg_hdr = msg->hdr;
 
-	if (msg->content) {
+	if (msg->content != NULL) {
 		scmi_shmem_memcpy(regmap + sizeof(*layout),
 				  POINTER_TO_UINT(msg->content), msg->len);
 	}

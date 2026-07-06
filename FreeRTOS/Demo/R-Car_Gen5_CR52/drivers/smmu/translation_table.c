@@ -17,7 +17,7 @@
 #define MAX_TABLE_SIZE      512U
 #define ENTRY_TABLE_MASK    MAX_TABLE_SIZE - 1
 #define ENTRY_ADDR_MASK     0xFFFFFFFFFU << 12
-#define PAGE_MASK           0xFFF
+#define PAGE_MASK           0xFFFULL
 #define PAGE_ATTR_MASK      (~(ENTRY_ADDR_MASK))
 
 static int get_entry_type(uint64_t *entry)
@@ -61,7 +61,7 @@ static uint64_t *Find_Entry_Table(uint64_t *ttb, uint64_t virt_addr, int tbl_lev
 static uint64_t *Allocate_Table(void)
 {
     uint64_t *new_table = aligned_malloc(((uint32_t)1 << 12), MAX_TABLE_SIZE * sizeof(uint64_t));
-    if (new_table) {
+    if (new_table != NULL) {
         memset(new_table, 0, MAX_TABLE_SIZE * sizeof(uint64_t));
     }
 
@@ -85,7 +85,7 @@ static e_smmu_map_fault_code_t Map_Region(uint64_t *ttb, struct st_mm_region *re
     uint8_t tbl_level;
     uint64_t *new_table;
 
-    while (mem_size)
+    while (mem_size != 0ULL)
     {
         tbl_level = 0;
         table = ttb;
@@ -170,7 +170,7 @@ e_smmu_map_fault_code_t CreateTranslationTable(uint64_t **ttb, st_mm_region_t re
         return ret;
     }
 
-    if (region_mem.mem_size & PAGE_MASK) {
+    if ((region_mem.mem_size & PAGE_MASK) != 0ULL) {
         ret = MAP_ERR_INVALID_SIZE;
         return ret;
     }
