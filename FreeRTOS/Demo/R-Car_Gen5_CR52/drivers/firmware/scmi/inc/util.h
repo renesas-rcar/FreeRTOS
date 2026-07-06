@@ -128,7 +128,7 @@ struct scmi_protocol;
 #define SCMI_TRANSPORT_CHAN_DEFINE(idx, proto, pdata)		\
 	STRUCT_SECTION(scmi_channel, SCMI_TRANSPORT_CHAN_NAME(proto, idx)) = \
 	{									\
-		.data = pdata,							\
+		.data = (pdata),							\
 	}
 
 extern struct scmi_dev transport_dev;
@@ -151,9 +151,9 @@ extern struct scmi_dev transport_dev;
 #define SCMI_PROTOCOL_DATA_DEFINE(proto, pdata)			\
 	STRUCT_SECTION(scmi_protocol, SCMI_PROTOCOL_NAME(proto)) = \
 	{									\
-		.id = proto,							\
+		.id = (proto),							\
 		.tx = SCMI_TRANSPORT_TX_CHAN(),			\
-		.data = pdata,							\
+		.data = (pdata),							\
 		.transport = TRANSPORT_GET() \
 	}
 

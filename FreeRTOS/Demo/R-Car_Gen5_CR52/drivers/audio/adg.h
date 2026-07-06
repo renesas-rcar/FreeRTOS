@@ -19,7 +19,7 @@
 #define BRRA0				(*(volatile uint32_t*)(ADG0_BASE))
 #define BRRB0				(*(volatile uint32_t*)(ADG0_BASE+0x004u))
 #define BRGCKR0				(*(volatile uint32_t*)(ADG0_BASE+0x008u))
-#define AUDIO_CLK_SEL0_(channel)      (*(volatile uint32_t*)(0xec54a000u + channel*0x10000u))
+#define AUDIO_CLK_SEL0_(channel)      (*(volatile uint32_t*)(0xec54a000u + (channel)*0x10000u))
 
 
 //Value for BRGCKR

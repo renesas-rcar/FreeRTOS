@@ -49,7 +49,7 @@
 #define	SDTA		(1 << 10)	/* Serial Data Alignment */
 #define	PDTA		(1 <<  9)	/* Parallel Data Alignment */
 #define	DEL			(1 <<  8)	/* Serial Data Delay */
-#define	CKDV(v)		(v <<  4)	/* Serial Clock Division Ratio */
+#define	CKDV(v)		((v) <<  4)	/* Serial Clock Division Ratio */
 #define	TRMD		(1 <<  1)	/* Transmit/Receive Mode Select */
 #define	EN			(1 <<  0)	/* SSI Module Enable */
 
@@ -86,17 +86,17 @@ typedef struct _audio_ssi_conf_t {
 }audio_ssi_conf_t;
 
 #define SSI0 (0xEC549000u)
-#define SSICR0(channel) (SSI0 + (channel * 0x10000u))
-#define SSI0SR(channel) (SSI0 + 0x04u + (channel * 0x10000u))
-#define SSI0TDR(channel) (SSI0 + 0x08u + (channel * 0x10000u))
-#define SSI0RDR(channel) (SSI0 + 0x0cu + (channel * 0x10000u))
+#define SSICR0(channel) (SSI0 + ((channel) * 0x10000u))
+#define SSI0SR(channel) (SSI0 + 0x04u + ((channel) * 0x10000u))
+#define SSI0TDR(channel) (SSI0 + 0x08u + ((channel) * 0x10000u))
+#define SSI0RDR(channel) (SSI0 + 0x0cu + ((channel) * 0x10000u))
 
-#define SSIWSR0(channel) (SSI0 + 0x20u + (channel * 0x10000u))
+#define SSIWSR0(channel) (SSI0 + 0x20u + ((channel) * 0x10000u))
 
-#define SSIFMR0(channel) (SSI0 + 0x24u + (channel * 0x10000u))
-#define SSIFSR0(channel) (SSI0 + 0x28u + (channel * 0x10000u))
+#define SSIFMR0(channel) (SSI0 + 0x24u + ((channel) * 0x10000u))
+#define SSIFSR0(channel) (SSI0 + 0x28u + ((channel) * 0x10000u))
 
-#define SSICRE0(channel) (SSI0 + 0x30u + (channel * 0x10000u))
+#define SSICRE0(channel) (SSI0 + 0x30u + ((channel) * 0x10000u))
 
 int ssi_init(ssi_conf_t *p_conf);
 void ssi_start(ssi_conf_t *p_conf);

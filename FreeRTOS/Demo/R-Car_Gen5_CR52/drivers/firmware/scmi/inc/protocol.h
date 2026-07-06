@@ -65,7 +65,7 @@
  *
  */
 #define SCMI_FIELD_PARSE(hdr, mask, shift) \
-	(((uint32_t)(hdr) >> (shift)) & mask)
+	(((uint32_t)(hdr) >> (shift)) & (mask))
 #define SCMI_MESSAGE_ID_PARSE(hdr) \
 	SCMI_FIELD_PARSE(hdr, GENMASK(7, 0), 0)
 

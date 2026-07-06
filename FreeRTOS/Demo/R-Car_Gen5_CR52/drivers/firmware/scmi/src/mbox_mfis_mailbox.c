@@ -24,27 +24,27 @@
 #define MAILBOX_MBOX_SIZE    3
 
 /* MFIS Write Protection Control Register */
-#define MFIS_SCP_REG_MFISWPCNTR(base) (*((volatile uint32_t *)(base + 0x900U)))
+#define MFIS_SCP_REG_MFISWPCNTR(base) (*((volatile uint32_t *)((base) + 0x900U)))
 
 /*
  * MFIS CPU communication message register Realtime core[m](m=0-11)
  * to SCP core.
  */
 #define MFIS_SCP_REG_MFISRSEMBR(base, m) \
-    (*(volatile uint32_t *)(size_t)(base + (0x1000U * (m)) + 0x44U + 0x20000U))
+    (*(volatile uint32_t *)(size_t)((base) + (0x1000U * (m)) + 0x44U + 0x20000U))
 
 /*
  * MFIS CPU communication control register Realtime core[m]
  * to SCP Core(m=0-11).
  */
 #define MFIS_SCP_REG_MFISRSEICR(base, m) \
-    (*(volatile uint32_t *)(size_t)(base + (0x1000U * (m)) + 0x04U + 0x20000U))
+    (*(volatile uint32_t *)(size_t)((base) + (0x1000U * (m)) + 0x04U + 0x20000U))
 
 /* MFIS CPU communication control register SCP core
  * to Realtime core[m](m=0-11).
  */
 #define MFIS_SCP_REG_MFISRSIICR(base, m) \
-    (*(volatile uint32_t *)(size_t)(base + (0x1000U * (m)) + 0x00U + 0x20000U))
+    (*(volatile uint32_t *)(size_t)((base) + (0x1000U * (m)) + 0x00U + 0x20000U))
 
 static struct scmi_dev mfis_dev;
 

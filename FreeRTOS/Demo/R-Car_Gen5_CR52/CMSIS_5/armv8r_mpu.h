@@ -153,7 +153,7 @@
 #define ARM_MPU_ATTR(O, I) ((((O) & 0xFU) << 4U) | ((I) & 0xFU))
 
 /* \brief Specifies MAIR_ATTR number */
-#define MAIR_ATTR(x)       ((x > 7 || x < 0) ? 0 : x)
+#define MAIR_ATTR(x)       (((x) > 7 || (x) < 0) ? 0 : (x))
 
 /* MPU Region Base Address Register bit assignments */ 
 /**

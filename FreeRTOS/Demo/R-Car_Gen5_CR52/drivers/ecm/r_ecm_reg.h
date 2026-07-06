@@ -89,7 +89,7 @@
 #define READ_REGISTER_32(addr)                      (*(volatile uint32_t *)(addr))
 #define WRITE_REGISTER_32(addr, value)              (*(volatile uint32_t *)(addr) = (uint32_t)value)
 
-#define ECM_SET_BIT(n)                              (uint32_t)(0x1U << n)
+#define ECM_SET_BIT(n)                              (uint32_t)(0x1U << (n))
 #define ECM_SET_BIT0                                (uint32_t)(0x00000001U)
 #define ECM_SET_BIT1                                (uint32_t)(0x00000002U)
 #define ECM_SET_BIT2                                (uint32_t)(0x00000004U)

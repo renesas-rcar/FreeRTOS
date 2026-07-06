@@ -37,7 +37,7 @@
 
 #define VALIDATE_ID(id, max) \
     do { \
-        if ((id) >= max) { \
+        if ((id) >= (max)) { \
             SM_LOG_ERR("Invalid ID\n\r"); \
             return -1; \
         } \

@@ -33,7 +33,7 @@ extern "C" {
 /***********************************************************************************************************************
  * Macro definitions
  **********************************************************************************************************************/
-#define ECM_GET_ERROR_DOMAIN_ID(register_number, bit_positive)  ((register_number * 32) + bit_positive)
+#define ECM_GET_ERROR_DOMAIN_ID(register_number, bit_positive)  (((register_number) * 32) + (bit_positive))
 
 /***********************************************************************************************************************
  * Typedef definitions

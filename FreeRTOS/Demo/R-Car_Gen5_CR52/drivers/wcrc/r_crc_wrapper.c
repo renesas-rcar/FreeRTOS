@@ -76,8 +76,8 @@ typedef enum e_wcrc_fifo_ports_use_rtdma
 
 /************************************ WCRC registers ************************************/
 /* Register base */
-#define WCRC_BASE_ADDR(unit)       (0x19200000 + (unit * 0x10000))
-#define WCRC_FIFO_ADDR(unit)       (0x19400000 + (unit * 0x04000))
+#define WCRC_BASE_ADDR(unit)       (0x19200000 + ((unit) * 0x10000))
+#define WCRC_FIFO_ADDR(unit)       (0x19400000 + ((unit) * 0x04000))
 
 /* Request ID for WCRC */
 #define MID_RID_WCRC_CRC_RES(unit)                  ((unit)*(0x10) + (0x18U))	/* WCRC(unit) CRC  DMARS ID RX */
@@ -337,7 +337,7 @@ typedef enum e_wcrc_fifo_ports_use_rtdma
 
 /************************************ CRC registers ************************************/
 /* Register base */
-#define CRC_BASE_ADDR(unit)       (0x19000000 + (unit * 0x10000))
+#define CRC_BASE_ADDR(unit)       (0x19000000 + ((unit) * 0x10000))
 
 /* Register offset */
 /* CRC[m] Input register */
@@ -389,7 +389,7 @@ typedef enum e_wcrc_fifo_ports_use_rtdma
 
 /************************************ KCRC registers ************************************/
 /* Register base */
-#define KCRC_BASE_ADDR(unit)       (0x19100000 + (unit * 0x10000))
+#define KCRC_BASE_ADDR(unit)       (0x19100000 + ((unit) * 0x10000))
 /* Register offsets */
 /* KCRC[m] data input register */
 #define KCRC_DIN 0x0000

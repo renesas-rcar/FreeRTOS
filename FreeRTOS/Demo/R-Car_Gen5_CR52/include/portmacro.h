@@ -91,7 +91,7 @@ typedef uint32_t TickType_t;
     {                                           \
         extern uint32_t ulPortYieldRequired;    \
                                                 \
-        if (xSwitchRequired != pdFALSE)         \
+        if ((xSwitchRequired) != pdFALSE)         \
         {                                       \
             ulPortYieldRequired = pdTRUE;       \
         }                                       \
@@ -126,8 +126,8 @@ extern void     vPortInstallFreeRTOSVectorTable(void);
 /* Task function macros as described on the FreeRTOS.org WEB site.  These are
  * not required for this port but included in case common demo code that uses these
  * macros is used. */
- #define portTASK_FUNCTION_PROTO(vFunction, pvParameters)    void vFunction(void * pvParameters)
- #define portTASK_FUNCTION(vFunction, pvParameters)          void vFunction(void * pvParameters)
+ #define portTASK_FUNCTION_PROTO(vFunction, pvParameters)    void (vFunction)(void * (pvParameters))
+ #define portTASK_FUNCTION(vFunction, pvParameters)          void (vFunction)(void * (pvParameters))
 
 /* Prototype of the FreeRTOS tick handler.  This must be installed as the
  * handler for whichever peripheral is used to generate the RTOS tick. */
@@ -156,7 +156,7 @@ void vPortTaskUsesFPU(void);
 
 /*-----------------------------------------------------------*/
 
-  #define portGET_HIGHEST_PRIORITY(uxTopPriority, uxReadyPriorities)    uxTopPriority = (31 - __CLZ(uxReadyPriorities))
+  #define portGET_HIGHEST_PRIORITY(uxTopPriority, uxReadyPriorities)    (uxTopPriority) = (31 - __CLZ(uxReadyPriorities))
 
  #endif                                /* configUSE_PORT_OPTIMISED_TASK_SELECTION */
 

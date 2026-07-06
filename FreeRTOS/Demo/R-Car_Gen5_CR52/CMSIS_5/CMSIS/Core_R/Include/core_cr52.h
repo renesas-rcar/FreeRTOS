@@ -444,7 +444,7 @@
 #define ISR_F_Msk                        (1UL << ISR_F_Pos)                     /* ISR: F Mask */
 
 /* DACR Register Defnition */
-#define DACR_D_Pos_(n)                   (2U*n)                                 /* DACR: Dn Position */
+#define DACR_D_Pos_(n)                   (2U*(n))                                 /* DACR: Dn Position */
 #define DACR_D_Msk_(n)                   (3UL << DACR_D_Pos_(n))                /* DACR: Dn Mask */
 #define DACR_Dn_NOACCESS                 0U                                     /* DACR Dn field: No access */
 #define DACR_Dn_CLIENT                   1U                                     /* DACR Dn field: Client */
@@ -478,7 +478,7 @@
 #define PRLAR_LIMIT_Msk                  (0x3FFFFFFUL << PRLAR_LIMIT_Pos)       /* PRLAR: LIMIT Mask */
 
 /* MAIR Register Defnition */
-#define MAIR_ATTR_Pos(n)                 (8U*n)                                 /* MAIR: Attr Position */
+#define MAIR_ATTR_Pos(n)                 (8U*(n))                                 /* MAIR: Attr Position */
 #define MAIR_ATTR_Msk(n)                 (255UL << MAIR_ATTR_Pos(n))            /* MAIR: Attr Mask */
 
 /*******************************************************************************

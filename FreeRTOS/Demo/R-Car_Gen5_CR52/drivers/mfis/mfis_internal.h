@@ -31,8 +31,8 @@
 #define MFIS_ACCESS_CONTROL (MFIS_COMMON_BASE + 0x0904)
 
 /* Interrupt ID of MFIS, i=[0-63] */
-#define INTID_S_R(i)    (0x0056 + i * 2) // Common INTID ch[i] from Sender to Receiver, unused
-#define INTID_R_S(i)    (0x0057 + i * 2) // Common INTID ch[i] from Receiver to Sender
-#define MFIS_INTID(i,type)    (0x0057 + i * 2 - type) // Common INTID ch[i] from Sender to Receiver, unused
+#define INTID_S_R(i)    (0x0056 + (i) * 2) // Common INTID ch[i] from Sender to Receiver, unused
+#define INTID_R_S(i)    (0x0057 + (i) * 2) // Common INTID ch[i] from Receiver to Sender
+#define MFIS_INTID(i,type)    (0x0057 + (i) * 2 - (type)) // Common INTID ch[i] from Sender to Receiver, unused
 
 #endif // MFIS_INTERNAL_H

@@ -21,10 +21,10 @@ static uint32_t clk_rate;
 #define DIV_ROUND_UP(a, b) (((a) + (b) - 1U) / (b))
 #define TIMEOUT_TO_X(timeout_ms, channel)    \
     ({ \
-        const uint16_t *timeout_array = (channel == 0xC1380000) ? timeout_ch20 : timeout_ch0_19; \
+        const uint16_t *timeout_array = ((channel) == 0xC1380000) ? timeout_ch20 : timeout_ch0_19; \
         uint8_t result = 7; \
         for (uint8_t i = 0; i < 8; ++i) { \
-            if (timeout_ms <= timeout_array[i]) { \
+            if ((timeout_ms) <= timeout_array[i]) { \
                 result = i; \
                 break; \
             } \
