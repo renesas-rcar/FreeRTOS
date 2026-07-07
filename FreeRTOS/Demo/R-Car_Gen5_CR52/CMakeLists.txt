@@ -312,6 +312,12 @@ install(
     DESTINATION include
 )
 
+# Specify interrupt id header depend on BOARD_ID
+install(
+    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/interrupt_id.h
+    DESTINATION include
+)
+
 # Logging
 install(
     FILES
