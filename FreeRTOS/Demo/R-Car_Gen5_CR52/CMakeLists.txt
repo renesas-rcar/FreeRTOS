@@ -417,6 +417,8 @@ if(BOARD STREQUAL "x5h_vdk")
         dummy_app
         cxl_app
         audio_app
+        gic_app
+        generic_timer_app
     )
 elseif(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil")
     set(SAMPLE_APPS
@@ -442,6 +444,8 @@ elseif(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil")
         dummy_app
         ucie
         audio_app
+        gic_app
+        generic_timer_app
     )
 elseif(BOARD STREQUAL "x5h_rfs2")
     set(SAMPLE_APPS
@@ -464,6 +468,8 @@ elseif(BOARD STREQUAL "x5h_rfs2")
         dummy_app
         ucie
         audio_app
+        gic_app
+        generic_timer_app
     )
 elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
     set(SAMPLE_APPS
@@ -503,6 +509,8 @@ elseif(BOARD STREQUAL "mdp_aiacc_hil")
         ecm_app
         sensor_app
         dummy_app
+        gic_app
+        generic_timer_app
     )
 else()
     message(FATAL_ERROR "Invalid BOARD: ${BOARD}. Cannot add apps!")

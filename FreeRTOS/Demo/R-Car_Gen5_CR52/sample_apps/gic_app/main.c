@@ -35,7 +35,7 @@
 #include "interrupts.h"
 #include "../drivers/timer/arm_generic_timer.h"
 #include "pfc/r_pfc_api.h"
-#include "device_tree_x5h.h"
+#include "device_tree.h"
 #include "gic.h"
 #include "cmsis_cp15.h"
 #include "dmac/dmac_common.h"
