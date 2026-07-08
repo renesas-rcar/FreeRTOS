@@ -80,7 +80,7 @@ typedef enum e_modsel_func
 } modsel_func_t;
 
 #define GEN_ID(reg_pfc_t, grp, pin, fid)   \
-((reg_pfc_t<<REG_TYPE_POS) + (grp<<GROUP_START_POS) + (pin<<PIN_START_POS) + (fid<<FUNC_START_POS))
+(((uint32_t)(reg_pfc_t)<<REG_TYPE_POS) + ((uint32_t)(grp)<<GROUP_START_POS) + ((uint32_t)(pin)<<PIN_START_POS) + ((uint32_t)(fid)<<FUNC_START_POS))
 
 /******************* Define pin functions *******************/
 #define MAX_ITEM_IN_GROUP   16

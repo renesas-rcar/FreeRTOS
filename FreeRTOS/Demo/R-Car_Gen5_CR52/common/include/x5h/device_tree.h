@@ -16,7 +16,7 @@ extern "C" {
 #include <stdint.h>
 #include "board.h"
 
-#define MODULE_CONFIG(module_id, is_enabled)    {module_id, is_enabled}
+#define MODULE_CONFIG(module_id, is_enabled)    {(module_id), (is_enabled)}
 
 /**
  * @brief Superset list of all HW IPs.
