@@ -6,7 +6,7 @@
 
 set(app_name "rt_dmac_app")
 
-if(BOARD STREQUAL "ai_acc")
+if(BOARD STREQUAL "mdp_aiacc_rfs2" OR BOARD STREQUAL "mdp_aiacc_hil")
     add_executable(${app_name}
         ai_acc_main.c
     )
