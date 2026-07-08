@@ -17,6 +17,7 @@
 #include "scif.h"
 #include "serial/r_serial.h"
 #include "pfc/r_pfc_api.h"
+#include "scif_private.h"
 
 static bool portInitialized = false;
 
@@ -75,87 +76,31 @@ int32_t R_SERIAL_ReConfigure(e_serial_devices_t device)
 	return ret;
 }
 
-#if (BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL)
-static int uart_set_pfc(e_serial_devices_t device)
-{
-    int ret = 0;
-    st_module_config_t uart_module;
-
-    uart_module.is_enabled = 1;
-
-    switch (device) {
-        case SCIF0:
-            uart_module.module_id = MODULE_SCIF0;
-            break;
-        case SCIF1:
-            uart_module.module_id = MODULE_SCIF1;
-            break;
-        case SCIF3:
-            uart_module.module_id = MODULE_SCIF3;
-            break;
-        case SCIF4:
-            uart_module.module_id = MODULE_SCIF4;
-            break;
-        case HSCIF0:
-            uart_module.module_id = MODULE_HSCIF0;
-            break;
-        case HSCIF1:
-            uart_module.module_id = MODULE_HSCIF1;
-            break;
-        case HSCIF2:
-            uart_module.module_id = MODULE_HSCIF2;
-            break;
-        case HSCIF3:
-            uart_module.module_id = MODULE_HSCIF3;
-            break;
-        case SCIF2_UNSUPPORTED:
-        default:
-            ret = -1;
-            goto end_set_pfc;
+#if (BOARD == MDP_AIACC_RFS2 || BOARD == X5H_VDK || BOARD == X5H_RFS2)
+    static int uart_set_pfc(e_serial_devices_t device)
+    {
+        return 0;
     }
+#else
+    static int uart_set_pfc(e_serial_devices_t device)
+    {
+        st_module_config_t uart_module;
 
-    ret = pfcInitModule(uart_module);
+        if ((size_t)device >= ARRAY_SIZE(dev_to_module_list)) {
+            return -1;
+        }
 
-end_set_pfc:
-    return ret;
-}
-#elif (BOARD == MDP_AIACC_HIL)
-static int uart_set_pfc(e_serial_devices_t device)
-{
-    int ret = 0;
-    st_module_config_t uart_module;
+        uart_module.module_id = dev_to_module_list[device];
 
-    uart_module.is_enabled = 1;
+        if (uart_module.module_id == MODULE_INVALID) {
+            return -1;
+        }
 
-    switch (device) {
-        case SCIF0:
-            uart_module.module_id = MODULE_SCIF0;
-            break;
-        case SCIF1:
-            uart_module.module_id = MODULE_SCIF1;
-            break;
-        case HSCIF0:
-            uart_module.module_id = MODULE_HSCIF0;
-            break;
-        case HSCIF1:
-            uart_module.module_id = MODULE_HSCIF1;
-            break;
-        default:
-            ret = -1;
-            goto end_set_pfc;
+        uart_module.is_enabled = 1;
+
+        return pfcInitModule(uart_module);
     }
-
-    ret = pfcInitModule(uart_module);
-
-end_set_pfc:
-    return ret;
-}
-#else   // (BOARD == MDP_AIACC_RFS2 || BOARD == X5H_VDK || BOARD == X5H_RFS2)
-static int uart_set_pfc(e_serial_devices_t device)
-{
-    return 0;
-}
-#endif //#if (BOARD == X5H_IRONHIDE)
+#endif
 
 int32_t R_SERIAL_PutString(const unsigned char *buffer, unsigned short length)
 {

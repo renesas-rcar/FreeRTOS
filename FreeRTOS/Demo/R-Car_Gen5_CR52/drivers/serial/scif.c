@@ -7,6 +7,7 @@
 
 #include "CMSIS_5/cmsis_rcar_gen5.h"
 #include "scif.h"
+#include "scif_private.h"
 
 static uint32_t scif_base;
 
@@ -161,32 +162,12 @@ static void uart_rcar_irq_rx_enable(void)
 	uart_rcar_write_16(SCSCR, reg_val);
 }
 
-uint32_t console_init(uint32_t port) {
-#if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
-    const uint32_t serial_channels_arr[] = {
-        0xc0700000, // SCIF0
-        0xc0704000, // SCIF1
-        0x0,        // Unsupported
-        0xc0708000, // SCIF3
-        0xc070C000, // SCIF4
-        0xc0710000, // HSCIF0
-        0xc0714000, // HSCIF1
-        0xc0718000, // HSCIF2
-        0xc071C000  // HSCIF3
-    };
-#else   // (BOARD == MDP_AIACC_RFS2 || BOARD == MDP_AIACC_HIL)
-    const uint32_t serial_channels_arr[] = {
-        0x38000000, // SCIF0
-        0x38004000, // SCIF1
-        0x0,
-        0x0,
-        0x0,
-        0x38010000, // HSCIF0
-        0x38014000, // HSCIF1
-        0x0,
-        0x0
-    };
-#endif
+int32_t console_init(uint32_t port) {
+    if (port >= (sizeof(serial_channels_arr) / sizeof(serial_channels_arr[0])))
+    {
+        return -1;
+    }
+
 	uint16_t reg_val;
 
     scif_base = serial_channels_arr[port];

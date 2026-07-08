@@ -24,7 +24,7 @@
 #endif
 #endif
 
-uint32_t console_init(uint32_t port);
+int32_t console_init(uint32_t port);
 void console_apply_log_state(uint8_t enable);
 void console_putc(char c);
 int console_getc(unsigned char *p_char);
