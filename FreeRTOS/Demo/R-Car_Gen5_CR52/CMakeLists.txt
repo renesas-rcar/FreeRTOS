@@ -489,6 +489,8 @@ elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
         ecm_app
         ucie
         dummy_app
+        gic_app
+        generic_timer_app
     )
 elseif(BOARD STREQUAL "mdp_aiacc_hil")
     set(SAMPLE_APPS
