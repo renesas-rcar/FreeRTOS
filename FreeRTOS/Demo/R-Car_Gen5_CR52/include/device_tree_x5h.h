@@ -67,7 +67,7 @@ typedef struct {
     uint32_t is_enabled;	    ///< Enable PFC for module or not.
 } st_module_config_t;
 
-static inline st_module_config_t* getModuleConfigs() {
+static inline st_module_config_t* getModuleConfigs(void) {
     static st_module_config_t MODULE_CONFIG_LIST[] = {
         MODULE_CONFIGS
     };
