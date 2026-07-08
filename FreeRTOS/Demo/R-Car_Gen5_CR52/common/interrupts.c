@@ -6,6 +6,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include <stddef.h>
+#include "board.h"
 #include "cmsis_rcar_gen5.h"
 #include "interrupts.h"
 #include "core_cr52.h"

@@ -21,7 +21,7 @@ message(STATUS ${KERNEL_DIR})
 message(STATUS ${LOGGING_DIR})
 
 if(NOT DEFINED BOARD)
-    set(BOARD "x5h_vdk")
+    set(BOARD "x5h_ironhide")
 endif()
 
 set(ALLOWED_RAM_REGION "1;2;3;4;5;6")

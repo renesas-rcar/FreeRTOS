@@ -10,20 +10,6 @@
 
 #include <stdint.h>
 
-/// Initialize scif .
-/// \param[in]     port          port number
-/// \return 1 on success, 0 on error.
-
-#ifndef UART_BAUDRATE
-#if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2)
-#define UART_BAUDRATE 115200
-#elif (BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
-#define UART_BAUDRATE 1843200
-#else
-#define UART_BAUDRATE 115200
-#endif
-#endif
-
 int32_t console_init(uint32_t port);
 void console_apply_log_state(uint8_t enable);
 void console_putc(char c);
