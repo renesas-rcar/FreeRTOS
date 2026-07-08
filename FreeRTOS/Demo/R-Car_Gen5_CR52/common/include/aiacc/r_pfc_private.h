@@ -23,7 +23,7 @@ extern "C" {
 #include "r_pfc_common_private.h"
 
 /* PFC base adrress */
-#define PFC_BASE_OFFSET    0x000
+#define PFC_BASE_OFFSET    0x000U
 #define PFC_GR_NUM  3
 
 #define PFC_GR_0           (0x38080000U + PFC_BASE_OFFSET)
