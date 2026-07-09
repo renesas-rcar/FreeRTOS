@@ -23,16 +23,16 @@ extern "C" {
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
-static const uint32_t serial_channels_arr[] = {
-    0xc0700000, // SCIF0
-    0xc0704000, // SCIF1
-    0x0,        // Unsupported
-    0xc0708000, // SCIF3
-    0xc070C000, // SCIF4
-    0xc0710000, // HSCIF0
-    0xc0714000, // HSCIF1
-    0xc0718000, // HSCIF2
-    0xc071C000  // HSCIF3
+static uint32_t serial_channels_arr[] = {
+    0x38000000, // SCIF0
+    0x38004000, // SCIF1
+    0x0,
+    0x0,
+    0x0,
+    0x38010000, // HSCIF0
+    0x38014000, // HSCIF1
+    0x0,
+    0x0
 };
 
 static const e_module_id_t dev_to_module_list[] = {
