@@ -83,9 +83,8 @@ typedef enum e_modsel_func
 (((uint32_t)(reg_pfc_t)<<REG_TYPE_POS) + ((uint32_t)(grp)<<GROUP_START_POS) + ((uint32_t)(pin)<<PIN_START_POS) + ((uint32_t)(fid)<<FUNC_START_POS))
 
 /******************* Define pin functions *******************/
-#define MAX_ITEM_IN_GROUP   16
 #define CREATE_GROUP(name, ...) \
-static int name[MAX_ITEM_IN_GROUP] = {__VA_ARGS__, -1};
+static int name[] = {__VA_ARGS__, -1};
 
 typedef struct {
     e_module_id_t module_id;
