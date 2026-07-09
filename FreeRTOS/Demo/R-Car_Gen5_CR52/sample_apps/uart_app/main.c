@@ -53,7 +53,7 @@
         HSCIF1,
         HSCIF2
     };
-#elif (BOARD == AI_ACC)
+#elif (BOARD == MDP_AIACC_RFS2)
     uint8_t serialChannelArr[] = {
         SCIF1,
         SCIF0,
@@ -65,7 +65,7 @@
         SCIF1,
         HSCIF0
     };
-#else //MDP board
+#elif (BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
     uint8_t serialChannelArr[] = {
         HSCIF0
     };
