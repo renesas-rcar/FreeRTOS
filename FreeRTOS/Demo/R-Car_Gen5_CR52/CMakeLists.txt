@@ -259,6 +259,7 @@ target_include_directories(freertos_bsp
         # LOGGING
         $<BUILD_INTERFACE:${LOGGING_DIR}>
         # COMMON
+        $<BUILD_INTERFACE:${BSP_DIR}/common/include>
         $<BUILD_INTERFACE:${BSP_DIR}/common/include/${PLATFORM_DEVICE}>
         
         $<INSTALL_INTERFACE:include/kernel/include>
