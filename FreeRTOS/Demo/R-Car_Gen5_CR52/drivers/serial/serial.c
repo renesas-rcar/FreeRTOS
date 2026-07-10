@@ -76,12 +76,6 @@ int32_t R_SERIAL_ReConfigure(e_serial_devices_t device)
 	return ret;
 }
 
-#if (BOARD == MDP_AIACC_RFS2 || BOARD == X5H_VDK || BOARD == X5H_RFS2)
-    static int uart_set_pfc(e_serial_devices_t device)
-    {
-        return 0;
-    }
-#else
     static int uart_set_pfc(e_serial_devices_t device)
     {
         st_module_config_t uart_module;
@@ -100,7 +94,6 @@ int32_t R_SERIAL_ReConfigure(e_serial_devices_t device)
 
         return pfcInitModule(uart_module);
     }
-#endif
 
 int32_t R_SERIAL_PutString(const unsigned char *buffer, unsigned short length)
 {

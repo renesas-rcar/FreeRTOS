@@ -451,9 +451,6 @@ int pfcInitModule(st_module_config_t module)
 
 int pfcInitModules(st_module_config_t* module_list)
 {
-#if (BOARD == X5H_RFS2 || BOARD == MDP_AIACC_RFS2)
-    ( void ) module_list;
-#else	// (BOARD == X5H_VDK || BOARD == MDP_AIACC_HIL || BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL)
     int module_indx = 0, ret = 0;
     st_module_config_t module;
 
@@ -474,7 +471,6 @@ int pfcInitModules(st_module_config_t* module_list)
             return -1;
         }
     }
-#endif
 
     return 0;
 }
