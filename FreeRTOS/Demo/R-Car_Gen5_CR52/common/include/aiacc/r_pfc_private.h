@@ -91,16 +91,16 @@ CREATE_GROUP(i2c2_grp, SDA2, SCL2, MODSEL_SDA2, MODSEL_SCL2)
 CREATE_GROUP(i2c3_grp, SDA3, SCL3, MODSEL_SDA3, MODSEL_SCL3)
 
 static const st_driver_group_t all_drv_groups[] = {
-    {.module_id = MODULE_HSCIF0, .group = ADD_GROUP(hscif0_grp)},
-    {.module_id = MODULE_SCIF0,  .group = ADD_GROUP(scif0_grp)},
-    {.module_id = MODULE_HSCIF1, .group = ADD_GROUP(hscif1_grp)},
-    {.module_id = MODULE_SCIF1,  .group = ADD_GROUP(scif1_grp)},
-    {.module_id = MODULE_I2C0,  .group = ADD_GROUP(i2c0_grp)},
-    {.module_id = MODULE_I2C1,  .group = ADD_GROUP(i2c1_grp)},
-    {.module_id = MODULE_I2C2,  .group = ADD_GROUP(i2c2_grp)},
-    {.module_id = MODULE_I2C3,  .group = ADD_GROUP(i2c3_grp)},
+    {MODULE_HSCIF0, ADD_GROUP(hscif0_grp)},
+    {MODULE_SCIF0,  ADD_GROUP(scif0_grp)},
+    {MODULE_HSCIF1, ADD_GROUP(hscif1_grp)},
+    {MODULE_SCIF1,  ADD_GROUP(scif1_grp)},
+    {MODULE_I2C0,   ADD_GROUP(i2c0_grp)},
+    {MODULE_I2C1,   ADD_GROUP(i2c1_grp)},
+    {MODULE_I2C2,   ADD_GROUP(i2c2_grp)},
+    {MODULE_I2C3,   ADD_GROUP(i2c3_grp)},
     // Add driver groups.
-    {.module_id = MODULE_INVALID, .group = 0},
+    {MODULE_INVALID, 0},
 };
 
 #ifdef __cplusplus
