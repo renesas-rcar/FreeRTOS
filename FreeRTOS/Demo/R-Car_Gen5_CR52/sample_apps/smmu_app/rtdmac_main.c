@@ -43,6 +43,7 @@
 
 #include "stdio.h"
 #include "stdbool.h"
+#include "board.h"
 #define main_DMAC_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 #define DESTINATION_OFFSET 			   0x01000000
 #define SOURCE_OFFSET_MAPPING          0x10000000
@@ -135,8 +136,13 @@ static void prvDMACTask( void *pvParameters )
 		}
 	}
 
+    
     st_smmu_streamid_instance_ctrl_t smmu_ctrl = {
+    #if (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
+    .stream_id = 0x00E01, /*AIACC RTDMAC 0 CHANNEL 1*/
+    #else
     .stream_id = 0xE0001, /*X5H RTDMAC 0 CHANNEL 1*/
+    #endif    
     .smmu_domain = SMMU_RT,
     .is_secure = is_secure,
     };
