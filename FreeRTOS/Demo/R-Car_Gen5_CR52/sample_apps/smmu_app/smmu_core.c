@@ -40,13 +40,21 @@
 #include "pfc/r_pfc_api.h"
 
 #include "device_tree.h"
-
+#include "board.h"
 #include "rcar_utils.h"
 
 #define main_SMMU_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
-#define MASK 0x00000FFF
 #define SMMU_COREID_MAX 2
 #define NUMBER_OF_STREAMID 2
+
+#if (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
+#define RCTBUBYPSEN_ADDRESS     0x18B41010  /* Realtime Core TBU bypass enable register address */
+#define MASK 0x00000003
+#else
+#define RCTBUBYPSEN_ADDRESS     0x18B47800  /* Realtime Core TBU bypass enable register address */
+#define MASK 0x00000FFF
+#endif
+
 /*-----------------------------------------------------------*/
 /*
  * Configure the hardware as necessary to run this demo.
@@ -99,10 +107,18 @@ static void prvSMMU_RT_Task( void *pvParameters )
         return;
     }
 
+    #if (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
+    uint32_t streamId[SMMU_COREID_MAX][NUMBER_OF_STREAMID] = {
+        { 0x00800, 0x00900},    // core0
+        { 0x00B00, 0x00A00}     // core1
+    };
+
+    #else
     uint32_t streamId[SMMU_COREID_MAX][NUMBER_OF_STREAMID] = {
         { 0x00000, 0x00C00},    // core0
         { 0x10C01, 0x10100}     // core1
     };
+    #endif
 
     st_smmu_streamid_instance_ctrl_t smmu_ctrl = {
         .smmu_domain = SMMU_RT,
@@ -138,8 +154,8 @@ static void prvSMMU_RT_Task( void *pvParameters )
 
     printf("* Test case 5: Disable SMMU bypass mode *\r\n");
 
-    volatile uint32_t *RCTBUBYPSEN = (volatile uint32_t *)0x18B47800;
-
+    volatile uint32_t *RCTBUBYPSEN = (volatile uint32_t *)RCTBUBYPSEN_ADDRESS;
+    
     uint32_t smmu_bypass = ~(1U<<coreid) & MASK ;
     uint32_t old = *RCTBUBYPSEN;
     uint32_t new = (old & ~MASK) | (smmu_bypass & MASK);
@@ -150,8 +166,7 @@ static void prvSMMU_RT_Task( void *pvParameters )
     else
         printf("Disable Failed\r\n");
 
-    R_SMMU_Enable(SMMU_RT, is_secure);
-
+    R_SMMU_Enable(SMMU_RT, is_secure);    
     printf("**********************************************\r\n");
 
     printf("* Test case 6: Verify data *\r\n");
