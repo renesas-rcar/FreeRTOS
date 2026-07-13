@@ -93,9 +93,9 @@ uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
     mem_write32(base + HDMA_DAR_HIGH_OFF, (uint32_t)(dstAddr >> 32));
 
     if (rw) {
-        mem_write32(base + HDMA_CONTROL1_OFF, 0x00070000);
+        mem_write32(base + HDMA_CONTROL1_OFF, 0x00070010);
     } else {
-        mem_write32(base + HDMA_CONTROL1_OFF, 0x00040000);
+        mem_write32(base + HDMA_CONTROL1_OFF, 0x00040010);
     }
 
     mem_write32(base + HDMA_FUNC_NUM_OFF, 0x00000000);
