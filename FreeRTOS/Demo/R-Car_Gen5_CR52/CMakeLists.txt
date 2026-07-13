@@ -334,15 +334,26 @@ install(
     DESTINATION .
     FILES_MATCHING PATTERN "*.ld"
 )
-install(
-    DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/
-    DESTINATION bins
-    FILES_MATCHING
-        PATTERN "*.elf"
-        PATTERN "*.srec"
-        PATTERN "*.map"
-    PATTERN "CMakeFiles" EXCLUDE
-)
+
+if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2")
+    install(
+        DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/
+        DESTINATION bins
+        FILES_MATCHING
+            PATTERN "*.elf"
+            PATTERN "*.map"
+        PATTERN "CMakeFiles" EXCLUDE
+    )
+else()
+    install(
+        DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/
+        DESTINATION bins
+        FILES_MATCHING
+            PATTERN "*.srec"
+            PATTERN "*.map"
+        PATTERN "CMakeFiles" EXCLUDE
+    )
+endif()
 
 ################ Function to convert output file to .srec #############################
 
