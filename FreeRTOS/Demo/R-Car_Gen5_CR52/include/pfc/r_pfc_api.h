@@ -16,6 +16,7 @@ extern "C" {
 #include "board.h"
 
 #include "device_tree.h"
+#include "r_pfc_cfg.h"
 
 /**
 * @defgroup PFC_Module Pin Function Control Module
@@ -25,37 +26,6 @@ extern "C" {
 * This module provides pin configuration for PFC mode and pull resistor settings.
 * It includes initialization of pin groups and setting pins to pull-up, pull-down, or no pull states.
 */
-
-/**
- * @brief PFC groups enumeration.
- * 
- * Defines groups of pins for pin function control.
- */
-#if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
-typedef enum e_rcar_pfc_group
-{
-    RCAR_PFC_GROUP_00 = 0x00,           ///< PFC Group 00
-    RCAR_PFC_GROUP_01 = 0x01,           ///< PFC Group 01
-    RCAR_PFC_GROUP_02 = 0x02,           ///< PFC Group 02
-    RCAR_PFC_GROUP_03 = 0x03,           ///< PFC Group 03
-    RCAR_PFC_GROUP_04 = 0x04,           ///< PFC Group 04
-    RCAR_PFC_GROUP_05 = 0x05,           ///< PFC Group 05
-    RCAR_PFC_GROUP_06 = 0x06,           ///< PFC Group 06
-    RCAR_PFC_GROUP_07 = 0x07,           ///< PFC Group 07
-    RCAR_PFC_GROUP_08 = 0x08,           ///< PFC Group 08
-    RCAR_PFC_GROUP_09 = 0x09,           ///< PFC Group 09
-    RCAR_PFC_GROUP_10 = 0x0A,           ///< PFC Group 10
-    RCAR_PFC_GROUP_MAX,
-} rcar_pfc_group_t;
-#else   // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
-typedef enum e_rcar_pfc_group
-{
-    RCAR_PFC_GROUP_00 = 0x00,           ///< PFC Group 00
-    RCAR_PFC_GROUP_01 = 0x01,           ///< PFC Group 01
-    RCAR_PFC_GROUP_02 = 0x02,           ///< PFC Group 02
-    RCAR_PFC_GROUP_MAX,
-} rcar_pfc_group_t;
-#endif
 
 /** 
  * @brief PFC pins enumeration.

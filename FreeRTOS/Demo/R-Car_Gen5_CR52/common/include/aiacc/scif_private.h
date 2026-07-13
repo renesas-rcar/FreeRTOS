@@ -23,6 +23,14 @@ extern "C" {
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
+#ifndef UART_ID
+    #define UART_ID HSCIF0
+#endif // UART_ID
+
+#ifndef UART_BAUDRATE
+    #define UART_BAUDRATE 1843200
+#endif // UART_BAUDRATE
+
 static uint32_t serial_channels_arr[] = {
     0x38000000, // SCIF0
     0x38004000, // SCIF1
