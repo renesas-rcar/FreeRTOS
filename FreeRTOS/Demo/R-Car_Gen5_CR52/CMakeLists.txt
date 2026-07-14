@@ -274,12 +274,6 @@ target_include_directories(freertos_bsp
         $<BUILD_INTERFACE:${BSP_DIR}/drivers/taud>
         $<BUILD_INTERFACE:${BSP_DIR}/drivers/ecm>
         $<BUILD_INTERFACE:${BSP_DIR}/drivers/tcm>
-        # POSIX
-        $<BUILD_INTERFACE:${BSP_DIR}/common/POSIX_portable>
-        $<BUILD_INTERFACE:${POSIX_DIR}/include>
-        $<BUILD_INTERFACE:${POSIX_DIR}/include/private>
-        $<BUILD_INTERFACE:${POSIX_DIR}/FreeRTOS-Plus-POSIX/include>
-        $<BUILD_INTERFACE:${POSIX_DIR}/FreeRTOS-Plus-POSIX/include/portable>
         # LOGGING
         $<BUILD_INTERFACE:${LOGGING_DIR}>
         # COMMON

@@ -55,7 +55,7 @@ CMake options for the project:
 
 ### X5H BSP
 
-`<install_dir>/lib/libfreertos_bsp.a` The archieve file contains FreeRTOS Kernel and R-Car BSP, POSIX libraries
+`<install_dir>/lib/libfreertos_bsp.a` The archieve file contains FreeRTOS Kernel and R-Car BSP
 
 `<install_dir>/objects/dummy/common/dummy.c.o` Link your application with this object to suspend some warning: `warning: <symbol> is not implemented and will always fail`
 

@@ -98,10 +98,6 @@
 #include "StreamBufferDemo.h"
 #include "death.h"
 
-#ifdef configSUPPORT_POSIX
-#include "posix_demo.h"
-#endif
-
 /* Logging Function include. */
 #ifdef LOGGING_ENABLE
 #include "logging_stack.h"
@@ -126,8 +122,6 @@
 /*CORTEX M3 DEFINE*/
 #define mainMESSAGE_BUFFER_TASKS_STACK_SIZE	( 200 )
 #define mainCREATOR_TASK_PRIORITY  ( configMAX_PRIORITIES - ( UBaseType_t ) 2 )
-
-#define mainPOSIX_DEMO_PRIORITY    ( tskIDLE_PRIORITY + 4 )
 /*-----------------------------------------------------------*/
 
 /*
@@ -212,10 +206,6 @@ void main_full( void )
 	vStartStreamBufferTasks();
 	/*----------------*/
 #endif
-
-#ifdef configSUPPORT_POSIX
-    xTaskCreate( vStartPOSIXDemo, "posix", configMINIMAL_STACK_SIZE, NULL, mainPOSIX_DEMO_PRIORITY, NULL );
-#endif 
 
 	/* Create the task that just adds a little random behaviour. */
 	xTaskCreate( prvPseudoRandomiser, "Rnd", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 4, NULL );
