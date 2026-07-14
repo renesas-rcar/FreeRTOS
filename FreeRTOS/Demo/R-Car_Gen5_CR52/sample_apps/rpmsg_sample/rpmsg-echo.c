@@ -31,6 +31,7 @@
 
 static struct rpmsg_endpoint lept;
 static int shutdown_req = 0;
+int is_print_result = 1;
 
 #define hello_msg "Hello world from CR52/Free-RTOS!"
 #define goodbye_msg "Good bye!"
@@ -55,6 +56,13 @@ static int rpmsg_endpoint_cb(struct rpmsg_endpoint *ept, void *data, size_t len,
         return RPMSG_SUCCESS;
     }
 
+    if(is_print_result == 1)
+    {
+        LPRINTF("TC1 result: PASS\r\n");
+        LPRINTF("TC2: If the TC1 OK log is found on both Core 0 and Core 1, judge as OK. Otherwise, judge as NG.\r\n");
+        LPRINTF("<APP_END>\r\n");
+        is_print_result = 0;
+    }
     LPRINTF("Incoming msg: %s\r\n", payload);
 
     rpmsg_send(ept, hello_msg, strlen(hello_msg));
@@ -138,9 +146,19 @@ void echoTask( void *pvParameters )
     LPRINTF("RPMsg device TX buffer size: %#x\r\n", rpmsg_get_tx_buffer_size(&lept));
     LPRINTF("RPMsg device RX buffer size: %#x\r\n", rpmsg_get_rx_buffer_size(&lept));
 
+    LPRINTF("TC1: Check data tranfer.\r\n");
+    int time_out_test = 10000;
     while(1) {
         platform_poll(platform);
         vTaskDelay(1);
+        time_out_test--;
+        if(time_out_test == 0)
+        {
+            if(is_print_result == 1)
+            {
+                LPRINTF("TC1 result: FAIL\r\n");
+            }     
+        }
         /* we got a shutdown request, exit */
         if (shutdown_req) {
             break;
