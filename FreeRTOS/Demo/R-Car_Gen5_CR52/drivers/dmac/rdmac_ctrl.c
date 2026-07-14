@@ -14,32 +14,16 @@
  
  extern int printf_delay(const char *format, ...);
  
- /*!
-  *  @brief          RT-DMA intialize
-  *  @details
-  *  @param[in]      mode
-  *  @return         drv_OK
-  *  @par    Refer   (none)
-  *  @par    Modify  (none)
- */
- uint16_t R_RTDMAC_RcarDmacCtrlInit(DMAC_t dev, rDmacPriorityMode_t mode)
+ /* Return code of API */
+ #define drv_OK                                (0U)    /* API completed without any error. */
+ #define drv_FAIL                              (1U)    /* Failed. */
+ 
+uint16_t R_RTDMAC_RcarDmacCtrlInit(DMAC_t dev, rDmacPriorityMode_t mode)
  { 
     return R_DMAC_RcarDmacCtrlInit(dev, mode);
  }
  
- /*!
-  *  @brief          RT-DMA Execute
-  *  @details
-  *  @param[in]      cfg
-  *  @param[in]      descCfg
-  *  @param[in]      cb
-  *  @return         drv_OK
-  *  @return         drv_ERR_NOT_INITIALIZED
-  *  @return         drv_RTDMAC_CH_BUSY
-  *  @par    Refer   (none)
-  *  @par    Modify  (none)
- */
- uint16_t R_RTDMAC_RcarDmacExec(DMAC_t dev, uint8_t ch, rDmacCfg_t *cfg, rDmacDescCfg_t *descCfg)
+uint16_t R_RTDMAC_RcarDmacExec(DMAC_t dev, uint8_t ch, rDmacCfg_t *cfg, rDmacDescCfg_t *descCfg)
  {
     uint8_t Value;
     uint16_t ret = drv_OK;
@@ -58,14 +42,6 @@
     return ret;
  }
  
- /*!
-  *  @brief          RT-DMA Stop
-  *  @details
-  *  @return         drv_OK
-  *  @return         drv_ERR_NOT_INITIALIZED
-  *  @par    Refer   (none)
-  *  @par    Modify  (none)
-  */
  uint16_t R_RTDMAC_RcarDmacStop(DMAC_t dev, uint8_t ch)
  {
      uint32_t Value;
@@ -80,13 +56,6 @@
      return ret;
 }
 
- /*!
- *  @brief          InterruptHandler
- *  @details
- *  @param[in]      p_context     context irq handle.
- *  @par    Refer   (none)
- *  @par    Modify  (none)
- */
 uint16_t R_RTDMAC_RcarCallBackSet(dmac_ctrl_t * const p_ctrl, void ( *p_callback)(void *), void * const p_context)
 {
     uint32_t Value;
