@@ -31,6 +31,7 @@
 #define __CMSIS_RCAR_GEN5_H
 
 #include "board.h"
+#include "gic_private.h"
 
 /* FPU */
 #define __FPU_PRESENT           1
@@ -40,18 +41,6 @@
 
 /* GIC */
 #define __GIC_PRESENT           1
-
-//#define GIC_DISTRIBUTOR_BASE	0xF0000000U
-#if (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
-    #define CR52_GICD_ADDR          ((void *)0xF0000000U)
-    #define CR52_GICR_ADDR          ((void *)0xF0100000U)
-#elif (BOARD == MDP_AIACC_RFS2 || BOARD == MDP_AIACC_HIL)
-    #define CR52_GICD_ADDR          ((void *)0xC0000000U)
-    #define CR52_GICR_ADDR          ((void *)0xC0100000U)
-#else
-    #define CR52_GICD_ADDR          ((void *)0xC0000000U)
-    #define CR52_GICR_ADDR          ((void *)0xC0100000U)
-#endif
 
 #define CR52_CPU_ID             0
 #define CR52_GIC_BASE_ADDR      ((uint32_t)CR52_GICD_ADDR)
