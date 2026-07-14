@@ -176,7 +176,10 @@ static void prvSMMU_RT_Task( void *pvParameters )
         R_SMMU_Unmap(&smmu_ctrl, 0x70000000, 0x90000000, 0x1000000);
     }
     printf("Unmap 0x70000000 and remap to a new PA. Expect it no longer maps to 0x90000000\n");
-    R_SMMU_Map(&smmu_ctrl, 0x70000000, 0x8E200000, 0x00100000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
+    for (uint8_t i = 0; i < sizeof(streamId[coreid])/sizeof(uint32_t); i ++) {
+        smmu_ctrl.stream_id = streamId[coreid][i];
+        R_SMMU_Map(&smmu_ctrl, 0x70000000, 0x8E200000, 0x00100000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
+    }
     *(uint32_t *)0x90000000 = 0x1111;
     *(uint32_t *)0x70000000 = 0x2222;
     vTaskDelay(10);
