@@ -166,6 +166,24 @@ else()
     )
 endif()
 
+if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2")
+    file(GLOB AUDIO_SRC_LIST
+        ${BSP_DIR}/drivers/audio/ak4619_module_dummy.c
+        ${BSP_DIR}/drivers/audio/adg.c
+        ${BSP_DIR}/drivers/audio/ssi.c
+        ${BSP_DIR}/drivers/audio/rcar_audio_api.c
+        ${BSP_DIR}/drivers/audio/rcar_audio.c
+    )
+else()
+    file(GLOB AUDIO_SRC_LIST
+        ${BSP_DIR}/drivers/audio/ak4619_module.c
+        ${BSP_DIR}/drivers/audio/adg.c
+        ${BSP_DIR}/drivers/audio/ssi.c
+        ${BSP_DIR}/drivers/audio/rcar_audio_api.c
+        ${BSP_DIR}/drivers/audio/rcar_audio.c
+    )
+endif()
+
 set(bsp_source
     ${BSP_DIR}/common/boot.S
     ${BSP_DIR}/common/asm_vectors.S
@@ -184,7 +202,6 @@ set(bsp_source
     ${BSP_DIR}/drivers/tcm/tcm.c
     ${BSP_DIR}/drivers/gpio/r_gpio_api.c
     ${BSP_DIR}/drivers/gpio/r_gpio.c
-    ${BSP_DIR}/drivers/audio/ak4619_module.c
     ${BSP_DIR}/drivers/pfc/r_pfc_api.c
     ${BSP_DIR}/drivers/mfis/mfis.c
     ${BSP_DIR}/drivers/dmac/dmac_ctrl.c
@@ -204,10 +221,7 @@ set(bsp_source
     ${BSP_DIR}/drivers/wcrc/r_wcrc.c
     ${BSP_DIR}/drivers/wcrc/r_crc_wrapper.c
 
-    ${BSP_DIR}/drivers/audio/adg.c
-    ${BSP_DIR}/drivers/audio/ssi.c
-    ${BSP_DIR}/drivers/audio/rcar_audio_api.c
-    ${BSP_DIR}/drivers/audio/rcar_audio.c
+    ${AUDIO_SRC_LIST}
     ${BSP_DIR}/drivers/taud/r_taud.c
     ${BSP_DIR}/drivers/taud/r_taud_reg.c
     ${BSP_DIR}/drivers/taud/r_taud_api.c

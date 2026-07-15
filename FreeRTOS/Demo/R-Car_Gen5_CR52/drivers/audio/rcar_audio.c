@@ -7,7 +7,6 @@
 
 #include <audio/rcar_audio.h>
 #include "rcar_audio_api.h"
-#include "board.h"
 
 int R_Audio_Init(st_audio_instance_ctrl_t * const p_instance_ctrl, st_audio_cfg_t const * const p_cfg)
 {
@@ -21,14 +20,12 @@ int R_Audio_Init(st_audio_instance_ctrl_t * const p_instance_ctrl, st_audio_cfg_
 		return ret;
 	}
 
-	#if (BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL)
 	ret = r_ak4619_init(p_cfg);
 	if(ret < 0)
 	{
 		printf("Can't set up AK4619 for Audio driver!\n");
 		return ret;
 	}
-	#endif
 	
 	ret = r_adg_init(p_cfg);
 	if(ret < 0)
@@ -175,11 +172,8 @@ int R_Audio_Deinit(st_audio_instance_ctrl_t * const p_instance_ctrl)
 	
 	p_instance_ctrl->p_cfg = NULL;
 	
-	#if (BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL)
 	ret = ak4619_module_deinit();
-	#endif
 	ret = r_deinit();
 	
 	return ret;
 }
-
