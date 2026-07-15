@@ -11,6 +11,10 @@
 #ifndef RDMAC_CTRL_COMMON_H
 #define RDMAC_CTRL_COMMON_H
 
+/* Return code of API */
+#define drv_OK                                (0U)    /* API completed without any error. */
+#define drv_FAIL                              (1U)    /* Failed. */
+
  /**
  *  @brief          DMA intialize
  *  @details
