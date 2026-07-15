@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef R_PFC_COMMON_PRVIATE_H
-#define R_PFC_COMMON_PRVIATE_H
+#ifndef R_PFC_COMMON_PRIVATE_H
+#define R_PFC_COMMON_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -97,4 +97,4 @@ typedef struct {
 }
 #endif
 
-#endif /* R_PFC_COMMON_PRVIATE_H */
+#endif /* R_PFC_COMMON_PRIVATE_H */

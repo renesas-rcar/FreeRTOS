@@ -12,7 +12,7 @@
  *
  */
 
-#ifndef R_PFC_PRVIATE_H
+#ifndef R_PFC_PRIVATE_H
 #define R_PFC_PRIVATE_H
 
 #ifdef __cplusplus

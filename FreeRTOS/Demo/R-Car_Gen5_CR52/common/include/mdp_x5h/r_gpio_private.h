@@ -12,7 +12,7 @@
  *
  */
 
-#ifndef R_GPIO_PRVIATE_H
+#ifndef R_GPIO_PRIVATE_H
 #define R_GPIO_PRIVATE_H
 
 #ifdef __cplusplus
