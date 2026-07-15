@@ -9,6 +9,8 @@
 #define arm_generic_timer_h
 
 #include "cmsis_rcar_gen5.h"
+#include "board.h"
+
 #define CNTFRQ_READ()         __get_CNTFRQ()
 #define CNTFRQ_WRITE(v)       __set_CNTFRQ(v)
 #define CNTPCT_READ()         __get_CNTPCT()

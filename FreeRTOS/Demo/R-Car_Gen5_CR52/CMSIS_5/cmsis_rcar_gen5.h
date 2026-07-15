@@ -30,7 +30,6 @@
 #ifndef __CMSIS_RCAR_GEN5_H
 #define __CMSIS_RCAR_GEN5_H
 
-#include "board.h"
 #include "gic_private.h"
 
 /* FPU */
