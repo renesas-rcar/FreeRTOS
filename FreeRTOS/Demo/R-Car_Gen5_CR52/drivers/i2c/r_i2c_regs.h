@@ -13,7 +13,6 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "board.h"
 
 typedef enum {
     R_I2C_IF0 = 0,  /**< channel 0 */
@@ -28,23 +27,7 @@ typedef enum {
     R_I2C_LAST      /**< delimiter */
 } r_i2c_Unit_t;
 
-#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK || BOARD == MDP_X5H_HIL)
-#define R_I2C_IF0_BASE    0xc11d0000
-#define R_I2C_IF1_BASE    0xc06c0000
-#define R_I2C_IF2_BASE    0xc06c8000
-#define R_I2C_IF3_BASE    0xc06d0000
-#define R_I2C_IF4_BASE    0xc06d8000
-#define R_I2C_IF5_BASE    0xc06e0000
-#define R_I2C_IF6_BASE    0xc06e8000
-#define R_I2C_IF7_BASE    0xc06f0000
-#define R_I2C_IF8_BASE    0xc06f8000
-#else // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
-#define R_I2C_IF0_BASE    0x38040000
-#define R_I2C_IF1_BASE    0x38048000
-#define R_I2C_IF2_BASE    0x38050000
-#define R_I2C_IF3_BASE    0x38058000
-#endif
-
+/* Offset I2C registers */
 #define R_I2C_ICSCR       0x00UL
 #define R_I2C_ICMCR       0x04UL
 #define R_I2C_ICSSR       0x08UL

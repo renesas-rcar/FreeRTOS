@@ -17,19 +17,7 @@
 #include "dmac/dmac_common.h"
 #include "i2c/r_i2c.h"
 #include "r_i2c_regs.h"
-
-/* ==================== DEFINE FUNCTIONS ==================== */
-#if (BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == X5H_VDK || BOARD == MDP_X5H_HIL)
-#include "dmac/sysdmac_ctrl.h"
-#define RCAR_DMAC_CTRL_INIT     R_SYSDMAC_RcarDmacCtrlInit
-#define RCAR_DMAC_CALLBACK_SET  R_SYSDMAC_RcarCallBackSet
-#define RCAR_DMAC_EXEC          R_SYSDMAC_RcarDmacExec
-#else // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
-#include "dmac/rtdmac_ctrl.h"
-#define RCAR_DMAC_CTRL_INIT     R_RTDMAC_RcarDmacCtrlInit
-#define RCAR_DMAC_CALLBACK_SET  R_RTDMAC_RcarCallBackSet
-#define RCAR_DMAC_EXEC          R_RTDMAC_RcarDmacExec
-#endif
+#include "r_i2c_private.h"
 
 /* ==================== DEFINES ==================== */
 #define I2C_OPEN                                (0x00000001ULL)
