@@ -156,6 +156,16 @@ elseif (BOARD STREQUAL "x5h_vdk")
     )
 endif()
 
+if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2")
+    set(STATE_MANAGER_SRC
+        ${BSP_DIR}/drivers/state-manager/state_manager_dummy.c
+    )
+else()
+    set(STATE_MANAGER_SRC
+        ${BSP_DIR}/drivers/state-manager/state_manager.c
+    )
+endif()
+
 set(bsp_source
     ${BSP_DIR}/common/boot.S
     ${BSP_DIR}/common/asm_vectors.S
@@ -190,7 +200,7 @@ set(bsp_source
     ${BSP_DIR}/common/rcar_utils.c
 
     ${SCMI_SRC_LIST}
-    ${BSP_DIR}/drivers/state-manager/state_manager.c
+    ${STATE_MANAGER_SRC}
     ${BSP_DIR}/drivers/wcrc/r_wcrc.c
     ${BSP_DIR}/drivers/wcrc/r_crc_wrapper.c
 

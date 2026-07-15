@@ -119,100 +119,6 @@ static void system_notification(void *data)
 	}
 }
 
-#if (BOARD == X5H_RFS2 || BOARD == MDP_AIACC_RFS2 || BOARD == MDP_AIACC_HIL)
-int R_StateManager_Init(void)
-{
-    return 0;
-}
-
-int R_StateManager_SCMI_Info_Show(void)
-{
-    return 0;
-}
-
-int R_StateManager_RequestDeepStop(void)
-{
-    return 0;
-}
-
-int R_StateManager_SysReboot(void)
-{
-    return 0;
-}
-
-int R_StateManager_SysPowerOff(void)
-{
-    return 0;
-}
-
-int R_StateManager_Power_Get(int domain_id, e_power_state_t *state)
-{
-    /*
-     * Due to no SCP support for RFS2 environment,
-     * also all modules are ON by default, the return
-     * value is set to POWER_ON.
-     */
-    *state = POWER_ON;
-    return 0;
-}
-
-int R_StateManager_PowerOff(int domain_id)
-{
-    return 0;
-}
-
-int R_StateManager_PowerOn(int domain_id)
-{
-    return 0;
-}
-
-int R_StateManager_SetClock(int clock_id, uint32_t *rates)
-{
-    return 0;
-}
-
-int R_StateManager_GetClock(int clock_id, uint32_t *rates)
-{
-    return 0;
-}
-
-int R_StateManager_ClockOff(int clock_id)
-{
-    return 0;
-}
-
-int R_StateManager_ClockOn(int clock_id)
-{
-    return 0;
-}
-
-int R_StateManager_ClockStatusGet(int clock_id, bool *status)
-{
-    return 0;
-}
-
-int R_StateManager_ResetAssert(int domain_id)
-{
-    return 0;
-}
-
-int R_StateManager_ResetDeassert(int domain_id)
-{
-    return 0;
-}
-
-int R_StateManager_Reset(int domain_id)
-{
-    return 0;
-}
-
-int R_StateManager_Reset_Status_Get(int domain_id, e_reset_domain_status_t *status) {
-	(void) domain_id;
-	(void) status;
-	return 0;
-}
-
-#else	// (BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL)
 int R_StateManager_Init(void)
 {
 	int ret;
@@ -659,4 +565,3 @@ int R_StateManager_Reset_Status_Get(int domain_id, e_reset_domain_status_t *stat
 
     return ret;
 }
-#endif //if (BOARD == X5H_RFS2)
