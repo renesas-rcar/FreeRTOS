@@ -40,6 +40,7 @@
 #include "pfc/r_pfc_api.h"
 
 #include "device_tree.h"
+#include "board.h"
 
 #define main_LOG_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
@@ -315,6 +316,10 @@ static void prvLogTask( void *pvParameters )
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
     unsigned char buffer[24] = "prvLogTask ...\n";
+
+    #if(BOARD == MDP_X5H_HIL || BOARD == MDP_AIACC_HIL)
+        vTaskDelay(6000);
+    #endif
 
     uartAppExample(serialChannelArr,ARRAY_SIZE(serialChannelArr));
 

@@ -40,6 +40,7 @@
 #include "device_tree.h"
 
 #include "rcar_utils.h"
+#include "board.h"
 /*-----------------------------------------------------------*/
 
 /*
@@ -83,6 +84,9 @@ static void prvSetupHardware( void )
 
 static void prvHelloWorldTask( void *pvParameters )
 {
+    #if(BOARD == MDP_X5H_HIL || BOARD == MDP_AIACC_HIL)
+        vTaskDelay(6000);
+    #endif
 
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;

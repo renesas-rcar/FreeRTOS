@@ -99,6 +99,9 @@ static void prvSetupHardware( void )
 
 static void prvI2CTask( void *pvParameters )
 {
+
+    vTaskDelay(6000);
+
 	/* Remove compiler warning about unused parameter. */
 	( void ) pvParameters;
 
@@ -663,6 +666,9 @@ static void prvI2CTask( void *pvParameters )
 #else   // (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
 static void prvI2CTask( void *pvParameters )
 {
+
+    vTaskDelay(6000); 
+
 	/* Remove compiler warning about unused parameter. */
 	( void ) pvParameters;
 
