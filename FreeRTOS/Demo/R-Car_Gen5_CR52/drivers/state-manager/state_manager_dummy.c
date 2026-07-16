@@ -23,26 +23,6 @@
 
 #include "FreeRTOS.h"
 
-#define SM_LOG_INFO(format, ...) \
-    {\
-        printf("SM: I [%s:%d] ", __func__, __LINE__);\
-        printf(format "\r\n", ##__VA_ARGS__);\
-    }
-
-#define SM_LOG_ERR(format, ...) \
-    {\
-        printf("SM: E [%s:%d] ", __func__, __LINE__);\
-        printf(format "\r\n", ##__VA_ARGS__);\
-    }
-
-#define VALIDATE_ID(id, max) \
-    do { \
-        if ((id) >= max) { \
-            SM_LOG_ERR("Invalid ID\n\r"); \
-            return -1; \
-        } \
-    } while(0)
-
 static uint32_t max_clockdomain_num;
 static uint32_t max_powerdomain_num;
 static uint32_t max_resetdomain_num;
@@ -90,33 +70,7 @@ static const char* agentid2str(int agent_id)
 
 static void system_notification(void *data)
 {
-	const char* flags_to_str[] = {"forceful", "graceful", "invalid"};
-    const char* system_state_to_str[] = {
-		"shutdown", "coldreset", "warmreset", "powerup", "suspend", "MAX"};
-	int ret;
-	scmi_syspower_state_notifier_t *notifier =
-		(scmi_syspower_state_notifier_t *)data;
-	static int cnt = 0;
-
-	SM_LOG_INFO("%s has transited to %s %s with timeout %d ms",
-			agentid2str(notifier->agent_id),
-			flags_to_str[notifier->flags],
-			system_state_to_str[notifier->system_state], notifier->timeout);
-
-	if (((SYSTEM_STATE_SUSPEND == notifier->system_state) ||
-		(SYSTEM_STATE_SHUTDOWN == notifier->system_state)) &&
-		(SCMI_AGENT_ID_FRTOS_1ST != notifier->agent_id)) {
-		/* Send suspend command to SCP FW
-         * FreeRTOS agents other than the main one.
-         */
-		ret = scmi_system_power_state_set(notifier->flags, SYSTEM_STATE_SHUTDOWN);
-		if (ret < 0) {
-			SM_LOG_ERR("Error: Failed to request system notification %d (ret %d).\r\n",
-					notifier->system_state, ret);
-			return;
-		}
-		/* Post shutdown or suspend */
-	}
+    (void)data;
 }
 
 int R_StateManager_Init(void)
