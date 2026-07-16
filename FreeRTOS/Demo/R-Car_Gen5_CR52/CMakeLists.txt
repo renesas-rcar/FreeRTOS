@@ -156,7 +156,7 @@ elseif (BOARD STREQUAL "x5h_vdk")
     )
 endif()
 
-if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2")
+if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2" OR BOARD STREQUAL "mdp_aiacc_hil")
     set(STATE_MANAGER_SRC
         ${BSP_DIR}/drivers/state-manager/state_manager_dummy.c
     )
