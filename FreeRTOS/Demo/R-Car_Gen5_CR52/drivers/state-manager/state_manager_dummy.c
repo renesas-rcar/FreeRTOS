@@ -151,57 +151,72 @@ int R_StateManager_Power_Get(int domain_id, e_power_state_t *state)
      * also all modules are ON by default, the return
      * value is set to POWER_ON.
      */
+    (void)domain_id;
+    (void)state;
     *state = POWER_ON;
     return 0;
 }
 
 int R_StateManager_PowerOff(int domain_id)
 {
+    (void)domain_id;
     return 0;
 }
 
 int R_StateManager_PowerOn(int domain_id)
 {
+    (void)domain_id;
     return 0;
 }
 
 int R_StateManager_SetClock(int clock_id, uint32_t *rates)
 {
+    (void)clock_id;
+    (void)rates;
     return 0;
 }
 
 int R_StateManager_GetClock(int clock_id, uint32_t *rates)
 {
+    (void)clock_id;
+    (void)rates;
     return 0;
 }
 
 int R_StateManager_ClockOff(int clock_id)
 {
+    (void)clock_id;
     return 0;
 }
 
 int R_StateManager_ClockOn(int clock_id)
 {
+    (void)clock_id;
     return 0;
 }
 
 int R_StateManager_ClockStatusGet(int clock_id, bool *status)
 {
+    (void)clock_id;
+    (void)status;
     return 0;
 }
 
 int R_StateManager_ResetAssert(int domain_id)
 {
+    (void)domain_id;
     return 0;
 }
 
 int R_StateManager_ResetDeassert(int domain_id)
 {
+    (void)domain_id;
     return 0;
 }
 
 int R_StateManager_Reset(int domain_id)
 {
+    (void)domain_id;
     return 0;
 }
 

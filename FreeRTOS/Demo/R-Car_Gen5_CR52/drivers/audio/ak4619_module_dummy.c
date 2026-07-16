@@ -87,6 +87,8 @@ static int ak4619_i2c_deinit(void)
 
 static int write_i2c_reg(uint8_t reg_addr, uint8_t data)
 {
+    (void)reg_addr;
+    (void)data;
     return 0;
 }
 
@@ -97,6 +99,9 @@ static int set_pdn_pin_high(void)
 
 static int ak4619_check_bick(e_ak4619_mclk_multiplier_t mclk_multiplier, uint8_t max_channel, uint8_t bit_per_channel)
 {
+    (void)mclk_multiplier;
+    (void)max_channel;
+    (void)bit_per_channel;
     return 0;
 }
 
@@ -105,33 +110,43 @@ int ak4619_configure_clock(e_ak4619_mclk_multiplier_t mclk_multiplier,
                             uint8_t bit_per_channel,
                             e_ak4619_fs_select_t fs)
 {
+    (void)mclk_multiplier;
+    (void)max_channel;
+    (void)bit_per_channel;
+    (void)fs;
     return 0;
 }
 
 int ak4619_configure_audio_format(e_ak4619_interface_format_t format) 
 {
+    (void)format;
     return 0;
 }
 
 int ak4619_configure_word_length(e_ak4619_data_bit_length_t didl_set, e_ak4619_data_bit_length_t dodl_set)
 {
+    (void)didl_set;
+    (void)dodl_set;
     return 0;
 }
 
 /* Board has only connect to SDIN1, so input must be SDIN1 */
 int ak4619_configure_input_dac(e_ak4619_dac_source_t dac_1)
 {
+    (void)dac_1;
     return 0;
 }
 
 /* Now it only support use DAC1 */
 int ak4619_set_dac(bool DAC)
 {
+    (void)DAC;
     return 0;
 }
 
 int ak4619_set_reset_bit(bool rstn_bit_set)
 {
+    (void)rstn_bit_set;
     return 0;
 }
 
@@ -153,7 +168,10 @@ int ak4916_set_volume(void)
 
 int ak4619_module_init(ak4619_instance_set_t *instance_set, uint8_t max_channel,
                         uint8_t bit_per_channel)
-{ 
+{
+    (void)instance_set;
+    (void)max_channel;
+    (void)bit_per_channel;
     return 0;  
 }
 
