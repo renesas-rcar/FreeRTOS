@@ -21,6 +21,9 @@
 extern "C" {
 #endif
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 /* RTDMA Workaround functions */
 static inline uint16_t R_RTDMAC_WA_16_BYTES(rDmacCfg_t *cfg, rDmacDescCfg_t *descCfg)
 {
@@ -31,7 +34,7 @@ static inline uint16_t R_RTDMAC_WA_16_BYTES(rDmacCfg_t *cfg, rDmacDescCfg_t *des
         (cfg->mTransferUnit == DRV_RTDMAC_TRANS_UNIT_64BYTE) ||
         (cfg->mTransferUnit == DRV_RTDMAC_TRANS_UNIT_MAX))
     {
-        printf("RTDMAC error: transfer unit must be 16 bytes or less\n");
+        LogError(("RTDMAC error: transfer unit must be 16 bytes or less\n"));
         return drv_FAIL;
     }
 
@@ -43,7 +46,7 @@ static inline uint16_t R_RTDMAC_WA_16_BYTES(rDmacCfg_t *cfg, rDmacDescCfg_t *des
     {
         if ((cfg->mSrcAddr & 0xFU) != 0U)
         {
-            printf("RTDMAC error: source address 0x%08x must be 16-byte aligned\n", cfg->mSrcAddr);
+            LogError(("RTDMAC error: source address 0x%08x must be 16-byte aligned\n", cfg->mSrcAddr));
             return drv_FAIL;
         }
     }
@@ -55,7 +58,7 @@ static inline uint16_t R_RTDMAC_WA_16_BYTES(rDmacCfg_t *cfg, rDmacDescCfg_t *des
         {
             if ((p_desc_table[i].SAR & 0xFU) != 0U)
             {
-                printf("RTDMAC error: descriptor[%d].SAR=0x%08x must be 16-byte aligned\n", i, p_desc_table[i].SAR);
+                LogError(("RTDMAC error: descriptor[%d].SAR=0x%08x must be 16-byte aligned\n", i, p_desc_table[i].SAR));
                 return drv_FAIL;
             } 
         }
