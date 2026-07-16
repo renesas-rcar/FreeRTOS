@@ -110,7 +110,7 @@ static void system_notification(void *data)
          * FreeRTOS agents other than the main one.
          */
 		ret = scmi_system_power_state_set(notifier->flags, SYSTEM_STATE_SHUTDOWN);
-		if (ret) {
+		if (ret < 0) {
 			SM_LOG_ERR("Error: Failed to request system notification %d (ret %d).\r\n",
 					notifier->system_state, ret);
 			return;
