@@ -135,6 +135,13 @@ int ak4619_set_reset_bit(bool rstn_bit_set);
 int ak4619_power_on(void);
 
 /**
+ * @brief This function configures the DAC1 left and right volume registers of the AK4619.
+ *
+ * @return 0 if success, otherwise -1.
+ */
+int ak4916_set_volume(void);
+
+/**
  * @brief This function use to Init module AK4619 ready to work
  * 
  * @param instance_set Variables config
