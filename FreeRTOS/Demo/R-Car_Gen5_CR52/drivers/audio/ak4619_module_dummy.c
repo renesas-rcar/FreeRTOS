@@ -36,7 +36,7 @@ static const i2c_master_cfg_t g_i2c_device_cfg_ak4619 =
 /***********************************************************************************************************************
  * GPIO variables
  **********************************************************************************************************************/
-gpio_pin_cfg_t g_gpio_pin_cfg[] =
+static gpio_pin_cfg_t g_gpio_pin_cfg[] =
 {
     {
         .pin_cfg = GPIO_DIRECTION_OUTPUT,
@@ -49,14 +49,14 @@ gpio_pin_cfg_t g_gpio_pin_cfg[] =
 };
 
 
-gpio_cfg_t g_gpio_cfg =
+static gpio_cfg_t g_gpio_cfg =
 {
     .number_of_pins = sizeof(g_gpio_pin_cfg) / sizeof(gpio_pin_cfg_t),
     .p_pin_cfg_data = g_gpio_pin_cfg,
     .p_extend = NULL
 };
 
-gpio_instance_ctrl_t g_gpio_instance_ctrl;
+static gpio_instance_ctrl_t g_gpio_instance_ctrl;
 
 /***********************************************************************************************************************
  * Global variables

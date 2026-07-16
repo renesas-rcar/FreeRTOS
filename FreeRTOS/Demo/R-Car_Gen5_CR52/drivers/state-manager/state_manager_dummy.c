@@ -43,9 +43,9 @@
         } \
     } while(0)
 
-uint32_t max_clockdomain_num;
-uint32_t max_powerdomain_num;
-uint32_t max_resetdomain_num;
+static uint32_t max_clockdomain_num;
+static uint32_t max_powerdomain_num;
+static uint32_t max_resetdomain_num;
 static bool initialized = false;
 
 static const char* agentid2str(int agent_id)
