@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef DEVICE_TREE_MDP_AIACC_H
-#define DEVICE_TREE_MDP_AIACC_H
+#ifndef DEVICE_TREE_H
+#define DEVICE_TREE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,4 +65,4 @@ static inline st_module_config_t* getModuleConfigs(void) {
 }
 #endif
 
-#endif // DEVICE_TREE_MDP_AIACC_H
+#endif // DEVICE_TREE_H
