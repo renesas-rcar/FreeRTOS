@@ -13,7 +13,6 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "board.h"
 
 #include "device_tree.h"
 #include "r_pfc_cfg.h"
