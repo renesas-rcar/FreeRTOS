@@ -343,6 +343,12 @@ install(
     DESTINATION include
 )
 
+# Specify pfc cfg header depend on BOARD_ID
+install(
+    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/r_pfc_cfg.h
+    DESTINATION include
+)
+
 # Logging
 install(
     FILES
