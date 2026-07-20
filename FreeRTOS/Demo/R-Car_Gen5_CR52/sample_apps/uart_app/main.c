@@ -49,10 +49,11 @@
     uint8_t serialChannelArr[] = {
         SCIF1,
         SCIF0,
-        HSCIF0,
         SCIF3,
+        HSCIF0,
         HSCIF1,
-        HSCIF2
+        HSCIF2,
+        HSCIF3
     };
 #elif (BOARD == MDP_AIACC_RFS2)
     uint8_t serialChannelArr[] = {
@@ -86,7 +87,7 @@ static void uartIDtoString(uint8_t uartID,unsigned char *uartName);
 static void uartAppExample(uint8_t *channelArr, uint8_t arrLength);
 SemaphoreHandle_t xSemaphore = NULL;
 unsigned char p_char;
-uint8_t tcNum = 1;
+uint8_t tcNum = 1, flag = 0;
 /*-----------------------------------------------------------*/
 uint32_t getIrqID(uint8_t uart_id)
 {
@@ -199,7 +200,7 @@ static void uartAppExample(uint8_t *channelArr, uint8_t arrLength)
 
         if(allChannel[setIndex] == serialChannelArr[0]) {continue;}
 
-        uint8_t flag = 0;
+        flag = 0;
 
         for (uint8_t chnIndex = 0; chnIndex < arrLength; chnIndex++) {
             if (allChannel[setIndex] == serialChannelArr[chnIndex]) {
@@ -226,7 +227,7 @@ static void uartAppExample(uint8_t *channelArr, uint8_t arrLength)
             /* NA TC*/
             R_SERIAL_ReConfigure(serialChannelArr[0]);
             uartIDtoString(serialChannelArr[0],uartNameBuf);
-            printf(">>> TC%d result: NA. <<<\r\n", tcNum, uartNameBuf);
+            printf("\n>>> TC%d result: NA. <<<\r\n", tcNum, uartNameBuf);
             vTaskDelay(500);
         } else {
             /* Normal TC */
@@ -239,11 +240,17 @@ static void uartAppExample(uint8_t *channelArr, uint8_t arrLength)
                     printf(">>> TC%d result: PASS. <<<\n", tcNum);
                     vTaskDelay(1000);
                 }
+
+                R_SERIAL_ReConfigure(serialChannelArr[0]);
+                printf("\n>>> TC%d result: PASS. <<<\n", tcNum);
             } else {
                 for (loopIndex = 0; loopIndex < 10; loopIndex++) {
                     printf(">>> TC%d result: FAIL. <<<\n", tcNum);
                     vTaskDelay(1000);
                 }
+
+                R_SERIAL_ReConfigure(serialChannelArr[0]);
+                printf("\n>>> TC%d result: FAIL. <<<\n", tcNum);
             }
         }
     }
@@ -315,7 +322,6 @@ static void prvLogTask( void *pvParameters )
 
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
-    unsigned char buffer[24] = "prvLogTask ...\n";
 
     #if(BOARD == MDP_X5H_HIL || BOARD == MDP_AIACC_HIL)
         vTaskDelay(6000);
