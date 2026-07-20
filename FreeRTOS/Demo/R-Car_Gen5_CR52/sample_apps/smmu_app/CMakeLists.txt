@@ -3,31 +3,33 @@
 #
 # SPDX-License-Identifier: MIT
 #
+if(BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_aiacc_rfs2")
+    # Do not build SMMU SYSDMAC for AIACC 
+else()
+    set(app_name "smmu_app")
 
-set(app_name "smmu_app")
+    add_executable(${app_name}
+        main.c
+    )
 
-add_executable(${app_name}
-    main.c
-)
+    target_compile_definitions(${app_name}
+        PUBLIC
 
-target_compile_definitions(${app_name}
-    PUBLIC
+    )
 
-)
+    # Essential libraries to link with
+    target_link_libraries(${app_name}
+        freertos_bsp m
+    )
 
-# Essential libraries to link with
-target_link_libraries(${app_name}
-    freertos_bsp m
-)
+    # Add output program address map file
+    target_link_options(${app_name}
+        PUBLIC
+            -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/${app_name}.map
+    )
 
-# Add output program address map file
-target_link_options(${app_name}
-    PUBLIC
-        -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/${app_name}.map
-)
-
-convert_bin_to_srec(${app_name})
-
+    convert_bin_to_srec(${app_name})
+endif()
 #------------------------------------------------------------------------------
 # SMMU RT CORE
 #------------------------------------------------------------------------------
@@ -38,10 +40,18 @@ foreach(CORE IN LISTS CORES)
 
     if(CORE EQUAL 0)
         set(app_name "smmu_rt_core_app")
-        set(TEMP_LDFILE ${BSP_DIR}/common/linker/lscript_vram1.ld)
+        if(BOARD STREQUAL "mdp_aiacc_hil")
+            set(TEMP_LDFILE ${BSP_DIR}/common/linker/lscript_dram3.ld)
+        else()
+            set(TEMP_LDFILE ${BSP_DIR}/common/linker/lscript_vram1.ld)
+        endif()
     elseif(CORE EQUAL 1)
         set(app_name "smmu_rt_core_app_core1")
-        set(TEMP_LDFILE ${BSP_DIR}/common/linker/lscript_vram2.ld)
+        if(BOARD STREQUAL "mdp_aiacc_hil")
+            set(TEMP_LDFILE ${BSP_DIR}/common/linker/lscript_dram.ld)
+        else()
+            set(TEMP_LDFILE ${BSP_DIR}/common/linker/lscript_vram2.ld)
+        endif()
     endif()
 
     add_executable(${app_name}
