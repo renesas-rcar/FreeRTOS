@@ -311,6 +311,9 @@ static void prvDMACTask(void *pvParameters)
 {
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
+    #if (BOARD == MDP_AIACC_HIL)
+    vTaskDelay(5000);
+    #endif
     int ret;
 
     Context_t usr_context =

@@ -94,6 +94,9 @@ static void prvSetupHardware( void )
 static void prvSMMU_RT_Task( void *pvParameters )
 {
     /* Remove compiler warning about unused parameter. */
+    #if (BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
+    vTaskDelay(5000);
+    #endif
     ( void ) pvParameters;
     int ret;
 

@@ -118,6 +118,9 @@ static void prvSMMUTask( void *pvParameters )
 {
     /* Remove compiler warning about unused parameter. */
     (void)pvParameters;
+    #if (BOARD == MDP_X5H_HIL)
+    vTaskDelay(5000);
+    #endif
     int ret,i;
     bool is_secure = false;
 

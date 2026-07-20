@@ -312,6 +312,9 @@ static void prvSetupHardware(void)
 static void prvDMACTask(void *pvParameters)
 {
     /* Remove compiler warning about unused parameter. */
+    #if (BOARD == MDP_X5H_HIL)
+    vTaskDelay(5000);
+    #endif
     ( void ) pvParameters;
     int ret;
 
