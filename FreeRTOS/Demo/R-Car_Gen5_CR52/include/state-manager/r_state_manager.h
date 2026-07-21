@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef _R_STATE_MANAGER_H_
-#define _R_STATE_MANAGER_H_
+#ifndef R_STATE_MANAGER_H
+#define R_STATE_MANAGER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -204,4 +204,4 @@ int R_StateManager_Reset_Status_Get(int domain_id, e_reset_domain_status_t *stat
 
 /** @} */ // end of State_Manager
 
-#endif /* _R_STATE_MANAGER_H_ */
+#endif /* R_STATE_MANAGER_H */

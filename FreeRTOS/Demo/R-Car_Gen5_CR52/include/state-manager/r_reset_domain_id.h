@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef _R_RESET_DOMAIN_ID_H_
-#define _R_RESET_DOMAIN_ID_H_
+#ifndef R_RESET_DOMAIN_ID_H
+#define R_RESET_DOMAIN_ID_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -847,5 +847,5 @@ typedef enum {
 }
 #endif
 /** @} */ // end of X5H_Reset_Domain_ID
-#endif /* _R_RESET_DOMAIN_ID_H_ */
+#endif /* R_RESET_DOMAIN_ID_H */
 

@@ -18,8 +18,8 @@
 #include <errno.h>
 #include "common.h"
 
-#define CHAR_BIT 8
-#define BITS_PER_LONG (sizeof(long) * CHAR_BIT)
+#define CHAR_BIT_SCMI 8
+#define BITS_PER_LONG (sizeof(long) * CHAR_BIT_SCMI)
 
 /**
  * @brief Create a contiguous bitmask starting at bit position @p l

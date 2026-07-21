@@ -4,8 +4,8 @@
 * SPDX-License-Identifier: MIT
  *************************************************************************************************************/
 
-#ifndef _MEMORY_MAP_X5H_AI_ACC_H
-#define _MEMORY_MAP_X5H_AI_ACC_H
+#ifndef MEMORY_MAP_X5H_AI_ACC_H
+#define MEMORY_MAP_X5H_AI_ACC_H
 
 #include <stdint.h>
 #include "rcar_utils.h"
@@ -55,4 +55,4 @@ static const st_memory_region_t RCAR_MEMMORY_ARR[] = {
     {.type = PERIPHERAL,    .mem_addr = {.base_address = (uint32_t) PERIPHERAL_START_1,  .size = (uint32_t) PERIPHERAL_SIZE_1},   .attr = DEVICE_ATTR}
 };
 
-#endif // _MEMORY_MAP_AI_ACC_H
+#endif // MEMORY_MAP_AI_ACC_H

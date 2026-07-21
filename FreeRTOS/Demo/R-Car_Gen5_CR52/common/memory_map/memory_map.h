@@ -4,8 +4,8 @@
 * SPDX-License-Identifier: MIT
  *************************************************************************************************************/
 
-#ifndef _MEMORY_MAP_H
-#define _MEMORY_MAP_H
+#ifndef MEMORY_MAP_H
+#define MEMORY_MAP_H
 
 #include "board.h"
 

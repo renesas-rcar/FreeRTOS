@@ -15,7 +15,7 @@
 #include "mbox.h"
 
 /* get the name of mailbox channel's private data */
-#define _SCMI_MBOX_CHAN_NAME(proto, idx) \
+#define SCMI_MBOX_CHAN_NAME(proto, idx) \
 	CONCAT3(SCMI_TRANSPORT_CHAN_NAME(proto, idx), _, priv)
 
 struct scmi_mbox_channel {
