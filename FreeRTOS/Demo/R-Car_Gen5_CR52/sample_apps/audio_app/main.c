@@ -141,8 +141,7 @@ static void prvAudioTestTask( void *pvParameters )
 	printf("***********************************************\r\n");
 	
 	printf("* Test case 4: Verify Audio sound output. *\r\n");
-	printf("Please check if the recorded file on the Ubuntu PC matches the input sound.\r\n");
-	printf("Result: Failed!\n");
+	printf("Result: Passed if the recorded file on your PC matches the input sound \n");
 	printf("***********************************************\r\n");
 	
 	printf("* Test case 5: Stop Audio driver. *\r\n");
