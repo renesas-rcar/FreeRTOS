@@ -166,6 +166,16 @@ else()
     )
 endif()
 
+if(BOARD STREQUAL "mdp_aiacc_hil")
+    set(MFIS_SRC
+        ${BSP_DIR}/drivers/mfis/mfis_v2.c
+    )
+else()
+    set(MFIS_SRC
+        ${BSP_DIR}/drivers/mfis/mfis.c
+    )
+endif()
+
 if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2")
     file(GLOB AUDIO_SRC_LIST
         ${BSP_DIR}/drivers/audio/ak4619_module_dummy.c
@@ -203,7 +213,6 @@ set(bsp_source
     ${BSP_DIR}/drivers/gpio/r_gpio_api.c
     ${BSP_DIR}/drivers/gpio/r_gpio.c
     ${BSP_DIR}/drivers/pfc/r_pfc_api.c
-    ${BSP_DIR}/drivers/mfis/mfis.c
     ${BSP_DIR}/drivers/dmac/dmac_ctrl.c
     ${BSP_DIR}/drivers/dmac/rdmac_ctrl.c
     ${BSP_DIR}/drivers/dmac/sysdmac_ctrl.c
@@ -216,6 +225,7 @@ set(bsp_source
     ${BSP_DIR}/common/ARM_CR52/port.c
     ${BSP_DIR}/common/rcar_utils.c
 
+    ${MFIS_SRC}
     ${SCMI_SRC_LIST}
     ${STATE_MANAGER_SRC}
     ${BSP_DIR}/drivers/wcrc/r_wcrc.c
