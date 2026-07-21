@@ -61,7 +61,7 @@ static const uintptr_t smmu_base_addresses[] = {
 };
 
 /*Default configured values */
-#define SMMU_QUEUE_SIZE     ((1 << SMMU_QUEUE_LOG2SIZE) * 16)
+#define SMMU_QUEUE_SIZE     ((1U << SMMU_QUEUE_LOG2SIZE) * 16U)
 
 #define GENMASK(h, l)  (((~0UL) - (1UL << (l)) + 1) & \
                        (~0UL >> (BITS_PER_LONG - 1 - (h))))
@@ -199,7 +199,7 @@ void R_SMMU_Deinit(e_smmu_domain_t smmu_domain, bool is_secure) {
     l1ste_bits = strtab_cfg->LOG2SIZE - strtab_cfg->SPLIT;
     max_l1ste_bits = l1ste_bits < MAX_L1STE_BITS ? l1ste_bits : MAX_L1STE_BITS;
 
-    for (uint16_t i = 0; i < 1 << max_l1ste_bits; i++) {
+    for (uint16_t i = 0U; i < ((uint16_t)1 << max_l1ste_bits); i++) {
         if ((void*)(uintptr_t)((l1ste_tbl + i)->l2tbl_base << 6) != NULL) {
             aligned_free((void*)(uintptr_t)((l1ste_tbl + i)->l2tbl_base << 6));
         }
@@ -487,11 +487,11 @@ static smmu_l1ste_tbl_t* smmu_alloc_l1ste(e_smmu_domain_t smmu_domain, bool is_s
     
     log2size = smmu_strtab_cfg->LOG2SIZE;
     split = smmu_strtab_cfg->SPLIT;
-    num_l1_entry = (1 << (log2size - split));
+    num_l1_entry = ((uint32_t)1 << ((uint32_t)log2size - (uint32_t)split));
     num_l1_entry = num_l1_entry <= MAX_L1STE_ENTRY ? num_l1_entry : MAX_L1STE_ENTRY;
     
     l1ste_size = num_l1_entry*sizeof(smmu_l1ste_tbl_t);
-    l1ste_tbl = aligned_malloc(1 << (log2size - split + 3), l1ste_size);
+    l1ste_tbl = aligned_malloc(1U << (log2size - split + 3U), l1ste_size);
     if (l1ste_tbl == NULL)  {
         printf("Allocate l1ste fail\n");
         return NULL;
@@ -532,8 +532,8 @@ static st_smmu_ste_t* smmu_alloc_l2ste(e_smmu_domain_t smmu_domain, bool is_secu
     }
     
     split = smmu_strtab_cfg->SPLIT;
-    l2_tbl_size = (1 << split)*sizeof(st_smmu_ste_t);
-    l2ste_tbl = aligned_malloc(1 << (6 + split), l2_tbl_size);
+    l2_tbl_size = (1U << split)*sizeof(st_smmu_ste_t);
+    l2ste_tbl = aligned_malloc(1U << (6U + split), l2_tbl_size);
     if (l2ste_tbl == NULL) {
         printf("Allocate l2ste fail\n");
         return NULL;
@@ -577,7 +577,7 @@ static st_smmu_ste_t* smmu_init_ste(st_smmu_streamid_instance_ctrl_t *p_ctrl){
 
     stream_id_bits = MAX_L1STE_BITS + split;
     stream_id_bits = log2size < stream_id_bits ? log2size : stream_id_bits;
-    if (stream_id > (1 << stream_id_bits) - 1) {
+    if (stream_id > (((uint32_t)1 << stream_id_bits) - 1U)) {
         printf("Fail to init stream table entry. Stream id is too large\n");
         return NULL;
     }
@@ -624,7 +624,7 @@ static st_smmu_cd_t* smmu_init_cd_table(st_smmu_streamid_instance_ctrl_t *p_ctrl
         return NULL;
     }
 
-    cd_tbl = aligned_malloc(1 << 6, sizeof(st_smmu_cd_t));
+    cd_tbl = aligned_malloc(1U << 6, sizeof(st_smmu_cd_t));
     if (cd_tbl == NULL) {
         printf("Allocate cd table fail\n");
         return NULL;
@@ -701,7 +701,7 @@ static void smmu_init_cmdq(e_smmu_domain_t smmu_domain, bool is_secure){
 
     // Initialize CMDQ_BASE
     cmdq.base_reg = (st_smmu_cmdq_base_t *)(base + SMMU_CMDQ_BASE_OFFSET);
-    cmdq_ptr = (uintptr_t)aligned_malloc(1<<12, SMMU_QUEUE_SIZE);
+    cmdq_ptr = (uintptr_t)aligned_malloc(((uint32_t)1 << 12), SMMU_QUEUE_SIZE);
     cmdq.base_reg->ADDR = cmdq_ptr >> 5;
     cmdq.base_reg->LOG2SIZE = SMMU_QUEUE_LOG2SIZE;
     cmdq.base_reg->RA = 0;
@@ -728,7 +728,7 @@ static void smmu_init_evtq(e_smmu_domain_t smmu_domain, bool is_secure){
     }
     // Initialize EVTQ_BASE
     evtq.base_reg = (st_smmu_eventq_base_t *)(base + SMMU_EVTQ_BASE_OFFSET);
-    evtq_ptr = (uintptr_t)aligned_malloc(1<<12, SMMU_QUEUE_SIZE);
+    evtq_ptr = (uintptr_t)aligned_malloc(((uint32_t)1 << 12), SMMU_QUEUE_SIZE);
     evtq.base_reg->ADDR = evtq_ptr >> 5;
     evtq.base_reg->LOG2SIZE = SMMU_QUEUE_LOG2SIZE;
     evtq.base_reg->WA = 0;
@@ -747,7 +747,7 @@ static void smmu_init_evtq(e_smmu_domain_t smmu_domain, bool is_secure){
 static int smmu_write_cmd(st_smmu_cmdq_t * cmdq, st_smmu_cmd_t *cmd) {
     uint32_t q_index = cmdq->prod_reg->WR;       // Get current WR index
     uint8_t q_wrap = cmdq->prod_reg->WR_WRAP;
-    uint16_t wr_mask = (1 << SMMU_QUEUE_LOG2SIZE) -1;
+    uint16_t wr_mask = (uint16_t)(((uint32_t)1 << SMMU_QUEUE_LOG2SIZE) - 1U);
 
     // Get pointer to queue entry
     uint8_t *entry_addr = (uint8_t *)(uintptr_t)(cmdq->base_reg->ADDR << 5);
@@ -761,7 +761,7 @@ static int smmu_write_cmd(st_smmu_cmdq_t * cmdq, st_smmu_cmd_t *cmd) {
 
     // Increment producer index (WR)
     q_index++;
-    if (q_index >= (1 << SMMU_QUEUE_LOG2SIZE)) {
+    if (q_index >= (1U << SMMU_QUEUE_LOG2SIZE)) {
         q_index = 0;
         q_wrap ^= 1; // Toggle wrap bit on wraparound
     }

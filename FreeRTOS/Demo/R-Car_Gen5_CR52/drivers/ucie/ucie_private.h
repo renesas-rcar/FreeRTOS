@@ -8,8 +8,8 @@
 #ifndef R_UCIE_PRIVATE_H
 #define R_UCIE_PRIVATE_H
 
-#define RCAR_UCIE_BASE_ADD(a) ((a)&0x00ffffff)
-#define RCAR_UCIE_FN_OFS(f) (((f)&0x7)<<16)
+#define RCAR_UCIE_BASE_ADD(a) ((a) & 0x00ffffffU)
+#define RCAR_UCIE_FN_OFS(f) (((uint32_t)(f) & 0x7U) << 16)
 
 /*
  * The "rcar_ucie_v100" folder is header code for X5H

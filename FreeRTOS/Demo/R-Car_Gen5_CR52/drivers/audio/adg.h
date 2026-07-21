@@ -23,17 +23,17 @@
 
 
 //Value for BRGCKR
-#define BRGCKR_BRGA_CLKA	(0x0 << 20)
-#define BRGCKR_BRGA_CLKB	(0x1 << 20)
-#define BRGCKR_BRGA_S0D4	(0x2 << 20)
-#define BRGCKR_BRGA_CLKC	(0x4 << 20)
+#define BRGCKR_BRGA_CLKA	(0x0U << 20)
+#define BRGCKR_BRGA_CLKB	(0x1U << 20)
+#define BRGCKR_BRGA_S0D4	(0x2U << 20)
+#define BRGCKR_BRGA_CLKC	(0x4U << 20)
 
-#define BRGCKR_BRGB_CLKA	(0x0 << 16)
-#define BRGCKR_BRGB_CLKB	(0x1 << 16)
-#define BRGCKR_BRGB_S0D4	(0x2 << 16)
-#define BRGCKR_BRGB_CLKC	(0x4 << 16)
-#define BRGCKR_OUT_BRGA		(0x0 << 31)
-#define BRGCKR_OUT_BRGB		(0x1 << 31)
+#define BRGCKR_BRGB_CLKA	(0x0U << 16)
+#define BRGCKR_BRGB_CLKB	(0x1U << 16)
+#define BRGCKR_BRGB_S0D4	(0x2U << 16)
+#define BRGCKR_BRGB_CLKC	(0x4U << 16)
+#define BRGCKR_OUT_BRGA		(0x0U << 31)
+#define BRGCKR_OUT_BRGB		(0x1U << 31)
 
 typedef struct {
 	uint32_t freq;		

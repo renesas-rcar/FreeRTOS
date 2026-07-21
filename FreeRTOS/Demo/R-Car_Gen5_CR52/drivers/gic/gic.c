@@ -211,7 +211,7 @@ int R_GIC_SetAddr(void* dist, void* rdist) {
       return -1;
     }
 
-    while((gic_rdist[index].target_ctrl.GICR_TYPER[0] & (1<<4)) == 0)
+    while((gic_rdist[index].target_ctrl.GICR_TYPER[0] & (1U<<4)) == 0)
     {
       index++;
     }
@@ -277,7 +277,7 @@ uint32_t R_GIC_EnableInt(uint32_t ID, uint32_t rd) {
     }
 
     if (ID < 31) {
-       gic_rdist[rd].sgi_ppi.GICR_ISENABLER[0] = 1 << ID;
+       gic_rdist[rd].sgi_ppi.GICR_ISENABLER[0] = ((uint32_t)1 << ID);
     } else if (ID < 1020) {
       GIC_EnableIRQ(gic_dist, ID);
     }
@@ -288,7 +288,7 @@ uint32_t R_GIC_EnableInt(uint32_t ID, uint32_t rd) {
 uint32_t R_GIC_DisableInt(uint32_t ID, uint32_t rd) {
     if (ID < 31)
     {
-      gic_rdist[rd].sgi_ppi.GICR_ICENABLER[0] = 1 << ID;
+      gic_rdist[rd].sgi_ppi.GICR_ICENABLER[0] = ((uint32_t)1 << ID);
     }
     else if (ID < 1020)
     {
@@ -350,13 +350,13 @@ uint32_t R_GIC_SetIntGroup(uint32_t ID, uint32_t rd, uint32_t security) {
 
     if (ID < 31)
     {
-      gic_rdist[rd].sgi_ppi.GICR_IGROUPR[0] |= (1 << (ID%32));
-      gic_rdist[rd].sgi_ppi.GICR_IGRPMODR[0] &= (1 << (ID%32));
+      gic_rdist[rd].sgi_ppi.GICR_IGROUPR[0] |= ((uint32_t)1 << (ID % 32U));
+      gic_rdist[rd].sgi_ppi.GICR_IGRPMODR[0] &= ((uint32_t)1 << (ID % 32U));
     }
     else if (ID < 1020)
     {
-      gic_dist->GICD_IGROUPR[ID/32] |= (1 << (ID%32));
-      gic_dist->GICD_IGRPMODR[ID/2] &= (1 << (ID%32));
+      gic_dist->GICD_IGROUPR[ID / 32U] |= ((uint32_t)1 << (ID % 32U));
+      gic_dist->GICD_IGRPMODR[ID / 2U] &= ((uint32_t)1 << (ID % 32U));
     }
 
   return 0;
@@ -384,7 +384,7 @@ uint32_t R_GIC_SetIntPending(uint32_t ID, uint32_t rd) {
     }
 
     if (ID < 31) {
-      gic_rdist[rd].sgi_ppi.GICR_ISPENDR[0] = 1 << (ID%32);
+      gic_rdist[rd].sgi_ppi.GICR_ISPENDR[0] = ((uint32_t)1 << (ID % 32U));
     }
     else if (ID < 1020)
     {
@@ -406,7 +406,7 @@ uint32_t R_GIC_ClearIntPending(uint32_t ID, uint32_t rd) {
 
     if (ID < 31)
     {
-      gic_rdist[rd].sgi_ppi.GICR_ICPENDR[0] = 1 << (ID%32);
+      gic_rdist[rd].sgi_ppi.GICR_ICPENDR[0] = ((uint32_t)1 << (ID % 32U));
     }
     else if (ID < 1020)
     {

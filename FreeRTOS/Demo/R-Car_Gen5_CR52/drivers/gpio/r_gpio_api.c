@@ -10,11 +10,11 @@
 #include "r_gpio_private.h"
 #include "r_gpio_api.h"
 
-#define PINS_EACH_GROUP 32
+#define PINS_EACH_GROUP 32U
 
 #define GPIO_BASE_ADDR_ERR           0xABCD
 
-#define BIT(nr)             (1UL << (nr))
+#define BIT(nr)             ((uint32_t)1 << (nr))
 
 /* GPIO Bus Domain:
  * By default: use Bus Domain 0.
@@ -87,7 +87,7 @@ int R_GPIO_GroupWriteOutput(rcar_gpio_group_t grp, uint32_t group_level,
     bool pin_level;
 
     for (pin_num = 0U; pin_num < PINS_EACH_GROUP; pin_num++) {
-        mask_pos = 1U << pin_num;
+        mask_pos = ((uint32_t)1 << pin_num);
         if (mask_pins & mask_pos) {
             pin_level = (group_level & mask_pos) >> pin_num;
             R_GPIO_PinWriteOutput(grp, pin_num, pin_level);
@@ -165,7 +165,7 @@ int R_GPIO_GroupConfigMode(rcar_gpio_group_t grp, uint32_t mask_directions,
     rcar_io_direction_t pin_option;
 
     for (pin_num = 0U; pin_num < PINS_EACH_GROUP; pin_num++) {
-        mask_pos = 1U << pin_num;
+        mask_pos = ((uint32_t)1 << pin_num);
         if (mask_pins & mask_pos) {
             pin_option = (mask_directions & mask_pos) >> pin_num;
             (void) R_GPIO_PinConfigMode(grp, pin_num, pin_option);

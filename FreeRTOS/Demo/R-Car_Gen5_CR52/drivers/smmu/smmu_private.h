@@ -132,8 +132,8 @@ typedef struct st_smmu_ste
 #define CTXDESC_CD_48BIT_IPA    5
 #define CTXDESC_CD_AA64         1
 #define CTXDESC_CD_S            1
-#define CTXDESC_CD_R            1
-#define CTXDESC_CD_A            1
+#define CTXDESC_CD_R            1U
+#define CTXDESC_CD_A            1U
 #define CTXDESC_CD_ASET         1
 #define CTXDESC_CD_HAD0_DIS     1
 
@@ -229,7 +229,7 @@ typedef struct st_smmu_cd
 #define STRTAB_STE_DRE_EN           1
 
 #define MAX_L1STE_BITS     12
-#define MAX_L1STE_ENTRY  (1 << MAX_L1STE_BITS)
+#define MAX_L1STE_ENTRY  (1U << MAX_L1STE_BITS)
 
 /**
  * @brief Defines the log2 size of the SMMU queue.

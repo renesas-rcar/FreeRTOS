@@ -60,7 +60,7 @@ int ucie_epf_test_read(struct st_pcie_ep *ep, ucie_epf_test_reg_t *bar0_reg)
 
     index = free_win / 32;
     bit_pos = free_win % 32;
-    ep->ob_window_map[index] |= (1 << bit_pos);
+    ep->ob_window_map[index] |= (1U << bit_pos);
 
     printf_delay("[%s] Executing memcpy\n",__func__);
     vTaskDelay(2);
@@ -95,7 +95,7 @@ int ucie_epf_test_write(struct st_pcie_ep *ep, ucie_epf_test_reg_t *bar0_reg)
 
     index = free_win / 32;
     bit_pos = free_win % 32;
-    ep->ob_window_map[index] |= (1 << bit_pos);
+    ep->ob_window_map[index] |= (1U << bit_pos);
 
     buf = malloc(size);
     if (!buf) {
@@ -348,7 +348,7 @@ void R_PCIE_EP_Inbound_ATU(struct st_pcie_ep *ep, uint16_t channel)
 
     index = free_win / 32;
     bit_pos = free_win % 32;
-    ep->ib_window_map[index] |= (1 << bit_pos);
+    ep->ib_window_map[index] |= (1U << bit_pos);
 }
 
 void R_PCIE_EP_Init(struct st_pcie_ep *ep, uint16_t channel)

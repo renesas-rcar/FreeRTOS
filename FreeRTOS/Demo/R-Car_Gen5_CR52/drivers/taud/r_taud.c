@@ -197,11 +197,11 @@ static e_taud_err_t r_taud_pwm_output_func_open(r_taud_ctrl_t * const p_ctrl)
     err = r_taud_setup_clk_src();
     
 
-    p_instance_ctrl->channel_mask = (1U << p_pwm_cfg->master_ch);
+    p_instance_ctrl->channel_mask = (1U << (uint32_t)p_pwm_cfg->master_ch);
 
     for (uint8_t i = 0; i < p_pwm_cfg->slave_num; i++)
     {
-        p_instance_ctrl->channel_mask |= (1U << p_pwm_cfg->p_slave[i].ch);
+        p_instance_ctrl->channel_mask |= (1U << (uint32_t)p_pwm_cfg->p_slave[i].ch);
     }
 
 

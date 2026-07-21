@@ -417,34 +417,34 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     reg_val = mem_read32(ucie_axi_base + MMPL_MMMISCCTRL_ADD);
     reg_val = reg_val & MMPL_MMMISCCTRL_MASK;
     reg_val = reg_val &      ~( MMPL_MMMISCCTRL_MMPHYCOMPLIANCE_MASK  << MMPL_MMMISCCTRL_MMPHYCOMPLIANCE_SHIFT);
-    reg_val = reg_val | ((0x1 & MMPL_MMMISCCTRL_MMPHYCOMPLIANCE_MASK) << MMPL_MMMISCCTRL_MMPHYCOMPLIANCE_SHIFT);
+    reg_val = reg_val | ((0x1U & MMPL_MMMISCCTRL_MMPHYCOMPLIANCE_MASK) << MMPL_MMMISCCTRL_MMPHYCOMPLIANCE_SHIFT);
     mem_write32( ucie_axi_base + MMPL_MMMISCCTRL_ADD, reg_val );
     
     reg_val = mem_read32(ucie_axi_base + DWORD_0_DWMISCCTRL0_ADD);
     reg_val = reg_val & DWORD_0_DWMISCCTRL0_MASK;
     reg_val = reg_val &      ~( DWORD_0_DWMISCCTRL0_DWPHYCOMPLIANCE_MASK  << DWORD_0_DWMISCCTRL0_DWPHYCOMPLIANCE_SHIFT);
-    reg_val = reg_val | ((0x1 & DWORD_0_DWMISCCTRL0_DWPHYCOMPLIANCE_MASK) << DWORD_0_DWMISCCTRL0_DWPHYCOMPLIANCE_SHIFT);
+    reg_val = reg_val | ((0x1U & DWORD_0_DWMISCCTRL0_DWPHYCOMPLIANCE_MASK) << DWORD_0_DWMISCCTRL0_DWPHYCOMPLIANCE_SHIFT);
     mem_write32( ucie_axi_base + DWORD_0_DWMISCCTRL0_ADD, reg_val );
     
     reg_val = mem_read32(ucie_axi_base + DWORD_1_DWMISCCTRL0_ADD);
     reg_val = reg_val & DWORD_1_DWMISCCTRL0_MASK;
     reg_val = reg_val &      ~( DWORD_1_DWMISCCTRL0_DWPHYCOMPLIANCE_MASK  << DWORD_1_DWMISCCTRL0_DWPHYCOMPLIANCE_SHIFT);
-    reg_val = reg_val | ((0x1 & DWORD_1_DWMISCCTRL0_DWPHYCOMPLIANCE_MASK) << DWORD_1_DWMISCCTRL0_DWPHYCOMPLIANCE_SHIFT);
+    reg_val = reg_val | ((0x1U & DWORD_1_DWMISCCTRL0_DWPHYCOMPLIANCE_MASK) << DWORD_1_DWMISCCTRL0_DWPHYCOMPLIANCE_SHIFT);
     mem_write32( ucie_axi_base + DWORD_1_DWMISCCTRL0_ADD, reg_val );
     
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMTRAINVAR0I0_ADD);
     reg_val = reg_val & ACSM_ACSMTRAINVAR0I0_MASK;
-    reg_val = reg_val | (0x1 << 16);
+    reg_val = reg_val | ((uint32_t)0x1 << 16U);
     mem_write32(ucie_axi_base + ACSM_ACSMTRAINVAR0I0_ADD, reg_val);
 
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMTRAINVAR0I1_ADD);
     reg_val = reg_val & ACSM_ACSMTRAINVAR0I1_MASK;
-    reg_val = reg_val | (0x1 << 16);
+    reg_val = reg_val | ((uint32_t)0x1 << 16U);
     mem_write32(ucie_axi_base + ACSM_ACSMTRAINVAR0I1_ADD, reg_val);
 
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMTRAINVAR0I2_ADD);
     reg_val = reg_val & ACSM_ACSMTRAINVAR0I2_MASK;
-    reg_val = reg_val | (0x1 << 16);
+    reg_val = reg_val | ((uint32_t)0x1 << 16U);
     mem_write32(ucie_axi_base + ACSM_ACSMTRAINVAR0I2_ADD, reg_val);
 
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMTRAINVAR1I1_ADD);
@@ -480,31 +480,31 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     // mem_write32( ACSM_ACSMLTSMINDEX0VAR14_ADD , 32'h0010_0000, 32'h0010_0000); //AcsmLtsmIndex0Var14[20] == 1  (1DVrefSel)
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMLTSMINDEX0VAR14_ADD);
     reg_val = reg_val & ACSM_ACSMLTSMINDEX0VAR14_MASK;
-    reg_val = reg_val | (0x1 << 20);
+    reg_val = reg_val | ((uint32_t)0x1 << 20U);
     mem_write32(ucie_axi_base + ACSM_ACSMLTSMINDEX0VAR14_ADD, reg_val);
 
     // mem_write32( ACSM_ACSMLTSMINDEX0VAR16_ADD , 32'h0010_0000, 32'h0010_0000); //AcsmLtsmIndex0Var16[20] == 1  (1DVrefSel)
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMLTSMINDEX0VAR16_ADD);
     reg_val = reg_val & ACSM_ACSMLTSMINDEX0VAR16_MASK;
-    reg_val = reg_val | (0x1 << 20);
+    reg_val = reg_val | ((uint32_t)0x1 << 20U);
     mem_write32(ucie_axi_base + ACSM_ACSMLTSMINDEX0VAR16_ADD, reg_val);
 
     // mem_write32( ucie_axi_base + ACSM_ACSMTRAINVAR0I0_ADD     , 32'h0001_0000, 32'h0001_0000); //AcsmTrainVar0I0[16] == 1
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMTRAINVAR0I0_ADD);
     reg_val = reg_val & ACSM_ACSMTRAINVAR0I0_MASK;
-    reg_val = reg_val | (0x1 << 16);
+    reg_val = reg_val | ((uint32_t)0x1 << 16U);
     mem_write32(ucie_axi_base + ACSM_ACSMTRAINVAR0I0_ADD, reg_val);
 
     // mem_write32( ucie_axi_base + ACSM_ACSMTRAINVAR0I1_ADD     , 32'h0001_0000, 32'h0001_0000); //AcsmTrainVar0I1[16] == 1
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMTRAINVAR0I1_ADD);
     reg_val = reg_val & ACSM_ACSMTRAINVAR0I1_MASK;
-    reg_val = reg_val | (0x1 << 16);
+    reg_val = reg_val | ((uint32_t)0x1 << 16U);
     mem_write32(ucie_axi_base + ACSM_ACSMTRAINVAR0I1_ADD, reg_val);
 
     // mem_write32( ucie_axi_base + ACSM_ACSMTRAINVAR0I2_ADD     , 32'h0001_0000, 32'h0001_0000); //AcsmTrainVar0I2[16] == 1
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMTRAINVAR0I2_ADD);
     reg_val = reg_val & ACSM_ACSMTRAINVAR0I2_MASK;
-    reg_val = reg_val | (0x1 << 16);
+    reg_val = reg_val | ((uint32_t)0x1 << 16U);
     mem_write32(ucie_axi_base + ACSM_ACSMTRAINVAR0I2_ADD, reg_val);
 
     // mem_write32( ucie_axi_base + ACSM_ACSMTRAINVAR1I1_ADD     , 32'h0000_0100, 32'h0000_0000); //AcsmTrainVar1I1[8] = 0
@@ -523,13 +523,13 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     reg_val = mem_read32(ucie_axi_base + DWORD_0_DWRXLATCTRL_ADD);
     reg_val = reg_val & DWORD_0_DWRXLATCTRL_MASK;
     reg_val = reg_val &      ~( DWORD_0_DWRXLATCTRL_DWRXVLDMARGIN_MASK  << DWORD_0_DWRXLATCTRL_DWRXVLDMARGIN_SHIFT);
-    reg_val = reg_val | ((0x1 & DWORD_0_DWRXLATCTRL_DWRXVLDMARGIN_MASK) << DWORD_0_DWRXLATCTRL_DWRXVLDMARGIN_SHIFT);
+    reg_val = reg_val | ((0x1U & DWORD_0_DWRXLATCTRL_DWRXVLDMARGIN_MASK) << DWORD_0_DWRXLATCTRL_DWRXVLDMARGIN_SHIFT);
     mem_write32( ucie_axi_base + DWORD_0_DWRXLATCTRL_ADD, reg_val );
     
     reg_val = mem_read32(ucie_axi_base + DWORD_1_DWRXLATCTRL_ADD);
     reg_val = reg_val & DWORD_1_DWRXLATCTRL_MASK;
     reg_val = reg_val &      ~( DWORD_1_DWRXLATCTRL_DWRXVLDMARGIN_MASK  << DWORD_1_DWRXLATCTRL_DWRXVLDMARGIN_SHIFT);
-    reg_val = reg_val | ((0x1 & DWORD_1_DWRXLATCTRL_DWRXVLDMARGIN_MASK) << DWORD_1_DWRXLATCTRL_DWRXVLDMARGIN_SHIFT);
+    reg_val = reg_val | ((0x1U & DWORD_1_DWRXLATCTRL_DWRXVLDMARGIN_MASK) << DWORD_1_DWRXLATCTRL_DWRXVLDMARGIN_SHIFT);
     mem_write32( ucie_axi_base + DWORD_1_DWRXLATCTRL_ADD, reg_val );
     
     //// d. Write 00800000 to UcieTrainingSetup1 to program PPGC pattern.
@@ -552,7 +552,7 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     reg_val = mem_read32(ucie_axi_base + DWORD_1_DWMISCCTRL0_ADD);
     reg_val = reg_val & DWORD_1_DWMISCCTRL0_MASK;
     reg_val = reg_val &      ~( DWORD_1_DWMISCCTRL0_DWTXCKPARKLEVEL_MASK  << DWORD_1_DWMISCCTRL0_DWTXCKPARKLEVEL_SHIFT);
-    reg_val = reg_val | ((0x1 & DWORD_1_DWMISCCTRL0_DWTXCKPARKLEVEL_MASK) << DWORD_1_DWMISCCTRL0_DWTXCKPARKLEVEL_SHIFT);
+    reg_val = reg_val | (((uint32_t)0x1 & DWORD_1_DWMISCCTRL0_DWTXCKPARKLEVEL_MASK) << DWORD_1_DWMISCCTRL0_DWTXCKPARKLEVEL_SHIFT);
     mem_write32( ucie_axi_base + DWORD_1_DWMISCCTRL0_ADD, reg_val );
     
     //// g. Program DwModeCtrl0 with the following values.
@@ -561,45 +561,45 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     reg_val = mem_read32(ucie_axi_base + DWORD_0_DWMODECTRL0_ADD);
     reg_val = reg_val & DWORD_0_DWMODECTRL0_MASK;
     reg_val = reg_val &      ~( DWORD_0_DWMODECTRL0_DWRXCTLCLKSEL_MASK  << DWORD_0_DWMODECTRL0_DWRXCTLCLKSEL_SHIFT);
-    reg_val = reg_val | ((0x1 & DWORD_0_DWMODECTRL0_DWRXCTLCLKSEL_MASK) << DWORD_0_DWMODECTRL0_DWRXCTLCLKSEL_SHIFT);
+    reg_val = reg_val | (((uint32_t)0x1 & DWORD_0_DWMODECTRL0_DWRXCTLCLKSEL_MASK) << DWORD_0_DWMODECTRL0_DWRXCTLCLKSEL_SHIFT);
     reg_val = reg_val &      ~( DWORD_0_DWMODECTRL0_DWRXLATALIGN_MASK  << DWORD_0_DWMODECTRL0_DWRXLATALIGN_SHIFT);
-    reg_val = reg_val | ((0x1 & DWORD_0_DWMODECTRL0_DWRXLATALIGN_MASK) << DWORD_0_DWMODECTRL0_DWRXLATALIGN_SHIFT);
+    reg_val = reg_val | ((0x1U & DWORD_0_DWMODECTRL0_DWRXLATALIGN_MASK) << DWORD_0_DWMODECTRL0_DWRXLATALIGN_SHIFT);
     mem_write32( ucie_axi_base + DWORD_0_DWMODECTRL0_ADD, reg_val );
     
     reg_val = mem_read32(ucie_axi_base + DWORD_1_DWMODECTRL0_ADD);
     reg_val = reg_val & DWORD_1_DWMODECTRL0_MASK;
     reg_val = reg_val &      ~( DWORD_1_DWMODECTRL0_DWRXCTLCLKSEL_MASK  << DWORD_1_DWMODECTRL0_DWRXCTLCLKSEL_SHIFT);
-    reg_val = reg_val | ((0x1 & DWORD_1_DWMODECTRL0_DWRXCTLCLKSEL_MASK) << DWORD_1_DWMODECTRL0_DWRXCTLCLKSEL_SHIFT);
+    reg_val = reg_val | (((uint32_t)0x1 & DWORD_1_DWMODECTRL0_DWRXCTLCLKSEL_MASK) << DWORD_1_DWMODECTRL0_DWRXCTLCLKSEL_SHIFT);
     reg_val = reg_val &      ~( DWORD_1_DWMODECTRL0_DWRXLATALIGN_MASK  << DWORD_1_DWMODECTRL0_DWRXLATALIGN_SHIFT);
-    reg_val = reg_val | ((0x1 & DWORD_1_DWMODECTRL0_DWRXLATALIGN_MASK) << DWORD_1_DWMODECTRL0_DWRXLATALIGN_SHIFT);
+    reg_val = reg_val | ((0x1U & DWORD_1_DWMODECTRL0_DWRXLATALIGN_MASK) << DWORD_1_DWMODECTRL0_DWRXLATALIGN_SHIFT);
     mem_write32( ucie_axi_base + DWORD_1_DWMODECTRL0_ADD, reg_val );
     
     //// h. Write AcsmLtsmIndex0Var14=0x14efef to enable 1D Vref training.
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMLTSMINDEX0VAR14_ADD);
     reg_val = reg_val & ACSM_ACSMLTSMINDEX0VAR14_MASK;
     reg_val = reg_val &           ~( ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_MASK  << ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_SHIFT);
-    reg_val = reg_val | ((0x14EFEF & ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_MASK) << ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_SHIFT);
+    reg_val = reg_val | ((0x14EFEFU & ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_MASK) << ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_SHIFT);
     mem_write32( ucie_axi_base + ACSM_ACSMLTSMINDEX0VAR14_ADD, reg_val );
     
     // adr symbol is none
     reg_val = mem_read32(ucie_axi_base + (RCAR_UCIE_BASE_ADD(0x41F12000)+0x150) );
     reg_val = reg_val & ACSM_ACSMLTSMINDEX0VAR14_MASK;
     reg_val = reg_val &           ~( ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_MASK  << ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_SHIFT);
-    reg_val = reg_val | ((0x14EFEF & ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_MASK) << ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_SHIFT);
+    reg_val = reg_val | ((0x14EFEFU & ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_MASK) << ACSM_ACSMLTSMINDEX0VAR14_ACSMLTSMINDEX0VAR14_SHIFT);
     mem_write32( ucie_axi_base + (RCAR_UCIE_BASE_ADD(0x41F12000)+0x150), reg_val );
     
     //// i. Write AcsmLtsmIndex0Var16=0x10f7f1 to enable 1D Vref training.
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMLTSMINDEX0VAR16_ADD );
     reg_val = reg_val & ACSM_ACSMLTSMINDEX0VAR16_MASK;
     reg_val = reg_val &           ~( ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_MASK  << ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_SHIFT);
-    reg_val = reg_val | ((0x10F7F1 & ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_MASK) << ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_SHIFT);
+    reg_val = reg_val | ((0x10F7F1U & ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_MASK) << ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_SHIFT);
     mem_write32( ucie_axi_base + ACSM_ACSMLTSMINDEX0VAR16_ADD, reg_val );
     
     // adr symbol is none
     reg_val = mem_read32(ucie_axi_base + (RCAR_UCIE_BASE_ADD(0x41F12000)+0x158) );
     reg_val = reg_val & ACSM_ACSMLTSMINDEX0VAR16_MASK;
     reg_val = reg_val &           ~( ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_MASK  << ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_SHIFT);
-    reg_val = reg_val | ((0x10F7F1 & ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_MASK) << ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_SHIFT);
+    reg_val = reg_val | ((0x10F7F1U & ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_MASK) << ACSM_ACSMLTSMINDEX0VAR16_ACSMLTSMINDEX0VAR16_SHIFT);
     mem_write32( ucie_axi_base + (RCAR_UCIE_BASE_ADD(0x41F12000)+0x158), reg_val );
     
     //// j. Write 00001600 to AcsmLoopVar1 so that LTSM will go from RESET to LINKINIT
@@ -780,7 +780,7 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMSEQ0CTRL_ADD);
     reg_val = reg_val & ACSM_ACSMSEQ0CTRL_MASK;
     reg_val = reg_val &       ~( ACSM_ACSMSEQ0CTRL_ACSMSEQ0STOPADDR_MASK  << ACSM_ACSMSEQ0CTRL_ACSMSEQ0STOPADDR_SHIFT);
-    reg_val = reg_val | ((0x28 & ACSM_ACSMSEQ0CTRL_ACSMSEQ0STOPADDR_MASK) << ACSM_ACSMSEQ0CTRL_ACSMSEQ0STOPADDR_SHIFT);
+    reg_val = reg_val | (((uint32_t)0x28 & ACSM_ACSMSEQ0CTRL_ACSMSEQ0STOPADDR_MASK) << ACSM_ACSMSEQ0CTRL_ACSMSEQ0STOPADDR_SHIFT);
     mem_write32( ucie_axi_base + ACSM_ACSMSEQ0CTRL_ADD, reg_val );
     
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMSEQ1CTRL_ADD);
@@ -793,7 +793,7 @@ static void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     reg_val = mem_read32(ucie_axi_base + ACSM_ACSMCTRL_ADD);
     reg_val = reg_val & ACSM_ACSMCTRL_MASK;
     reg_val = reg_val &       ~( ACSM_ACSMCTRL_ACSMSTOPADDR_MASK  << ACSM_ACSMCTRL_ACSMSTOPADDR_SHIFT);
-    reg_val = reg_val | ((0x28 & ACSM_ACSMCTRL_ACSMSTOPADDR_MASK) << ACSM_ACSMCTRL_ACSMSTOPADDR_SHIFT);
+    reg_val = reg_val | (((uint32_t)0x28 & ACSM_ACSMCTRL_ACSMSTOPADDR_MASK) << ACSM_ACSMCTRL_ACSMSTOPADDR_SHIFT);
     mem_write32( ucie_axi_base + ACSM_ACSMCTRL_ADD, reg_val );
     #endif
 }
@@ -1055,16 +1055,16 @@ static void Ucie_Setup_PCIE_Post(e_ucie_ch_t ch, e_ucie_mode_t mode)
 
     if (mode != UCIE_MODE_RC)
     {
-        mem_write32(ucie_axi_base + PF0_PCIE_CAP_DEVICE_CONTROL_DEVICE_STATUS_ADD + RCAR_UCIE_FN_OFS(1), 0x00102150);
+        mem_write32(ucie_axi_base + PF0_PCIE_CAP_DEVICE_CONTROL_DEVICE_STATUS_ADD + RCAR_UCIE_FN_OFS(1U), 0x00102150);
     }
 
     if (mode == UCIE_MODE_RC)
     {
 
         //;BAR0_MASK_REG
-        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR0_REG_ADD + RCAR_UCIE_FN_OFS(1), 0x00000000);
+        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR0_REG_ADD + RCAR_UCIE_FN_OFS(1U), 0x00000000U);
         //;BAR1_MASK_REG
-        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR1_REG_ADD + RCAR_UCIE_FN_OFS(1), 0x00000000);
+        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR1_REG_ADD + RCAR_UCIE_FN_OFS(1U), 0x00000000U);
 
         mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR0_REG_ADD, 0x09100004);
         mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR1_REG_ADD, 0x00000000);
@@ -1091,17 +1091,17 @@ static void Ucie_Setup_PCIE_Post(e_ucie_ch_t ch, e_ucie_mode_t mode)
         mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR0_REG_ADD, 0x08C00004);
         mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR1_REG_ADD, 0x00000000);
         //;BAR0_MASK_REG
-        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR0_REG_ADD + RCAR_UCIE_FN_OFS(1), 0x08E00004);
+        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR0_REG_ADD + RCAR_UCIE_FN_OFS(1U), 0x08E00004);
         //;BAR1_MASK_REG
-        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR1_REG_ADD + RCAR_UCIE_FN_OFS(1), 0x00000000);
+        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_BAR1_REG_ADD + RCAR_UCIE_FN_OFS(1U), 0x00000000);
         mem_write32(ucie_axi_base + PF0_TYPE1_HDR_SEC_LAT_TIMER_SUB_BUS_SEC_BUS_PRI_BUS_REG_ADD, 0x08D00000);
-        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_SEC_LAT_TIMER_SUB_BUS_SEC_BUS_PRI_BUS_REG_ADD + RCAR_UCIE_FN_OFS(1), 0x08F00000);
+        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_SEC_LAT_TIMER_SUB_BUS_SEC_BUS_PRI_BUS_REG_ADD + RCAR_UCIE_FN_OFS(1U), 0x08F00000);
         mem_write32(ucie_axi_base + PF0_TYPE1_HDR_MEM_LIMIT_MEM_BASE_REG_ADD, 0x00004001);
-        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_MEM_LIMIT_MEM_BASE_REG_ADD + RCAR_UCIE_FN_OFS(1), 0x00004101);
+        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_MEM_LIMIT_MEM_BASE_REG_ADD + RCAR_UCIE_FN_OFS(1U), 0x00004101);
         mem_write32(ucie_axi_base + PF0_TYPE1_HDR_IO_LIMIT_UPPER_IO_BASE_UPPER_REG_ADD, 0xB0000001U);
-        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_IO_LIMIT_UPPER_IO_BASE_UPPER_REG_ADD + RCAR_UCIE_FN_OFS(1), 0xB0010001U);
+        mem_write32(ucie_axi_base + PF0_TYPE1_HDR_IO_LIMIT_UPPER_IO_BASE_UPPER_REG_ADD + RCAR_UCIE_FN_OFS(1U), 0xB0010001U);
         mem_write32(ucie_axi_base + PF0_PORT_LOGIC_TRGT_MAP_CTRL_OFF_ADD, 0x00000054);
-        mem_write32(ucie_axi_base + PF0_PORT_LOGIC_TRGT_MAP_CTRL_OFF_ADD + RCAR_UCIE_FN_OFS(1), 0x00010054);
+        mem_write32(ucie_axi_base + PF0_PORT_LOGIC_TRGT_MAP_CTRL_OFF_ADD + RCAR_UCIE_FN_OFS(1U), 0x00010054);
     }
 
     mem_write32(ucie_axi_base + 0x4, 0x00110007);

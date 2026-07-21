@@ -211,12 +211,12 @@ static void EnablePMU(void)
     uint32_t value;
 
     // Enable PMU and reset event and cycle counters
-    value = (1 << 0)  // E: All counters are enabled.
-          | (1 << 2); // C: Reset cycle counter.
+    value = ((uint32_t)1 << 0)  // E: All counters are enabled.
+          | ((uint32_t)1 << 2); // C: Reset cycle counter.
     __asm__ volatile ("mcr p15, 0, %0, c9, c12, 0" :: "r"(value));
 
     // Enable cycle counter (counter 31)
-    value = (1 << 31);
+    value = ((uint32_t)1 << 31);
     __asm__ volatile ("mcr p15, 0, %0, c9, c12, 1" :: "r"(value));
 }
 

@@ -35,23 +35,23 @@
 /*
  * System word length
  */
-#define	SWL_16		(1 << 16)	/* R/W System Word Length */
+#define	SWL_16		(1u << 16)	/* R/W System Word Length */
 #define	SWL_24		(2 << 16)	/* R/W System Word Length */
-#define	SWL_32		(3 << 16)	/* R/W System Word Length */
+#define	SWL_32		(3u << 16)	/* R/W System Word Length */
 #define	SWL_48		(4 << 16)	/* R/W System Word Length */
 #define	SWL_64		(5 << 16)	/* R/W System Word Length */
 #define	SWL_128		(6 << 16)	/* R/W System Word Length */
 
-#define	SCKD		(1 << 15)	/* Serial Bit Clock Direction */
-#define	SWSD		(1 << 14)	/* Serial WS Direction */
+#define	SCKD		(1u << 15)	/* Serial Bit Clock Direction */
+#define	SWSD		(1u << 14)	/* Serial WS Direction */
 #define	SCKP		(1 << 13)	/* Serial Bit Clock Polarity */
-#define	SWSP		(1 << 12)	/* Serial WS Polarity */
+#define	SWSP		(1u << 12)	/* Serial WS Polarity */
 #define	SDTA		(1 << 10)	/* Serial Data Alignment */
 #define	PDTA		(1 <<  9)	/* Parallel Data Alignment */
-#define	DEL			(1 <<  8)	/* Serial Data Delay */
+#define	DEL			(1u <<  8)	/* Serial Data Delay */
 #define	CKDV(v)		((v) <<  4)	/* Serial Clock Division Ratio */
-#define	TRMD		(1 <<  1)	/* Transmit/Receive Mode Select */
-#define	EN			(1 <<  0)	/* SSI Module Enable */
+#define	TRMD		(1u <<  1)	/* Transmit/Receive Mode Select */
+#define	EN			((uint32_t)1 <<  0)	/* SSI Module Enable */
 
 /*
  * SSISR
@@ -59,15 +59,15 @@
 #define	UIRQ		(1 << 27)	/* Underflow Error Interrupt Status */
 #define	OIRQ		(1 << 26)	/* Overflow Error Interrupt Status */
 #define	IIRQ		(1 << 25)	/* Idle Mode Interrupt Status */
-#define	DIRQ		(1 << 24)	/* Data Interrupt Status Flag */
-#define IDST        (1 << 0)        /* Idle Mode Status Flag */
+#define	DIRQ		(1u << 24)	/* Data Interrupt Status Flag */
+#define IDST        (1u << 0)        /* Idle Mode Status Flag */
 
 /*
  * SSIWSR
  */
-#define CONT		(1 << 8)	/* WS Continue Function */
-#define MONO		(1 << 1)	/* TDM format / Monaural format */
-#define WS_MODE		(1 << 0)	/* WS Mode */
+#define CONT		((uint32_t)1 << 8)	/* WS Continue Function */
+#define MONO		(1u << 1)	/* TDM format / Monaural format */
+#define WS_MODE		(1u << 0)	/* WS Mode */
 
 typedef struct _ssi_conf_t {
 	uint32_t cr_own;

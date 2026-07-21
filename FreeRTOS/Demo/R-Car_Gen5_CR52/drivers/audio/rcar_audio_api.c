@@ -51,7 +51,7 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 		if(p_cfg->num_channel > 0 && p_cfg->num_channel < 3)
 		{
 			// ssi_conf->cr_own = (p_cfg->format == STEREO_FORMAT) ? ssi_conf->cr_own | ((p_cfg->num_channel-1) << 22) : ssi_conf->cr_own & ~(3 << 22);
-			ssi_conf->cr_own = ssi_conf->cr_own & ~(3 << 22);
+			ssi_conf->cr_own = ssi_conf->cr_own & ~(3UL << 22);
 		}
 		else
 		{
@@ -63,7 +63,7 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 		
 		ssi_conf->wsr &= ~(WS_MODE);
 		ssi_conf->wsr &= ~(MONO);
-		ssi_conf->wsr &= ~(31 << 16);
+		ssi_conf->wsr &= ~((uint32_t)31 << 16);
 		ssi_conf->cr_own &= ~(SWSP);
 
 		if(p_cfg->bit_depth == TWO_BYTES_PER_SAMPLE)
@@ -75,7 +75,7 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 		}
 		else
 		{
-			ssi_conf->cr_own &= ~(63 << 16);
+			ssi_conf->cr_own &= ~((uint32_t)63 << 16);
 			ssi_conf->cr_own |= DWL_32;
 			reg_val = SWL_32;
 			ssi_conf->cr_own |= reg_val;
@@ -124,7 +124,7 @@ int r_ssi_config(st_audio_cfg_t const * const p_cfg)
 		if(p_cfg->num_channel > 0 && p_cfg->num_channel < 3)
 		{
 			// ssi_conf->cr_own = (p_cfg->format == STEREO_FORMAT) ? ssi_conf->cr_own | ((p_cfg->num_channel-1) << 22) : ssi_conf->cr_own & ~(3 << 22);
-			ssi_conf->cr_own = ssi_conf->cr_own & ~(3 << 22);
+			ssi_conf->cr_own = ssi_conf->cr_own & ~((uint32_t)3 << 22);
 		}
 		else
 		{
@@ -134,7 +134,7 @@ int r_ssi_config(st_audio_cfg_t const * const p_cfg)
 
 		ssi_conf->wsr &= ~(WS_MODE);
 		ssi_conf->wsr &= ~(MONO);
-		ssi_conf->wsr &= ~(31 << 16);
+		ssi_conf->wsr &= ~((uint32_t)31 << 16);
 		ssi_conf->cr_own &= ~(SWSP);
 		
 		if(p_cfg->bit_depth == TWO_BYTES_PER_SAMPLE)

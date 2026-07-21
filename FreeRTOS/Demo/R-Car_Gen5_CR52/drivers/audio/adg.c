@@ -38,7 +38,7 @@ bool adg_set_clock(adg_conf_t *adg, bool use_brgb){
 			uint32_t brgckr_val = use_brgb ? clock_input[i].brgckr_brgb : clock_input[i].brgckr_brga; 
 			
 			for(uint32_t cks = 0; cks <= 3; cks++){
-			uint32_t divider_base = 1 << (cks * 2); //2^(CKS*2)
+			uint32_t divider_base = ((uint32_t)1 << (cks * 2U)); //2^(CKS*2)
 			float N = input_freq / req_clk;
 			float brr_float = (N / (2*divider_base) ) - 1;
 			uint32_t brr = (uint32_t)(brr_float + 0.5);
@@ -76,7 +76,7 @@ bool adg_set_clock(adg_conf_t *adg, bool use_brgb){
 			BRRB0 = (best_cks << 8) | best_brr;
 			BRGCKR0 = best_brgckr_val ;
 			
-			BRRA0 = (0 << 8) | 0;
+			BRRA0 = ((uint32_t)0 << 8U) | 0U;
 			BRGCKR0 |=  BRGCKR_BRGA_CLKA | BRGCKR_OUT_BRGA ;
 			
 			AUDIO_CLK_SEL0_(channel_ssi) = 0x00000020;
@@ -85,7 +85,7 @@ bool adg_set_clock(adg_conf_t *adg, bool use_brgb){
 			BRRA0 = (best_cks << 8) | best_brr;
 			BRGCKR0 = best_brgckr_val ;
 			
-			BRRB0 = (0 << 8) | 0;
+			BRRB0 = ((uint32_t)0 << 8U) | 0U;
 			BRGCKR0 |=  BRGCKR_BRGB_CLKA | BRGCKR_OUT_BRGB;
 			
 			AUDIO_CLK_SEL0_(channel_ssi) = 0x00000010;

@@ -13,26 +13,26 @@
 #include "state-manager/r_state_manager.h"
 #include "state-manager/r_reset_domain_id.h"
 
-#define SWDT_BASE	0x1C050000
-#define SWTCNT		0x0
+#define SWDT_BASE	0x1C050000U
+#define SWTCNT		0x0U
 
-#define SWTCSRA		0x04
-#define SWTCSRA_WOVF	(1 << 4)
-#define SWTCSRA_WRFLG	(1 << 5)
-#define SWTCSRA_TME	(1 << 7)
+#define SWTCSRA		0x04U
+#define SWTCSRA_WOVF	(1U << 4)
+#define SWTCSRA_WRFLG	(1U << 5)
+#define SWTCSRA_TME	(1U << 7)
 
-#define SWTCSRB		0x08
+#define SWTCSRB		0x08U
 #define OSCCLK		131570U
 
 #define RST_DM0_BASE	0xC1320000U
 
 #define RST_KCPROT_DIS	0xA5A5A501U
 #define RST_KCPROT_EN	0xA5A5A500U
-#define RST_WDTRSTCR	0x0420
-#define RST_RESKCPROT0	0x04F0
-#define SWDT_RSTMSK	(1 << 1)
-#define RST_RESFC	0x0460
-#define RST_SRES1FC5	(1 << 25)
+#define RST_WDTRSTCR	0x0420U
+#define RST_RESKCPROT0	0x04F0U
+#define SWDT_RSTMSK	(1U << 1)
+#define RST_RESFC	0x0460U
+#define RST_SRES1FC5	(1U << 25)
 
 #define DIV_ROUND_UP(a, b) (((a) + (b) - 1U) / (b))
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
@@ -97,12 +97,12 @@ uint8_t R_SWDT_Init(uint8_t timeout_sec) {
 	}
 
 	/* for SWDT */
-	r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5 << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) & ~SWTCSRA_TME));
+	r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5U << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) & ~SWTCSRA_TME));
 	r_swdt_wait_cycles(2);
 
 	r_swdt_write(SWDT_BASE + SWTCNT, 0x5A5A0000); //reset counter
-	r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5 << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) & ~SWTCSRA_WOVF));
-	r_swdt_write(SWDT_BASE + SWTCSRB, (0xA5A5A5 << 8) | 0);
+	r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5U << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) & ~SWTCSRA_WOVF));
+	r_swdt_write(SWDT_BASE + SWTCSRB, (0xA5A5A5U << 8U) | 0U);
 
 	for (uint8_t i = ARRAY_SIZE(clk_divs) - 1; i >= 0; i--) {
 		clks_per_sec = OSCCLK / clk_divs[i];
@@ -125,20 +125,20 @@ uint8_t R_SWDT_Init(uint8_t timeout_sec) {
 	r_swdt_write(RST_DM0_BASE + RST_WDTRSTCR, r_rst_read(RST_DM0_BASE + RST_WDTRSTCR) & ~SWDT_RSTMSK);
 	r_swdt_write(RST_DM0_BASE + RST_RESKCPROT0, RST_KCPROT_EN);
 
-	r_swdt_write(SWDT_BASE + SWTCNT, (0x5A5A << 16) | (65536 - MUL_BY_CLKS_PER_SEC(cks, timeout_sec)));
+	r_swdt_write(SWDT_BASE + SWTCNT, ((uint32_t)0x5A5A << 16U) | (65536U - MUL_BY_CLKS_PER_SEC(cks, timeout_sec)));
 
 	return 0;
 }
 
 uint8_t R_SWDT_Ping(uint8_t ping_rate) {
 	vTaskDelay(ping_rate*1000);
-	r_swdt_write(SWDT_BASE + SWTCNT, (0x5A5A << 16) | (65536 - MUL_BY_CLKS_PER_SEC(cks, init_timeout)));
+	r_swdt_write(SWDT_BASE + SWTCNT, ((uint32_t)0x5A5A << 16U) | (65536U - MUL_BY_CLKS_PER_SEC(cks, init_timeout)));
 
 	return 0;
 }
 
 uint32_t R_SWDT_Start() {
-	r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5 << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) | SWTCSRA_TME));
+	r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5U << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) | SWTCSRA_TME));
 
 	return 0;
 }

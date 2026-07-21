@@ -69,14 +69,14 @@
 #define OPCODE_CONF_WRITE32		0x5
 
 #define BYTE_ENABLES			0x3FC000
-#define BYTE_ENABLES_32			(0xf << 14)
+#define BYTE_ENABLES_32			(0xfU << 14)
 
 #define SRCID				0xE0000000
-#define SRCID_PROTO_STACK0_ACCESS	(0 << 29)
+#define SRCID_PROTO_STACK0_ACCESS	(0U << 29)
 
 #define DSTID				0x7000000
-#define DSTID_PROTO_STACK_ACCESS	(0x1 << 24)
-#define DSTID_PHY_STACK_ACCESS		(0x2 << 24)
+#define DSTID_PROTO_STACK_ACCESS	(0x1U << 24)
+#define DSTID_PHY_STACK_ACCESS		(0x2U << 24)
 
 #define CONTROL_PARITY(n)		((n) << 30)
 #define DATA_PARITY(n)			((n) << 31)

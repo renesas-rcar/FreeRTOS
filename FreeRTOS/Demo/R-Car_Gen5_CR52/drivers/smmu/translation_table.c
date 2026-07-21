@@ -14,9 +14,9 @@
 #include "rcar_utils.h"
 #include <string.h>
 
-#define MAX_TABLE_SIZE      512
+#define MAX_TABLE_SIZE      512U
 #define ENTRY_TABLE_MASK    MAX_TABLE_SIZE - 1
-#define ENTRY_ADDR_MASK     0xFFFFFFFFF << 12
+#define ENTRY_ADDR_MASK     0xFFFFFFFFFU << 12
 #define PAGE_MASK           0xFFF
 #define PAGE_ATTR_MASK      (~(ENTRY_ADDR_MASK))
 
@@ -25,7 +25,7 @@ static int get_entry_type(uint64_t *entry)
     return *entry & ENTRY_TYPE_MASK;
 }
 
-static int shift_table_level(int tbl_level)
+static unsigned int shift_table_level(unsigned int tbl_level)
 {
     return (12 + 9 * (3 - tbl_level));
 }
@@ -36,7 +36,7 @@ static uint64_t *Find_Entry_Table(uint64_t *ttb, uint64_t virt_addr, int tbl_lev
     uint16_t entry_idx;
 
     table = ttb;
-    for (int i = 0; i < 4; i++) {
+    for (unsigned int i = 0U; i < 4U; i++) {
         entry_idx = (virt_addr >> shift_table_level(i)) & ENTRY_TABLE_MASK;
         table += entry_idx;
 
@@ -60,7 +60,7 @@ static uint64_t *Find_Entry_Table(uint64_t *ttb, uint64_t virt_addr, int tbl_lev
 
 static uint64_t *Allocate_Table(void)
 {
-    uint64_t *new_table = aligned_malloc(1 << 12, MAX_TABLE_SIZE * sizeof(uint64_t));
+    uint64_t *new_table = aligned_malloc(((uint32_t)1 << 12), MAX_TABLE_SIZE * sizeof(uint64_t));
     if (new_table) {
         memset(new_table, 0, MAX_TABLE_SIZE * sizeof(uint64_t));
     }

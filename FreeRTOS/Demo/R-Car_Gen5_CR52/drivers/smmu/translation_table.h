@@ -14,11 +14,11 @@
  * Entry table definitions.
  *
  */
-#define ENTRY_TYPE_MASK     (3 << 0)
-#define ENTRY_TYPE_FAULT    (0 << 0)
-#define ENTRY_TYPE_TABLE    (3 << 0)
-#define ENTRY_TYPE_PAGE     (3 << 0)
-#define ENTRY_TYPE_BLOCK    (1 << 0)
+#define ENTRY_TYPE_MASK     (3U << 0)
+#define ENTRY_TYPE_FAULT    (0U << 0)
+#define ENTRY_TYPE_TABLE    (3U << 0)
+#define ENTRY_TYPE_PAGE     (3U << 0)
+#define ENTRY_TYPE_BLOCK    (1U << 0)
 
 #define MAIR0_ATTR          (0xC080400)
 

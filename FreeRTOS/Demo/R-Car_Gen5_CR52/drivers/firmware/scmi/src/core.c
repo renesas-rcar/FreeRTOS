@@ -92,7 +92,7 @@ static void scmi_notification_process(void *unused)
 	/* Remove compiler warning about unused parameter. */
 	(void) unused;
 #ifdef S2R_DRAFT_FLOW
-	int cnt = 0;
+	unsigned int cnt = 0;
 #endif
 
 	int ret;

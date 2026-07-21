@@ -109,7 +109,7 @@ void rcar_ucie_setup(uint16_t channel)
 
 bool rcar_ucie_calc_even_parity(uint64_t data)
 {
-    int i;
+    uint8_t i;
 
     for (i = 32; i > 0; i /= 2) {
         data ^= data >> i;

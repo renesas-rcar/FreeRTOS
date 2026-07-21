@@ -365,11 +365,11 @@ typedef enum e_wcrc_fifo_ports_use_rtdma
 #define CRC_POL_32_ETHERNET 0 //default CRC-32-IEEE 802.3
 #define CRC_POL_16_CCITT_FALSE_CRC16 BIT(0) //CCITT_FALSE_CRC16
 #define CRC_POL_8_SAE_J1850 BIT(1) //SAE_J1850
-#define CRC_POL_8_0X2F (3 << 0) // 0x2F polynomial
+#define CRC_POL_8_0X2F (3U << 0) // 0x2F polynomial
 #define CRC_POL_32_0XF4ACFB13 BIT(2) //0xF4ACFB13 polynomial
-#define CRC_POL_32_0X1EDC6F41 (5 << 0) //0x1EDC6F41 polynomial CRC-32 (Castagnoli)
-#define CRC_POL_21_0X102899 (6 << 0) //0x102899 polynomial CRC-21
-#define CRC_POL_17_0X1685B (7 << 0) //0x1685B polynomial CRC-17
+#define CRC_POL_32_0X1EDC6F41 (5U << 0) //0x1EDC6F41 polynomial CRC-32 (Castagnoli)
+#define CRC_POL_21_0X102899 (6U << 0) //0x102899 polynomial CRC-21
+#define CRC_POL_17_0X1685B (7U << 0) //0x1685B polynomial CRC-17
 #define CRC_POL_15_0X4599 BIT(3) //0x4599 polynomial CRC-15
 
 /* CRC[m] Control register 2 */
@@ -379,13 +379,13 @@ typedef enum e_wcrc_fifo_ports_use_rtdma
 #define byteswapmode_00 0 //default no byte swap of output data
 #define byteswapmode_01 BIT(4)
 #define byteswapmode_10 BIT(5)
-#define byteswapmode_11 (3 << 3)
+#define byteswapmode_11 (3U << 3)
 #define xorvalinmode BIT(3) //EXOR ON of input data
 #define bitswapinmode BIT(2) //bit swap of input data
 #define byteswapinmode_00 0 //default no byte swap of input data
 #define byteswapinmode_01 BIT(0)
 #define byteswapinmode_10 BIT(1)
-#define byteswapinmode_11 (3 << 0)
+#define byteswapinmode_11 (3U<< 0)
 
 /************************************ KCRC registers ************************************/
 /* Register base */
@@ -400,15 +400,15 @@ typedef enum e_wcrc_fifo_ports_use_rtdma
 
 /* KCRC[m] control register */
 #define KCRC_CTL 0x0090
-#define PSIZE_32 (31 << 16) //default 32-bit
-#define PSIZE_16 (15 << 16) //16-bit
-#define PSIZE_8 (7 << 16) //8-bit
+#define PSIZE_32 (31U << 16) //default 32-bit
+#define PSIZE_16 (15U << 16) //16-bit
+#define PSIZE_8 (7U << 16) //8-bit
 #define CMD0 BIT(8) //0: Mode N (Normal), 1: Mode R (output reflect)
 #define CMD1 BIT(5) //0: Mode N (Normal), 1: Mode R (input reflect)
 #define CMD2 BIT(4) //0: Mode M (MSB shift), 1: Mode R (LSB shift)
-#define DW_32   ((0x1F) << 16)  //default 32-bit fix mode
-#define DW_16   ((0xF)  << 16)  //16-bit fix mode
-#define DW_8    ((0x7)  << 16)  //8-bit fix mode
+#define DW_32   ((0x1FU) << 16)  //default 32-bit fix mode
+#define DW_16   ((0xFU)  << 16)  //16-bit fix mode
+#define DW_8    ((0x7U)  << 16)  //8-bit fix mode
 
 /* KCRC[m] Polynomial register */
 #define KCRC_POLY 0x00A0

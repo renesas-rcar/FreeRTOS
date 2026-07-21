@@ -228,7 +228,7 @@ int ak4619_configure_audio_format(e_ak4619_interface_format_t format)
     if (format == STEREO_I2S_COMPATIBLE)
     {
         reg_value_fm_1 &= ~0b11110000; // Clear 4 MSB bit (TDM, DCF[2:0] bit) to set mode Stereo I2S, bit 2 3 is DSL set Slot Length default 11 (32bit)
-        reg_value_fm_2 &= ~(1 << 4); // Clear bit 4 (Slot bit) to set mode Stereo I2S
+        reg_value_fm_2 &= ~(1U << 4); // Clear bit 4 (Slot bit) to set mode Stereo I2S
         if ((write_i2c_reg(REG_AUDIO_IF_FORMAT_ADDRESS_1, reg_value_fm_1) != 0) || (write_i2c_reg(REG_AUDIO_IF_FORMAT_ADDRESS_2, reg_value_fm_2) != 0))
         {
             printf("Can not configure stereo i2s compatible mode using I2C\n");
@@ -262,7 +262,7 @@ int ak4619_configure_word_length(e_ak4619_data_bit_length_t didl_set, e_ak4619_d
     } 
     
     reg_value_fm_2 &= ~0b00001111; // Clear 4 LSB bit, it use to change word length
-    temp = (didl_set << 2) | (dodl_set);
+    temp = ((uint8_t)didl_set << 2) | ((uint8_t)dodl_set);
     reg_value_fm_2 |= temp; // Set 4 LSB bit to change word length
 
     if (write_i2c_reg(REG_AUDIO_IF_FORMAT_ADDRESS_2, reg_value_fm_2) != 0)
@@ -318,7 +318,7 @@ int ak4619_set_dac(bool DAC)
             printf("Can not write GPIO Port 6 Pin 21 Low to select SDIN1\n");
             return -1;
         }
-        reg_value_pw_mnm |= 1 << 1; // set bit 1 of power management register to 1 -> enable DAC1
+        reg_value_pw_mnm |= 1U << 1; // set bit 1 of power management register to 1 -> enable DAC1
         if (write_i2c_reg(REG_POWER_MANAGEMENT_ADDRESS, reg_value_pw_mnm) != 0)
         {
             printf("Can not enable DAC1");
@@ -329,7 +329,7 @@ int ak4619_set_dac(bool DAC)
     }
     else if (DAC == false)
     {
-        reg_value_pw_mnm &= ~(1 << 1); // set bit 1 of power management register to 0 -> disable DAC1
+        reg_value_pw_mnm &= ~(1U << 1); // set bit 1 of power management register to 0 -> disable DAC1
         if (write_i2c_reg(REG_POWER_MANAGEMENT_ADDRESS, reg_value_pw_mnm) != 0)
         {
             printf("Can not disable DAC1");
@@ -350,7 +350,7 @@ int ak4619_set_reset_bit(bool rstn_bit_set)
 
     if (rstn_bit_set == true)
     {
-        reg_value_pw_mnm |= 1 << 0; // set bit RSTN = 1 -> normal operation
+        reg_value_pw_mnm |= 1U << 0; // set bit RSTN = 1 -> normal operation
         if (write_i2c_reg(REG_POWER_MANAGEMENT_ADDRESS, reg_value_pw_mnm) != 0)
         {
             printf("Can not set RSTN bit");
@@ -361,7 +361,7 @@ int ak4619_set_reset_bit(bool rstn_bit_set)
     }
     else if (rstn_bit_set == false)
     {
-        reg_value_pw_mnm &= ~(1 << 0); // set bit RSTN = 0
+        reg_value_pw_mnm &= ~(1U << 0); // set bit RSTN = 0
         if (write_i2c_reg(REG_POWER_MANAGEMENT_ADDRESS, reg_value_pw_mnm) != 0)
         {
             printf("Can not clear RSTN bit");
@@ -458,7 +458,7 @@ int ak4619_module_init(ak4619_instance_set_t *instance_set, uint8_t max_channel,
     } 
 
     reg_v &= ~0b00001100;
-    reg_v |= ((instance_set->didl_set)<<2); // set DSL[1:0] = didl_set;
+    reg_v |= ((uint8_t)(instance_set->didl_set)<<2); // set DSL[1:0] = didl_set;
     if (write_i2c_reg(REG_AUDIO_IF_FORMAT_ADDRESS_1, reg_v) != 0)
     {
         printf("Can not configure Reg REG_AUDIO_IF_FORMAT_ADDRESS_1 slot lenght set");
