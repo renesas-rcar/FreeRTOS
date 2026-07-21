@@ -17,6 +17,10 @@ static void scmi_mbox_cb(const struct scmi_dev *mbox,
 						 void *user_data,
 						 struct mbox_msg *data)
 {
+	(void)mbox;
+	(void)channel_id;
+	(void)data;
+
 	struct scmi_channel *scmi_chan = user_data;
 
 	if (scmi_chan->cb != NULL) {
@@ -28,6 +32,8 @@ static int scmi_mbox_send_message(const struct scmi_dev *transport,
 								  struct scmi_channel *chan,
 								  struct scmi_message *msg)
 {
+	(void)transport;
+
 	struct scmi_mbox_channel *mbox_chan;
 	int ret;
 
@@ -52,6 +58,7 @@ static int scmi_mbox_read_message(const struct scmi_dev *transport,
 								  struct scmi_channel *chan,
 								  struct scmi_message *msg)
 {
+	(void)transport;
 	struct scmi_mbox_channel *mbox_chan;
 
 	mbox_chan = chan->data;
@@ -62,6 +69,7 @@ static int scmi_mbox_read_message(const struct scmi_dev *transport,
 static bool scmi_mbox_channel_is_free(const struct scmi_dev *transport,
 									  struct scmi_channel *chan)
 {
+	(void)transport;
 	struct scmi_mbox_channel *mbox_chan = chan->data;
 
 	return scmi_shmem_channel_status(mbox_chan->shmem, chan->is_notification) &
@@ -71,6 +79,7 @@ static bool scmi_mbox_channel_is_free(const struct scmi_dev *transport,
 static int scmi_mbox_channel_free_set(const struct scmi_dev *transport,
 									  struct scmi_channel *chan)
 {
+	(void)transport;
 	struct scmi_mbox_channel *mbox_chan = chan->data;
 
 	return scmi_shmem_channel_free_set(mbox_chan->shmem, chan->is_notification);
@@ -80,6 +89,7 @@ static int scmi_mbox_setup_chan(const struct scmi_dev *transport,
 				struct scmi_channel *chan,
 				bool tx)
 {
+	(void)transport;
 	int ret;
 	struct scmi_mbox_channel *mbox_chan;
 	struct mbox_spec *mbox_tx;

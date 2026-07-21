@@ -110,6 +110,7 @@ static int heapBytesRemaining = (int)&_HEAP_SIZE; // that's (&HeapLimit)-(&HeapB
 
 //! _sbrk_r version supporting reentrant newlib (depends upon above symbols defined by linker control file).
 void * _sbrk_r(struct _reent *pReent, int incr) {
+    (void)pReent;
     static char *currentHeapEnd = &HeapBase;
     vTaskSuspendAll(); // Note: safe to use before FreeRTOS scheduler started, but not within an ISR
     if (currentHeapEnd + incr > &HeapLimit) {
@@ -145,8 +146,11 @@ char * sbrk(int incr) { return _sbrk_r(_impure_ptr, incr); }
 //! _sbrk is a synonym for sbrk.
 char * _sbrk(int incr) { return sbrk(incr); };
 
-void __malloc_lock(struct _reent *p)   { vTaskSuspendAll(); };
-void __malloc_unlock(struct _reent *p) { (void)xTaskResumeAll();  };
+void __malloc_lock(struct _reent *p);
+void __malloc_lock(struct _reent *p)   { (void)p; vTaskSuspendAll(); };
+
+void __malloc_unlock(struct _reent *p);
+void __malloc_unlock(struct _reent *p) { (void)p; (void)xTaskResumeAll();  };
 
 // newlib also requires implementing locks for the application's environment memory space,
 // accessed by newlib's setenv() and getenv() functions.

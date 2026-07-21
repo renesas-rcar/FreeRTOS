@@ -106,6 +106,7 @@ void R_DMAC_RcarInterruptHandler(void* p_context)
 
 static int R_DMAC_SetInterruptCallback(uint8_t irq, IrqHandlerFn handler, void *irq_arg)
 {
+    (void)irq;
     Context_t * p_usr_context = (Context_t *)irq_arg;
     rDmacIrqCfg_t *args = (rDmacIrqCfg_t *)p_usr_context->ctx;
 

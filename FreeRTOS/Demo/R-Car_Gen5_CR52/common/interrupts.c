@@ -309,6 +309,7 @@ void Irq_SetupEntry(unsigned int id, IrqHandlerFn Handler, Context_t *Context)
 
 static void StubHandler(void *data)
 {
+    (void)data;
     while (1) {}
 }
 

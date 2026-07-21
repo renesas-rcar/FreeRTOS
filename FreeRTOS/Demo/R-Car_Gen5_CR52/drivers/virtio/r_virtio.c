@@ -244,7 +244,7 @@ int R_VIRTIO_ResponseCb(struct rpmsg_endpoint *ept,
                             void *data, size_t len,
                             uint32_t src, void *priv)
 {
-    (void)ept;
+    (void)priv;
     (void)src;
     st_virtio_context_t *p_context = ept->priv;
 
@@ -293,6 +293,7 @@ static void Virtio_Task( void *pvParameters )
 typedef uint32_t (*VirtIO_Handler)(st_virtio_msg_t *msg);
 
 static uint32_t virtio_default_handler (st_virtio_msg_t *msg) {
+    (void)msg;
     uint32_t ret = 0;
     return ret;
 }

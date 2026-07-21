@@ -120,6 +120,7 @@ int ucie_epf_test_write(struct st_pcie_ep *ep, ucie_epf_test_reg_t *bar0_reg)
 
 void ucie_epf_test_raise_irq(struct st_pcie_ep *ep, ucie_epf_test_reg_t *bar0_reg)
 {
+    (void)ep;
     uint32_t channel = 1;
     bar0_reg->status |= STATUS_IRQ_RAISED;
     void *msi_mem = (void *)0xa645000;
@@ -232,6 +233,8 @@ int R_PCIE_EP_TransferDataDMA(struct st_pcie_ep *ep, uint64_t pcie_addr,
                           enum pcie_ob_mem_type ob_mem_type,
                           enum xfer_direction dir)
 {
+    (void)ep;
+    (void)ob_mem_type;
     uint32_t i;
     uint16_t channel = 1;
     uintptr_t addr = (uintptr_t)pcie_addr;

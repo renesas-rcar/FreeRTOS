@@ -124,6 +124,7 @@ static int set_pdn_pin_high(void)
 
 static int ak4619_check_bick(e_ak4619_mclk_multiplier_t mclk_multiplier, uint8_t max_channel, uint8_t bit_per_channel)
 {
+    (void)mclk_multiplier;
     uint16_t total_bits = max_channel * bit_per_channel;
     if (total_bits == 32 || total_bits == 48 || total_bits == 64)
     {

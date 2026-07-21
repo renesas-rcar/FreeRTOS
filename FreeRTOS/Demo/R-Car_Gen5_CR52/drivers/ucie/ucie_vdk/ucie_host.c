@@ -94,6 +94,7 @@ void R_PCIE_Host_Outbound_ATU(uint16_t channel)
 
 void R_PCIE_InitHost(struct st_pcie_host *host, uint16_t channel)
 {
+    (void)host;
     uint32_t ret;
 
     /* Init a controller in host mode */

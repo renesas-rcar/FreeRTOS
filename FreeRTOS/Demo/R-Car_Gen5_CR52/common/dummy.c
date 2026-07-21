@@ -22,22 +22,26 @@ __attribute__((weak)) uint32_t _TCM_SIZE   = 0u;
 //Dummy for these function when using newlib
 __attribute__((weak)) int _open(int fd)
 {
+  (void)fd;
   return (0);
 }
 
 __attribute__((weak)) int _close(int fd)
 {
-//  (void)fd;
+  (void)fd;
   return (0);
 }
 __attribute__((weak)) int _write (int fd, char* buf, int nbytes)
 {
-    return (0);
+  (void)fd;
+  (void)buf;
+  (void)nbytes;
+  return (0);
 }
 __attribute__((weak)) int _fstat(int fd, void *buf)
 {
   (void)fd;
-
+  (void)buf;
   return (0);
 }
 
@@ -57,6 +61,10 @@ __attribute__((weak)) off_t _lseek(int fd, off_t offset, int whence)
 __attribute__((weak)) int
 _read (int fd, char* buf, int nbytes)
 {
+  (void)fd;
+  (void)buf;
+  (void)nbytes;
+  return (0);
 }
 
 __attribute__((weak))  pid_t _getpid (void)
@@ -67,6 +75,8 @@ __attribute__((weak))  pid_t _getpid (void)
 
 __attribute__((weak)) int _kill (pid_t pid, int sig)
 {
+  (void)pid;
+  (void)sig;
   return 1;
 }
 
@@ -112,6 +122,7 @@ __attribute__((weak)) void vApplicationStackOverflowHook(TaskHandle_t xTask,
 
 __attribute__((weak)) void vApplicationAssertHook(void *arg)
 {
+    (void)arg;
     /* Weak function  */
     /* if want to use this function redefine this function */
 }

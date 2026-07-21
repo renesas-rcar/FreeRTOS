@@ -51,6 +51,7 @@ static uint32_t ReadTCM(rcar_tcm_region_t region)
 
 void WriteTCM(rcar_tcm_region_t region, uint32_t reg_val)
 {
+    (void)reg_val;
     switch (region) {
     case RCAR_TCM_A:
         __asm__ volatile ("mcr p15, 0, %0, c9, c1, 0" : : "r"(reg_val) : "memory");

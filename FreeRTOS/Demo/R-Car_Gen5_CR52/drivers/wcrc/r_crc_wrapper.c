@@ -1296,6 +1296,7 @@ static int wcrcPrepareDataThrough(wcrc_instance_ctrl_t * const p_instance_ctrl)
 static int wcrc_get_dma_fifo(wcrc_sub_module_t module,
                             wcrc_unit_t unit, uint32_t port)
 {
+    (void)module;
     uint32_t fifo_base, fifo_port_addr;
 
     /* Get FIFO address for DMA */

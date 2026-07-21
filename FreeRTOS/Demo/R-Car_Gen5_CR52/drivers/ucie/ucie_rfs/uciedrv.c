@@ -54,18 +54,21 @@ e_ucie_linkup_status_t R_UCIE_Retry_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode,
 
 uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
 {
+    (void)cfg;
     printf("ERROR: This feature isn't supported in this environment\n");
     return 0;
 }
 
 uint32_t R_UCIE_HDMA_WaitStop(st_ucie_hdma_cfg_t *cfg)
 {
+    (void)cfg;
     printf("ERROR: This feature isn't supported in this environment\n");
     return 0;
 }
 
 uint32_t R_UCIE_HDMA_Stop(st_ucie_hdma_cfg_t *cfg)
 {
+    (void)cfg;
     printf("ERROR: This feature isn't supported in this environment\n");
     return 0;
 }

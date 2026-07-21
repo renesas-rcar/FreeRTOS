@@ -138,6 +138,7 @@ int scmi_reset_protocol_attributes(uint32_t *attributes)
 int scmi_reset_domain_attributes(uint32_t domain_id, uint32_t *attributes,
 								 uint32_t *latency, uint8_t *name)
 {
+	(void)domain_id;
 	struct scmi_protocol *proto = &SCMI_PROTOCOL_NAME(SCMI_PROTOCOL_RESET_DOMAIN);
 	struct reset_domain_attributes reply_buffer;
 	struct scmi_message msg, reply;

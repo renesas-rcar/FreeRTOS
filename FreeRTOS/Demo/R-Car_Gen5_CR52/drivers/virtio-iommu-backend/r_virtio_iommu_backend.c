@@ -79,6 +79,7 @@ static int rpmsg_endpoint_cb(struct rpmsg_endpoint *ept, void *data, size_t len,
 {
     (void)priv;
     (void)src;
+    (void)len;
 
     st_virtio_msg_t *req = (st_virtio_msg_t *)data;
 
@@ -182,6 +183,7 @@ static int virtio_smmu_unmap(st_virtio_smmu_payload_req_t* data)
 
 static int virtio_smmu_probe(st_virtio_smmu_payload_req_t* data)
 {
+    (void)data;
     int ret = 0;
     return ret;
 }

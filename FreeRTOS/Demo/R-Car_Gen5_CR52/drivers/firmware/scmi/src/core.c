@@ -81,6 +81,7 @@ static int scmi_agent_respond(const struct scmi_dev *transport,
 
 static void scmi_core_isr_cb(struct scmi_channel *chan)
 {
+	(void)chan;
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	hasNotifEvent = true;
 	xSemaphoreGiveFromISR(hasNotifSemaphore, &xHigherPriorityTaskWoken);

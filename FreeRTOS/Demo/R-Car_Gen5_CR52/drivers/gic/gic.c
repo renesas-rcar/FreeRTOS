@@ -322,6 +322,7 @@ uint32_t R_GIC_SetIntPriority(uint32_t ID, uint32_t rd, uint8_t priority) {
 }
 
 uint32_t R_GIC_SetIntType(uint32_t ID, uint32_t rd, uint32_t type) {
+    (void)rd;  
     if (gic_rdist==0) {
         return 1;
     }
@@ -343,6 +344,7 @@ uint32_t R_GIC_SetIntType(uint32_t ID, uint32_t rd, uint32_t type) {
 }
 
 uint32_t R_GIC_SetIntGroup(uint32_t ID, uint32_t rd, uint32_t security) {
+    (void)security;
     // Just support group 1 non secure
     if (gic_rdist==0) {
         return 1;

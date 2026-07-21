@@ -175,5 +175,7 @@ void R_PCIE_Outbound_ATU(uint16_t channel, uint64_t base_addr, uint64_t target_a
 
 void R_UCIE_ControllerInit(uint32_t channel, struct st_pcie_ctrl *ctrl)
 {
+    (void)channel;
+    (void)ctrl;
     /* Config UCIe base address, configuration space, BAR address and range,... */
 }
