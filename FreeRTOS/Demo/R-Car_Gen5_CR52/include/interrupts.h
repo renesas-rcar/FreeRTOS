@@ -15,6 +15,12 @@
  * and managing interrupt contexts.
  */
 
+/**
+ * @defgroup Interrupt_ID Interrupt ID
+ * @brief Platform-specific interrupt IDs.
+ * @ingroup Interrupt_Controller
+ */
+
 #ifndef INTERRUPTS_H
 #define INTERRUPTS_H
 

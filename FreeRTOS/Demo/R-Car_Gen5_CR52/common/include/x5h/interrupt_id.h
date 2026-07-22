@@ -6,10 +6,10 @@
  */
 
 /**
- * @defgroup Interrupt_ID Interrupt ID
+ * @defgroup Interrupt_ID_X5H X5H
+ * @brief Interrupt ID list for the X5H platform.
+ * @ingroup Interrupt_ID
  * @{
- * @brief Interrupt ID list for X5H platform.
- *
  */
 
 #ifndef INTERRUPT_ID_H

@@ -6,10 +6,10 @@
  */
 
 /**
- * @defgroup Interrupt_ID Interrupt ID
+ * @defgroup Interrupt_ID_AIACC AIACC
+ * @brief Interrupt IDs for AIACC.
+ * @ingroup Interrupt_ID
  * @{
- * @brief Interrupt ID list for AIACC platform.
- *
  */
 
 #ifndef INTERRUPT_ID_H
@@ -313,6 +313,6 @@ extern "C" {
 }
 #endif
 
-/** @} */ // end of Interrupt_ID
+/** @} */ // end of Interrupt_ID_AIACC
 
 #endif /* INTERRUPT_ID_H*/
