@@ -15,6 +15,7 @@
 #include "state-manager/r_state_manager.h"
 #include "state-manager/r_clock_domain_id.h"
 #include <stdio.h>
+#include "board.h"
 
 #define CRC_OPEN    (0x00000001U)
 #define CRC_CLOSE   (0x00000002U)
@@ -333,6 +334,7 @@ static int wcrc_get_clock_ids(wcrc_unit_t unit, uint32_t *wcrc_id, uint32_t *crc
 
     switch (unit)
     {
+#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
         case WCRC_00:
             *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC0;
             *crc_id  = X5H_CLOCK_ID_MDLC_CRC0;
@@ -398,7 +400,7 @@ static int wcrc_get_clock_ids(wcrc_unit_t unit, uint32_t *wcrc_id, uint32_t *crc
             *crc_id  = X5H_CLOCK_ID_MDLC_CRC10;
             *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC10;
             break;
-
+#endif
         default:
             return -1;
     }

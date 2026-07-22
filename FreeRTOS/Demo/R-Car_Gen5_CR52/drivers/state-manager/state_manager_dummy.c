@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
-#include "scmi/inc/rcar_scmi_common.h"
+#include "scmi/rcar_scmi_common.h"
 #include "scmi/inc/common.h"
 #include "scmi/inc/base.h"
 #include "scmi/inc/power.h"
@@ -20,7 +20,6 @@
 #include "state-manager/r_power_domain_id.h"
 #include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_reset_domain_id.h"
-
 #include "FreeRTOS.h"
 
 static uint32_t max_clockdomain_num;

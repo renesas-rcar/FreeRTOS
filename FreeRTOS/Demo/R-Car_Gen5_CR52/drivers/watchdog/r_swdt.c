@@ -12,6 +12,7 @@
 #include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_state_manager.h"
 #include "state-manager/r_reset_domain_id.h"
+#include "board.h"
 
 #define SWDT_BASE	0x1C050000U
 #define SWTCNT		0x0U
@@ -78,6 +79,7 @@ uint8_t R_SWDT_Init(uint8_t timeout_sec) {
 	uint8_t ret;
 	int clock_id, reset_id;
 
+#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 	clock_id = X5H_CLOCK_ID_MDLC_WDT0;
 	ret = R_StateManager_ClockOn(clock_id);
 	if (ret) {
@@ -95,6 +97,7 @@ uint8_t R_SWDT_Init(uint8_t timeout_sec) {
 	if (ret) {
 		printf("Error: Failed to reset id %d ON.\r\n", reset_id);
 	}
+#endif
 
 	/* for SWDT */
 	r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5U << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) & ~SWTCSRA_TME));

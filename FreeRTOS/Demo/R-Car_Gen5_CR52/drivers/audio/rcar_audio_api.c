@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "rcar_audio_api.h"
+#include "board.h"
 
 audio_ssi_conf_t *audio_ssi_conf;
 adg_conf_t *audio_adg_conf;
@@ -293,6 +294,7 @@ int r_audio_clock_on(void)
 {
 	int res;
 
+#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 	int clock_id = X5H_CLOCK_ID_MDLC_ADG0;
 	res = R_StateManager_ClockOn(clock_id);
     if (res)
@@ -315,6 +317,7 @@ int r_audio_clock_on(void)
         printf("Error: Failed to set clock id %d ON.\r\n",
                 clock_id);
     }
+#endif
   
 	return res;
 }
@@ -322,6 +325,7 @@ int r_audio_clock_on(void)
 int r_audio_clock_off(void)
 {
 	int res;
+#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 	int clock_id = X5H_CLOCK_ID_MDLC_ADG0;
 	res = R_StateManager_ClockOff(clock_id);
     if (res)
@@ -333,6 +337,7 @@ int r_audio_clock_off(void)
     {
         printf("Set clock id %d OFF OK!\r\n", clock_id);
     }
+
 	clock_id = X5H_CLOCK_ID_MDLC_SSI0;
 	res = R_StateManager_ClockOff(clock_id);
     if (res)
@@ -355,6 +360,7 @@ int r_audio_clock_off(void)
     {
         printf("Set clock id %d OFF OK!\r\n", clock_id);
     }
+#endif
 
 	return res;
 }

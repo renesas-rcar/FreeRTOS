@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
-#include "scmi/inc/rcar_scmi_common.h"
+#include "scmi/rcar_scmi_common.h"
 #include "scmi/inc/common.h"
 #include "scmi/inc/base.h"
 #include "scmi/inc/power.h"
@@ -20,7 +20,7 @@
 #include "state-manager/r_power_domain_id.h"
 #include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_reset_domain_id.h"
-
+#include "board.h"
 #include "FreeRTOS.h"
 
 #define SM_LOG_INFO(format, ...) \
@@ -358,16 +358,20 @@ int R_StateManager_PowerOff(int domain_id)
 
 	VALIDATE_ID(domain_id, max_powerdomain_num);
 	pwr_cfg.domain_id = domain_id;
+#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 	if ((X5H_POWER_DOMAIN_ID_VIPN <= domain_id) &&
 			(X5H_POWER_DOMAIN_ID_P_RPU_CORE00 > domain_id)) {
 		pwr_cfg.flags = 0;
 	} else if ((X5H_POWER_DOMAIN_ID_P_RPU_CORE00 <= domain_id) &&
-			(X5H_POWER_DOMAIN_ID_COUNT > domain_id)) {
+			(X5H_POWER_DOMAIN_ID_Q_APU_P07 >= domain_id)) {
 		pwr_cfg.flags = SCMI_POWER_STATE_SET_FLAGS_ASYNC;
 	} else {
 		SM_LOG_ERR("Invalid power domain ID.\r\n");
 		return -EINVAL;
 	}
+#else
+    pwr_cfg.flags = 0;
+#endif
 	pwr_cfg.power_state= SCMI_POWER_STATE_OFF;
 
 	ret = scmi_power_state_set(&pwr_cfg);
@@ -386,16 +390,20 @@ int R_StateManager_PowerOn(int domain_id)
 
 	VALIDATE_ID(domain_id, max_powerdomain_num);
 	pwr_cfg.domain_id = domain_id;
+#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 	if ((X5H_POWER_DOMAIN_ID_VIPN <= domain_id) &&
 			(X5H_POWER_DOMAIN_ID_P_RPU_CORE00 > domain_id)) {
 		pwr_cfg.flags = 0;
 	} else if ((X5H_POWER_DOMAIN_ID_P_RPU_CORE00 <= domain_id) &&
-			(X5H_POWER_DOMAIN_ID_COUNT > domain_id)) {
+			(X5H_POWER_DOMAIN_ID_Q_APU_P07 >= domain_id)) {
 		pwr_cfg.flags = SCMI_POWER_STATE_SET_FLAGS_ASYNC;
 	} else {
 		SM_LOG_ERR("Invalid power domain ID.\r\n");
 		return -EINVAL;
 	}
+#else
+    pwr_cfg.flags = 0;
+#endif
 	pwr_cfg.power_state= SCMI_POWER_STATE_ON;
 
 	ret = scmi_power_state_set(&pwr_cfg);

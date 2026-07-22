@@ -13,6 +13,7 @@
 #include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_state_manager.h"
 #include "r_wwdt_reg.h"
+#include "board.h"
 
 const uint16_t timeout_ch0_19[] = { 15, 31, 62, 124, 250, 500, 1000, 2000 };
 const uint16_t timeout_ch20[] = { 2, 4, 8, 17, 34, 68, 136, 273 };
@@ -53,13 +54,16 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
 	uintptr_t wwdt_base_addr = R_WWDT_PRV_GetRegbase(unit);
 	int clock_id, clock_id_0, clock_id_1, ret;
 
+#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 	clock_id = X5H_CLOCK_ID_MDLC_WDT0;
 	ret = R_StateManager_ClockOn(clock_id);
     if (ret) {
 		printf("Error: Failed to set clock id %d ON.\r\n", clock_id);
     }
+#endif
 
 	switch(unit) {
+#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 		case R_WWDT0:
 			clock_id_0 = X5H_CLOCK_ID_MDLC_WWDT00;
 			clock_id_1 = X5H_CLOCK_ID_MDLC_WWDT01;
@@ -162,6 +166,7 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
 			clock_id_0 = X5H_CLOCK_ID_MDLC_WWDT200;
 			clock_id_1 = X5H_CLOCK_ID_MDLC_WWDT201;
 			break;
+#endif
 		default:
 			printf("Wrong Unit for Clock ID\n");
 			break;

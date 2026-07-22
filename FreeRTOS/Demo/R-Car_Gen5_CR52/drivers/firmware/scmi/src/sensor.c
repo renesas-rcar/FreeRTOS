@@ -13,7 +13,7 @@
 #include "scmi/inc/util.h"
 #include "scmi/inc/sensor.h"
 #include "scmi/inc/common.h"
-#include "scmi/inc/rcar_scmi_common.h"
+#include "scmi/rcar_scmi_common.h"
 #include "FreeRTOS.h"
 
 SCMI_PROTOCOL_DEFINE_NODEV(SCMI_PROTOCOL_SENSOR, NULL);
@@ -262,7 +262,7 @@ int scmi_sensor_description_get(uint32_t desc_index,
     int ret;
     uint8_t desc_size = 52; /* descriptor size: base 28 + power 4 + (resolution 4 + min 8 + max 8) = 52 */
     const uint32_t sizeof_scmi_shmem_layout = 28;
-    const uint32_t max_cap = X5H_SCMI_SHMEM_SIZE - sizeof_scmi_shmem_layout;
+    const uint32_t max_cap = SCMI_SHMEM_SIZE - sizeof_scmi_shmem_layout;
 
     if (!out || out_cap == 0u || !page) {
         return -EINVAL;

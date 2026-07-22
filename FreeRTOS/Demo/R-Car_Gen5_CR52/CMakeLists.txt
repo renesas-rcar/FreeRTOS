@@ -156,7 +156,7 @@ elseif (BOARD STREQUAL "x5h_vdk")
     )
 endif()
 
-if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2" OR BOARD STREQUAL "mdp_aiacc_hil")
+if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2")
     set(STATE_MANAGER_SRC
         ${BSP_DIR}/drivers/state-manager/state_manager_dummy.c
     )
@@ -350,6 +350,24 @@ install(
 # Specify pfc cfg header depend on BOARD_ID
 install(
     FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/r_pfc_cfg.h
+    DESTINATION include
+)
+
+# Specify power domain id header depend on BOARD_ID
+install(
+    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/state-manager/r_power_domain_id.h
+    DESTINATION include
+)
+
+# Specify clock domain id header depend on BOARD_ID
+install(
+    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/state-manager/r_clock_domain_id.h
+    DESTINATION include
+)
+
+# Specify reset domain id header depend on BOARD_ID
+install(
+    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/state-manager/r_reset_domain_id.h
     DESTINATION include
 )
 

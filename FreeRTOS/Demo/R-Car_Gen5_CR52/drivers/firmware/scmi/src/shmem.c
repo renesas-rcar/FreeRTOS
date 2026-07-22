@@ -11,7 +11,8 @@
 #include "scmi/inc/shmem.h"
 #include "scmi/inc/util.h"
 #include "scmi/inc/common.h"
-#include "scmi/inc/rcar_scmi_common.h"
+#include "scmi/rcar_scmi_common.h"
+#include "board.h"
 
 struct scmi_shmem_config {
 	uintptr_t phys_addr;
@@ -223,23 +224,23 @@ void scmi_shmem_update_flags(const struct scmi_dev *shmem, uint32_t mask,
 
 const struct scmi_shmem_config configs_main[MAX_SHMEM_REGION] = {
 	{
-		.phys_addr = X5H_SCMI_SHMEM_PLATFORM_MAIN,
-		.size = X5H_SCMI_SHMEM_SIZE - sizeof(struct scmi_shmem_layout),
+		.phys_addr = SCMI_SHMEM_PLATFORM_MAIN,
+		.size = SCMI_SHMEM_SIZE - sizeof(struct scmi_shmem_layout),
 	},
 	{
-		.phys_addr = X5H_SCMI_SHMEM_AGENT_MAIN,
-		.size = X5H_SCMI_SHMEM_SIZE - sizeof(struct scmi_shmem_layout),
+		.phys_addr = SCMI_SHMEM_AGENT_MAIN,
+		.size = SCMI_SHMEM_SIZE - sizeof(struct scmi_shmem_layout),
 	},
 };
 
 const struct scmi_shmem_config configs_2nd[MAX_SHMEM_REGION] = {
 	{
-		.phys_addr = X5H_SCMI_SHMEM_PLATFORM_2ND,
-		.size = X5H_SCMI_SHMEM_SIZE - sizeof(struct scmi_shmem_layout),
+		.phys_addr = SCMI_SHMEM_PLATFORM_2ND,
+		.size = SCMI_SHMEM_SIZE - sizeof(struct scmi_shmem_layout),
 	},
 	{
-		.phys_addr = X5H_SCMI_SHMEM_AGENT_2ND,
-		.size = X5H_SCMI_SHMEM_SIZE - sizeof(struct scmi_shmem_layout),
+		.phys_addr = SCMI_SHMEM_AGENT_2ND,
+		.size = SCMI_SHMEM_SIZE - sizeof(struct scmi_shmem_layout),
 	},
 };
 

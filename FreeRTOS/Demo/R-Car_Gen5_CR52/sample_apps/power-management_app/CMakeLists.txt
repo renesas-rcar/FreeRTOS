@@ -6,9 +6,15 @@
 
 set(app_name "power-management_app")
 
-add_executable(${app_name}
-    main.c
-)
+if(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil" OR BOARD STREQUAL "x5h_rfs2")
+    add_executable(${app_name}
+        main_x5h.c
+    )
+elseif(BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_aiacc_rfs2")
+    add_executable(${app_name}
+        main_aiacc.c
+    )
+endif()
 
 target_compile_definitions(${app_name}
     PUBLIC
