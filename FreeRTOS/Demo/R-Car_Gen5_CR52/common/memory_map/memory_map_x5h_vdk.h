@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include "rcar_utils.h"
+#include "board.h"
 
 typedef enum e_mem_attr {
     DEVICE_ATTR,

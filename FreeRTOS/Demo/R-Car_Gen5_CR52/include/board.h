@@ -25,6 +25,11 @@ extern "C" {
 #error "Board is not defined. X5H_IRONHIDE is set as default."
 #endif
 
+#ifndef BOARD
+#define BOARD               X5H_IRONHIDE
+#error "Board is not defined. X5H_IRONHIDE is set as default."
+#endif
+
 #ifdef __cplusplus
 }
 #endif
