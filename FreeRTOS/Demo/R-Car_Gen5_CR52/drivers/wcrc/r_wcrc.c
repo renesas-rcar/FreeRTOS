@@ -17,6 +17,12 @@
 #include <stdio.h>
 #include "board.h"
 
+#include "board.h"
+
+#if (BOARD == MDP_AIACC_HIL)
+#include "module_controller.h"
+#endif
+
 #define CRC_OPEN    (0x00000001U)
 #define CRC_CLOSE   (0x00000002U)
 
@@ -407,6 +413,28 @@ static int wcrc_get_clock_ids(wcrc_unit_t unit, uint32_t *wcrc_id, uint32_t *crc
     return 0;
 }
 
+#if (BOARD == MDP_AIACC_HIL)
+static void WcrcRequestClockOn()
+{
+    uint32_t module_num = MODULE_NUM_RT;
+
+    //WCRC
+    mdlc_ms_module_run_bit(module_num, 12, 26);
+    mdlc_ms_module_run_bit(module_num, 12, 28);
+    mdlc_ms_module_run_bit(module_num, 12, 30);
+
+    //CRC
+    mdlc_ms_module_run_bit(module_num, 13, 16);
+    mdlc_ms_module_run_bit(module_num, 13, 18);
+    mdlc_ms_module_run_bit(module_num, 13, 20);
+
+    //KCRC
+    mdlc_ms_module_run_bit(module_num, 14, 6);
+    mdlc_ms_module_run_bit(module_num, 14, 8);
+    mdlc_ms_module_run_bit(module_num, 14, 10);
+}
+#endif
+
 static int wcrc_enable_clock(wcrc_cfg_t const * const p_cfg)
 {
     int ret;
@@ -416,6 +444,10 @@ static int wcrc_enable_clock(wcrc_cfg_t const * const p_cfg)
     {
         return -1;
     }
+
+#if (BOARD == MDP_AIACC_HIL)
+    WcrcRequestClockOn();
+#endif
 
     ret = wcrc_get_clock_ids(p_cfg->unit, &wcrc_id, &crc_id, &kcrc_id);
     if (ret) {

@@ -1,7 +1,6 @@
 /*
  * FreeRTOS Kernel V11.1.0
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
- * Copyright (c) 2025 Renesas Electronics Corporation
+ * Copyright (c) 2026 Renesas Electronics Corporation
  *
  * SPDX-License-Identifier: MIT
  *
@@ -70,8 +69,8 @@ static uint32_t kcrc_output2 = 0xaf6d87d2;
 static uint32_t crc_output3[4] = {0x24884ce6, 0xf897a2b3, 0xf9dd2419, 0x25c2ca4c};
 static uint32_t kcrc_output3[4] = {0xc9d32fbd, 0x7e657dd7, 0x2f212a60, 0x9897780a};
 
-static uint32_t rtdma_inst[4]  = {RTDMA2_CH4, RTDMA2_CH2, RTDMA0_CH4, RTDMA1_CH6};
-static uint32_t rtdma_inst2[4] = {RTDMA0_CH0, RTDMA1_CH4, RTDMA1_CH8, RTDMA2_CH6};
+static uint32_t rtdma_inst[4]  = {RTDMA0_CH2, RTDMA1_CH2, RTDMA0_CH4, RTDMA1_CH6};
+static uint32_t rtdma_inst2[4] = {RTDMA0_CH0, RTDMA1_CH4, RTDMA1_CH8, RTDMA0_CH6};
 
 /**** Config CRC Independent mode ****/
 wcrc_cfg_t  g_wcrc_cfg0 =
@@ -113,7 +112,7 @@ wcrc_cfg_t  g_wcrc_cfg0 =
         .poly_size      = POLY_SIZE_32_BIT,
         .is_out_reflect = true,
         .is_in_reflect  = true,
-        .shift_mode     = MSB_SHIFT, 
+        .shift_mode     = MSB_SHIFT,
         .xor_mask_out   = 0xFFFFFFFF
     }
 };
@@ -123,7 +122,7 @@ wcrc_instance_ctrl_t g_wcrc_inst_ctrl_indepe;
 /**** Config E2E CRC mode ****/
 wcrc_cfg_t  g_wcrc_cfg1 =
 {
-    .unit       		= WCRC_09,
+    .unit       		= WCRC_01,
     .mode       		= E2E_CRC_MODE,
     .conv_size[CRC_SUB_MODULE]  = 4,
     .conv_size[KCRC_SUB_MODULE] = 4,
@@ -164,7 +163,7 @@ wcrc_cfg_t  g_wcrc_cfg1 =
         .poly_size      = POLY_SIZE_32_BIT,
         .is_out_reflect = true,
         .is_in_reflect  = true,
-        .shift_mode     = MSB_SHIFT, 
+        .shift_mode     = MSB_SHIFT,
         .xor_mask_out   = 0xFFFFFFFF,
         .p_rtdma_inst   = &rtdma_inst[2],
         .num_rtdma_inst = 2
@@ -176,7 +175,7 @@ wcrc_instance_ctrl_t g_wcrc_inst_ctrl_e2e;
 /**** Config E2E CRC mode ****/
 wcrc_cfg_t  g_wcrc_cfg3 =
 {
-    .unit       		= WCRC_04,
+    .unit       		= WCRC_02,
     .mode       		= E2E_CRC_MODE,
     .conv_size[CRC_SUB_MODULE]  = 16,
     .conv_size[KCRC_SUB_MODULE] = 16,
@@ -217,7 +216,7 @@ wcrc_cfg_t  g_wcrc_cfg3 =
         .poly_size      = POLY_SIZE_32_BIT,
         .is_out_reflect = false,
         .is_in_reflect  = false,
-        .shift_mode     = MSB_SHIFT, 
+        .shift_mode     = MSB_SHIFT,
         .xor_mask_out   = 0xFFFFFFFF,
         .p_rtdma_inst   = &rtdma_inst2[2],
         .num_rtdma_inst = 2
@@ -274,7 +273,7 @@ static void prvCRCTask( void *pvParameters )
     uint32_t crc_buf, kcrc_buf, crc_size;
     wcrc_instance_ctrl_t * p_instance_ctrl;
 
-#if (BOARD == MDP_X5H_HIL)
+#if (BOARD == MDP_AIACC_HIL)
     vTaskDelay(6000);
 #endif
 
@@ -284,10 +283,6 @@ static void prvCRCTask( void *pvParameters )
     ret = R_RTDMAC_RcarDmacCtrlInit(RT_DMAC0,
                                     DRV_RTDMAC_PRIO_FIX);
     ret = R_RTDMAC_RcarDmacCtrlInit(RT_DMAC1,
-                                    DRV_RTDMAC_PRIO_FIX);
-    ret = R_RTDMAC_RcarDmacCtrlInit(RT_DMAC2,
-                                    DRV_RTDMAC_PRIO_FIX);
-    ret = R_RTDMAC_RcarDmacCtrlInit(RT_DMAC3,
                                     DRV_RTDMAC_PRIO_FIX);
 
     init_data_input();

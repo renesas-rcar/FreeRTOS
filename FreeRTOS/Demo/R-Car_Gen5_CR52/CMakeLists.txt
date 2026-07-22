@@ -239,6 +239,12 @@ set(bsp_source
     ${UCIE_SRC_LIST}
 )
 
+if(BOARD STREQUAL "mdp_aiacc_hil")
+    list(APPEND bsp_source
+        ${BSP_DIR}/drivers/module_controller/module_controller.c
+    )
+endif()
+
 if(ENABLE_OPENAMP)
     list(APPEND bsp_source
         ${BSP_DIR}/common/libmetal/metal/cpu.c
@@ -298,6 +304,13 @@ target_include_directories(freertos_bsp
         $<BUILD_INTERFACE:${BSP_DIR}/CMSIS_5>
         $<BUILD_INTERFACE:${BSP_DIR}/CMSIS_5/CMSIS/Core_R/Include>
 )
+
+if(BOARD STREQUAL "mdp_aiacc_hil")
+    target_include_directories(freertos_bsp
+        PUBLIC
+            $<BUILD_INTERFACE:${BSP_DIR}/drivers/module_controller>
+    )
+endif()
 
 if(ENABLE_OPENAMP)
     target_include_directories(freertos_bsp PUBLIC

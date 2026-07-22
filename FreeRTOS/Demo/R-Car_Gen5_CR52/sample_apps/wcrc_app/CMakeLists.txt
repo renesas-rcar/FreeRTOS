@@ -6,9 +6,15 @@
 
 set(app_name "wcrc_app")
 
-add_executable(${app_name}
-    main.c
-)
+if(BOARD STREQUAL "mdp_aiacc_rfs2" OR BOARD STREQUAL "mdp_aiacc_hil")
+    add_executable(${app_name}
+        aiacc_main.c
+    )
+else()
+    add_executable(${app_name}
+        main.c
+    )
+endif()
 
 target_compile_definitions(${app_name}
     PUBLIC
