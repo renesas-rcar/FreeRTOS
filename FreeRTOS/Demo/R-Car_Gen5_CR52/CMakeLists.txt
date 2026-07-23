@@ -532,30 +532,14 @@ install(
     DIRECTORY ${BSP_DIR}/include
     DESTINATION .
 )
-# Specify device tree header depend on BOARD_ID
-install(
-    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/device_tree.h
-    DESTINATION include
-)
 
-# Specify interrupt id header depend on BOARD_ID
+# Specify header depend on BOARD_ID
 install(
-    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/interrupt_id.h
+    DIRECTORY ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/
     DESTINATION include
-)
-
-# Specify pfc cfg header depend on BOARD_ID
-install(
-    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/r_pfc_cfg.h
-    DESTINATION include
-)
-
-# Specify pd/clk/reset id header depend on BOARD_ID
-install(
-    DIRECTORY ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/state-manager/
-    DESTINATION include/state-manager
     FILES_MATCHING
         PATTERN "*.h"
+        PATTERN "*_private.h" EXCLUDE
 )
 
 # Logging
