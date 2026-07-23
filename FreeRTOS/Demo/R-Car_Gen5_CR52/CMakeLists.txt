@@ -366,22 +366,12 @@ install(
     DESTINATION include
 )
 
-# Specify power domain id header depend on BOARD_ID
+# Specify pd/clk/reset id header depend on BOARD_ID
 install(
-    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/state-manager/r_power_domain_id.h
-    DESTINATION include
-)
-
-# Specify clock domain id header depend on BOARD_ID
-install(
-    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/state-manager/r_clock_domain_id.h
-    DESTINATION include
-)
-
-# Specify reset domain id header depend on BOARD_ID
-install(
-    FILES ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/state-manager/r_reset_domain_id.h
-    DESTINATION include
+    DIRECTORY ${BSP_DIR}/common/include/${PLATFORM_DEVICE}/state-manager/
+    DESTINATION include/state-manager
+    FILES_MATCHING
+        PATTERN "*.h"
 )
 
 # Logging
