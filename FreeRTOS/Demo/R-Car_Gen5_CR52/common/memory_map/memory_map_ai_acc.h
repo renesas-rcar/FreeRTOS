@@ -31,8 +31,8 @@ typedef struct st_memory_region {
 #define PERIPHERAL_START_0          0x18800000
 #define PERIPHERAL_SIZE_0           0x1FA80000  // to 0x3828_0000
 
-#define OSAL_MEMORY_ADDRESS         0x63800000
-#define OSAL_MEMORY_SIZE            0x20000000  // to 0x8380_0000
+#define OSAL_MEMORY_ADDRESS         0x6B800000
+#define OSAL_MEMORY_SIZE            0x1D600000  // to 0x88E0_0000
 
 #define LDR_MEMORY_ADDRESS          0x8E200000
 #define LDR_MEMORY_SIZE             0x00100000  // to 0x8E30_0000
