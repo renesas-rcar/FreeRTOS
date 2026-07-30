@@ -44,6 +44,7 @@
 
 
 #define SCP2RT0_IRQ_ID			 (0xD6)
+#define SCP2RT1_IRQ_ID			 (0xD7)
 
 #define MFIS_SCP_BCH_BASE        (0x18A80000)
 

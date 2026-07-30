@@ -23,6 +23,8 @@
 
 #define MAILBOX_MAX_CHANNELS 4
 #define MAILBOX_MBOX_SIZE    3
+#define CLUSTER0_CORE0	     0
+#define CLUSTER0_CORE1	     1
 
 #if (BOARD == MDP_AIACC_HIL)
 
@@ -75,14 +77,14 @@ static void mfis_mailbox_isr(Context_t *context)
 						MFIS_SCP_IRQ_REG_INT(0U);
 
 #if (BOARD == MDP_AIACC_HIL)
-	if (mfis_read_bit(MFISISR_RS_B(0), MFISISR_ACK_INT) != 0U)
+	if (mfis_read_bit(MFISISR_RS_B(mfis_rtcore_num), MFISISR_ACK_INT) != 0U)
     {
-        mfis_set_bits(MFISICR_RS_B(0), MFISICR_ACK_INT_BIT);
+        mfis_set_bits(MFISICR_RS_B(mfis_rtcore_num), MFISICR_ACK_INT_BIT);
     }
 
-	if (mfis_read_bit(MFISISR_RS_B(0), MFISISR_RCV_INT) != 0U)
+	if (mfis_read_bit(MFISISR_RS_B(mfis_rtcore_num), MFISISR_RCV_INT) != 0U)
     {
-		mfis_set_bits(MFISICR_RS_B(0), MFISICR_RCV_INT_BIT);
+		mfis_set_bits(MFISICR_RS_B(mfis_rtcore_num), MFISICR_RCV_INT_BIT);
 		for (int i = 0; i < MAILBOX_MAX_CHANNELS; ++i) {
 			/* Continue to next channel if channel is not enabled */
 			if (!data->channel_enable) {
@@ -126,7 +128,7 @@ static int mfis_mailbox_send(const struct scmi_dev *dev, uint32_t channel,
 	}
 	if (msg == NULL) {
 #if (BOARD == MDP_AIACC_HIL)
-		mfis_write32(MFISCHN_SIG_RS_B(0), MFISCHN_SIG_SND_SIG_BIT);
+		mfis_write32(MFISCHN_SIG_RS_B(mfis_rtcore_num), MFISCHN_SIG_SND_SIG_BIT);
 #elif (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 		MFIS_SCP_REG_MFISRSEMBR(cfg->base, mfis_rtcore_num) = mfis_msg;
 		MFIS_SCP_REG_MFISRSEICR(cfg->base, mfis_rtcore_num) =
@@ -205,12 +207,26 @@ Context_t mfis_mailbox_cxt = {
 int mfis_mailbox_init(struct mbox_spec *spec)
 {
 	struct scmi_dev *dev = &mfis_dev;
+	uint32_t mfis_rtcore_num = CURRENT_CORE_IDX;
 	#if (BOARD == MDP_AIACC_HIL)
-	int irq_id = SCP2RT0_IRQ_ID;
-	mfis_set_bits(MFISIMR_RS_B(0), MFISIMR_ACK_INT_BIT); // Enable ACK interrupt
-	while (mfis_read_bit(MFISCHN_ACK_ST_RS_B(0), MFISCHN_ACK_ST_PND_ACK_BIT) != 0)
+	int irq_id;
+	if (mfis_rtcore_num == CLUSTER0_CORE0)
+	{
+		irq_id = SCP2RT0_IRQ_ID;
+	}
+	else if (mfis_rtcore_num == CLUSTER0_CORE1)
+	{
+		irq_id = SCP2RT1_IRQ_ID;
+	}
+	else
+	{
+		return -1;
+	}
+	 
+	mfis_set_bits(MFISIMR_RS_B(mfis_rtcore_num), MFISIMR_ACK_INT_BIT); // Enable ACK interrupt
+	while (mfis_read_bit(MFISCHN_ACK_ST_RS_B(mfis_rtcore_num), MFISCHN_ACK_ST_PND_ACK_BIT) != 0)
     {};
-	mfis_set_bits(MFISIMR_RS_B(0), MFISIMR_RCV_INT_BIT); // Enable receive interrupt
+	mfis_set_bits(MFISIMR_RS_B(mfis_rtcore_num), MFISIMR_RCV_INT_BIT); // Enable receive interrupt
 	#else
 	int irq_id = CURRENT_CORE_IDX + SCP2CR_INT_BASE_ID;
 	if (!spec) {
