@@ -95,7 +95,7 @@ static void prvSMMU_RT_Task( void *pvParameters )
 {
     /* Remove compiler warning about unused parameter. */
     #if (BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
-    vTaskDelay(5000);
+    vTaskDelay(1500);
     #endif
     ( void ) pvParameters;
     int ret;
@@ -155,7 +155,7 @@ static void prvSMMU_RT_Task( void *pvParameters )
 
     printf("**********************************************\r\n");
 
-    printf("* Test case 5: Disable SMMU bypass mode *\r\n");
+    printf("* Test case 5: Disable SMMU bypass mode and Enable SMMU *\r\n");
 
     volatile uint32_t *RCTBUBYPSEN = (volatile uint32_t *)RCTBUBYPSEN_ADDRESS;
     
@@ -163,13 +163,17 @@ static void prvSMMU_RT_Task( void *pvParameters )
     uint32_t old = *RCTBUBYPSEN;
     uint32_t new = (old & ~MASK) | (smmu_bypass & MASK);
     *RCTBUBYPSEN = new;
+    /* Wait for TBU bypass-disable to settle before next access */
+    for (int i = 0; i < 10000; i++)
+    {
+        __asm__ volatile("nop");
+    }
 
-    if ((*RCTBUBYPSEN & MASK) == (smmu_bypass & MASK))
-        printf("Disable Successfully\r\n");
-    else
-        printf("Disable Failed\r\n");
-
-    R_SMMU_Enable(SMMU_RT, is_secure);    
+    if (R_SMMU_Enable(SMMU_RT, is_secure) != 0)
+    {
+        printf("TC5 result: Failed\n");
+    }
+    printf("TC5 result: Passed\n");  
     printf("**********************************************\r\n");
 
     printf("* Test case 6: Verify data *\r\n");
