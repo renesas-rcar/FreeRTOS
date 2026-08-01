@@ -444,6 +444,7 @@ static void pmAppExample(void)
 	{
 		if ((X5H_CLOCK_ID_MDLC_HSCIF0 == domain_id) ||
             (X5H_CLOCK_ID_MDLC_SCIF0 == domain_id) ||
+            (X5H_CLOCK_ID_MDLC_SCIF1 == domain_id) ||
             (X5H_CLOCK_ID_MDLC_INTAP1 <= domain_id)
             )
         {
@@ -467,6 +468,12 @@ static void pmAppExample(void)
 	{
 		if ((X5H_RESET_DOMAIN_ID_HSCIF0 == domain_id) ||
             (X5H_RESET_DOMAIN_ID_SCIF0 == domain_id) ||
+            (X5H_RESET_DOMAIN_ID_SCIF1 == domain_id) ||
+            (X5H_RESET_DOMAIN_ID_CSITOP2 == domain_id) ||
+            (domain_id >= X5H_RESET_DOMAIN_ID_VCON0 && domain_id <= X5H_RESET_DOMAIN_ID_VCON9) ||
+            (X5H_RESET_DOMAIN_ID_CR52TOP0 == domain_id) ||
+            (X5H_RESET_DOMAIN_ID_CR52CORE0 == domain_id) ||
+            (X5H_RESET_DOMAIN_ID_CR52CORE0_PO == domain_id) ||
             (X5H_RESET_DOMAIN_ID_INTAP1 <= domain_id)
             ) {
 			continue;
