@@ -34,6 +34,7 @@
 #include "pfc/r_pfc_api.h"
 #include "device_tree.h"
 #include "rcar_utils.h"
+#include "board.h"
 /*-----------------------------------------------------------*/
 /*
  * Configure the hardware as necessary to run this demo.
@@ -45,6 +46,10 @@ int printf_raw(const char *format, ...);
 
 int main(void)
 {
+    #if (BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
+    for (uint32_t i = 0; i < 300000000; i++)
+    {};
+    #endif
     /* Configure the hardware ready to run the demo. */
     prvSetupHardware();
     printf_raw(">> TC1: Testing get timer counter <<\n");

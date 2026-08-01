@@ -41,6 +41,7 @@
 #include "dmac/dmac_common.h"
 #include "dmac/rtdmac_ctrl.h"
 #include "rcar_utils.h"
+#include "board.h"
 /*-----------------------------------------------------------*/
 #define INTERRUPT_FLAG_UNSET        0
 #define INTERRUPT_FLAG_SET          1
@@ -167,6 +168,10 @@ void vConfigureSGIInterrupt(volatile int *irq_flag)
 
 int main(void)
 {
+    #if (BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
+    for (uint32_t i = 0; i < 300000000; i++)
+    {};
+    #endif
     /* Configure the hardware ready to run the demo. */
     prvSetupHardware();
 
