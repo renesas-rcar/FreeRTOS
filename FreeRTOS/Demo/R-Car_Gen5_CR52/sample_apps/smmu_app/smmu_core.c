@@ -173,7 +173,10 @@ static void prvSMMU_RT_Task( void *pvParameters )
     {
         printf("TC5 result: Failed\n");
     }
-    printf("TC5 result: Passed\n");  
+    else
+    {
+        printf("TC5 result: Passed\n");  
+    }
     printf("**********************************************\r\n");
 
     printf("* Test case 6: Verify data *\r\n");
