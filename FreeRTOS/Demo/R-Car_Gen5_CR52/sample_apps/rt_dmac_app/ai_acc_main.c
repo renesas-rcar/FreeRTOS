@@ -58,7 +58,7 @@ void dmacUserCallback3(void *data);
  * Configure the hardware as necessary to run this demo.
  */
 static void prvSetupHardware( void );
-
+static uint32_t get_osal_addr(uint32_t offset);
 static void prvDMACTask( void *pvParameters );
 
 SemaphoreHandle_t xSemaphore = NULL;
@@ -96,11 +96,28 @@ rDmacCfg_t cfg1 =
     .mPrioLevel = 0
 };
 
+/*
+ * Offset table for TC4 descriptors.
+ * Actual address = OSAL base + offset, resolved at runtime in prvDMACTask().
+ * With OSAL base = 0x6B800000:
+ *   [0] SAR=0x6C000000  DAR=0x7B800000
+ *   [1] SAR=0x6C100000  DAR=0x7B900000
+ *   [2] SAR=0x6C200000  DAR=0x7BA00000
+ *   [3] SAR=0x6C300000  DAR=0x7BB00000
+ */
+static const uint32_t desc0_off[][2] = {
+    /* {SAR_off, DAR_off} */
+    {0x00800000, 0x10000000},
+    {0x00900000, 0x10100000},
+    {0x00A00000, 0x10200000},
+    {0x00B00000, 0x10300000},
+};
+
 rDmacDescMemCfg_t desc_mem[] = {
-    {.SAR = 0x64000000, .DAR = 0x74000000, .TCR = 4, .CHCR = 0},
-    {       0x64100000,        0x74100000,        4,         0},
-    {       0x64200000,        0x74200000,        4,         0},
-    {       0x64300000,        0x74300000,        4,         0},
+    {.SAR = 0x00000000, .DAR = 0x00000000, .TCR = 4, .CHCR = 0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
 };
 
 /* Define configure the DMA descriptor */
@@ -136,11 +153,29 @@ rDmacCfg_t cfg2 =
     .mPrioLevel = 1
 };
 
+/*
+ * Offset table for TC5 descriptors (Repeat mode).
+ * Actual address = OSAL base + offset, resolved at runtime in prvDMACTask().
+ * SAR is the same for all descriptors (shared source); DAR increments.
+ * With OSAL base = 0x6B800000:
+ *   [0] SAR=0x6D000000  DAR=0x7D000000
+ *   [1] SAR=0x6D000000  DAR=0x7D100000
+ *   [2] SAR=0x6D000000  DAR=0x7D200000
+ *   [3] SAR=0x6D000000  DAR=0x7D300000
+ */
+static const uint32_t desc2_off[][2] = {
+    /* {SAR_off, DAR_off} */
+    {0x01800000, 0x11800000},
+    {0x01800000, 0x11900000},
+    {0x01800000, 0x11A00000},
+    {0x01800000, 0x11B00000},
+};
+
 rDmacDescMemCfg_t desc_mem2[] = {
-    {.SAR = 0x65000000, .DAR = 0x75000000, .TCR = 4, .CHCR = 0},
-    {       0x65000000,        0x75100000,        4,         0},
-    {       0x65000000,        0x75200000,        4,         0},
-    {       0x65000000,        0x75300000,        4,         0},
+    {.SAR = 0x00000000, .DAR = 0x00000000, .TCR = 4, .CHCR = 0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
 };
 
 /* Define configure the DMA descriptor */
@@ -179,15 +214,41 @@ rDmacCfg_t cfg3 =
     .mPrioLevel = 1
 };
 
+/*
+ * Offset table for TC6 descriptors (Read-out mode, 8 descriptors).
+ * Actual address = OSAL base + offset, resolved at runtime in prvDMACTask().
+ * SAR is the same for all descriptors (shared source); DAR increments.
+ * With OSAL base = 0x6B800000:
+ *   [0] SAR=0x6E000000  DAR=0x78000000
+ *   [1] SAR=0x6E000000  DAR=0x78100000
+ *   [2] SAR=0x6E000000  DAR=0x78200000
+ *   [3] SAR=0x6E000000  DAR=0x78300000
+ *   [4] SAR=0x6E000000  DAR=0x78400000
+ *   [5] SAR=0x6E000000  DAR=0x78500000
+ *   [6] SAR=0x6E000000  DAR=0x78600000
+ *   [7] SAR=0x6E000000  DAR=0x78700000
+ */
+static const uint32_t desc3_off[][2] = {
+    /* {SAR_off, DAR_off} */
+    {0x02800000, 0x0C800000},
+    {0x02800000, 0x0C900000},
+    {0x02800000, 0x0CA00000},
+    {0x02800000, 0x0CB00000},
+    {0x02800000, 0x0CC00000},
+    {0x02800000, 0x0CD00000},
+    {0x02800000, 0x0CE00000},
+    {0x02800000, 0x0CF00000},
+};
+
 rDmacDescMemCfg_t desc_mem3[] = {
-    {.SAR = 0x66000000, .DAR = 0x70000000, .TCR = 4, .CHCR = 0},
-    {       0x66000000,        0x70100000,        4,         0},
-    {       0x66000000,        0x70200000,        4,         0},
-    {       0x66000000,        0x70300000,        4,         0},
-    {       0x66000000,        0x70400000,        4,         0},
-    {       0x66000000,        0x70500000,        4,         0},
-    {       0x66000000,        0x70600000,        4,         0},
-    {       0x66000000,        0x70700000,        4,         0},
+    {.SAR = 0x00000000, .DAR = 0x00000000, .TCR = 4, .CHCR = 0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
 };
 
 /* Define configure the DMA descriptor */
@@ -223,11 +284,29 @@ rDmacCfg_t cfg4 =
     .mPrioLevel = 1
 };
 
+/*
+ * Offset table for TC7 descriptors (Infinite Repeat mode).
+ * Actual address = OSAL base + offset, resolved at runtime in prvDMACTask().
+ * SAR is the same for all descriptors (shared source); DAR increments.
+ * With OSAL base = 0x6B800000:
+ *   [0] SAR=0x6F000000  DAR=0x79000000
+ *   [1] SAR=0x6F000000  DAR=0x79100000
+ *   [2] SAR=0x6F000000  DAR=0x79200000
+ *   [3] SAR=0x6F000000  DAR=0x79300000
+ */
+static const uint32_t desc4_off[][2] = {
+    /* {SAR_off, DAR_off} */
+    {0x03800000, 0x0D800000},
+    {0x03800000, 0x0D900000},
+    {0x03800000, 0x0DA00000},
+    {0x03800000, 0x0DB00000},
+};
+
 rDmacDescMemCfg_t desc_mem4[] = {
-    {.SAR = 0x66000000, .DAR = 0x70000000, .TCR = 4, .CHCR = 0},
-    {       0x66000000,        0x70100000,        4,         0},
-    {       0x66000000,        0x70200000,        4,         0},
-    {       0x66000000,        0x70300000,        4,         0},
+    {.SAR = 0x00000000, .DAR = 0x00000000, .TCR = 4, .CHCR = 0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
+    {       0x00000000,        0x00000000,        4,         0},
 };
 
 /* Define configure the DMA descriptor */
@@ -305,6 +384,18 @@ static void prvSetupHardware(void)
 
     Irq_Setup();
     (void)pfcInitModules(getModuleConfigs());
+}
+
+static uint32_t get_osal_addr(uint32_t offset)
+{
+    static st_memory_t region = {0};
+
+    if (region.size == 0)
+    {
+        region = R_UTILS_GetMemoryRegionInfo(OSAL, 0);
+    }
+
+    return region.base_address + offset;
 }
 
 static void prvDMACTask(void *pvParameters)
@@ -410,6 +501,14 @@ static void prvDMACTask(void *pvParameters)
 
     printf("*************************************************************\r\n");
     printf("***TC4: RT-DMAC mem-to-mem transfer in Descriptor Normal mode***\r\n");
+
+    /* Convert descriptor offsets to absolute addresses */
+    for (int i = 0; i < descCfg1.mDescCount; i++)
+    {
+        desc_mem[i].SAR = get_osal_addr(desc0_off[i][0]);
+        desc_mem[i].DAR = get_osal_addr(desc0_off[i][1]);
+    }
+
     /* Device Driver Part */
     R_RTDMAC_RcarDmacCtrlInit(rDmacIrqHandler_t_irq1.Unit, DRV_RTDMAC_PRIO_FIX);
 
@@ -464,6 +563,14 @@ static void prvDMACTask(void *pvParameters)
     R_RTDMAC_RcarDmacStop(rDmacIrqHandler_t_irq1.Unit, rDmacIrqHandler_t_irq1.SubCh);
     printf("**********************************************************\r\n");
     printf("***TC5: RT-DMAC mem-to-mem transfer in Descriptor Repeat mode***\r\n");
+
+    /* Convert descriptor offsets to absolute addresses */
+    for (int i = 0; i < descCfg2.mDescCount; i++)
+    {
+        desc_mem2[i].SAR = get_osal_addr(desc2_off[i][0]);
+        desc_mem2[i].DAR = get_osal_addr(desc2_off[i][1]);
+    }
+
     /* Device Driver Part */
     R_RTDMAC_RcarDmacCtrlInit(rDmacIrqHandler_t_irq2.Unit, DRV_RTDMAC_PRIO_FIX);
 
@@ -525,6 +632,14 @@ static void prvDMACTask(void *pvParameters)
 
     printf("*************************************************************\r\n");
     printf("***TC6: RT-DMAC mem-to-mem transfer in Descriptor Read-out mode***\r\n");
+
+    /* Convert descriptor offsets to absolute addresses */
+    for (int i = 0; i < desccfg3.mDescCount; i++)
+    {
+        desc_mem3[i].SAR = get_osal_addr(desc3_off[i][0]);
+        desc_mem3[i].DAR = get_osal_addr(desc3_off[i][1]);
+    }
+
     /* Device Driver Part */
     R_RTDMAC_RcarDmacCtrlInit(rDmacIrqHandler_t_irq3.Unit, DRV_RTDMAC_PRIO_FIX);
 
@@ -580,7 +695,15 @@ static void prvDMACTask(void *pvParameters)
         printf("TC6 Result: Failed\n");
     }
     printf("*************************************************************\r\n");
-     printf("***TC7: RT-DMAC mem-to-mem transfer in Descriptor Infinite Repeat mode***\r\n");
+    printf("***TC7: RT-DMAC mem-to-mem transfer in Descriptor Infinite Repeat mode***\r\n");
+
+    /* Convert descriptor offsets to absolute addresses */
+    for (int i = 0; i < desccfg4.mDescCount; i++)
+    {
+        desc_mem4[i].SAR = get_osal_addr(desc4_off[i][0]);
+        desc_mem4[i].DAR = get_osal_addr(desc4_off[i][1]);
+    }
+
     /* Device Driver Part */
     R_RTDMAC_RcarDmacCtrlInit(RT_DMAC0, DRV_RTDMAC_PRIO_FIX);
 
