@@ -44,6 +44,8 @@
 #include "logging_stack.h"
 #endif
 
+#include "board.h"
+
 /*-----------------------------------------------------------*/
 
 /*
@@ -89,7 +91,9 @@ static void prvLoggingTask( void *pvParameters )
 
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
-
+#if ((BOARD == MDP_X5H_HIL) || (BOARD == MDP_AIACC_HIL))
+    vTaskDelay(5000);
+#endif
     #ifdef LIBRARY_LOG_LEVEL
         LogAlways(("Logging enable [ON] ..."));
         vTaskDelay(100);
