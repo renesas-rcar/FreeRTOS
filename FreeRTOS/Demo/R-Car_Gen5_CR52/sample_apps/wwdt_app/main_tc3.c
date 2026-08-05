@@ -37,6 +37,15 @@
 
 #include "device_tree.h"
 
+#if (BOARD == X5H_VDK) || (BOARD == X5H_IRONHIDE) || (BOARD == X5H_RFS2) || (BOARD == MDP_X5H_HIL)
+#define WWDT_UNIT   R_WWDT20
+#elif (BOARD == MDP_AIACC_RFS2) || (BOARD == MDP_AIACC_HIL)
+#define WWDT_UNIT   R_WWDT2
+#endif
+
+#define STR(x) #x
+#define XSTR(x) STR(x)
+
 #define main_WWDT_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 #define printf_delay(fmt, ...)      \
 	vTaskDelay(1);		    \
@@ -86,17 +95,21 @@ static void prvWWDTTask( void *pvParameters )
 	( void ) pvParameters;
 	uint32_t err;
 
+#if (BOARD == MDP_X5H_HIL) || (BOARD == MDP_AIACC_HIL)
+	vTaskDelay(6000);
+#endif
+
 	/* Device driver part */
 	printf("---------- PROGRAM START ----------- \r\n");
 
-	printf_delay("=== Test Case 3: WWDT20, 68ms, 50% window ===\r\n");
-	R_WWDT_Init(R_WWDT20, WINDOW_50P, 68, false, ERM_RESET_MODE);
+	printf_delay("=== Test Case 3: %s, 68ms, 50% window ===\r\n", XSTR(WWDT_UNIT));
+	R_WWDT_Init(WWDT_UNIT, WINDOW_50P, 68, false, ERM_RESET_MODE);
 	printf_delay("R_WWDT_Init: done\r\n");
 
-	err = R_WWDT_Refresh(R_WWDT20);
+	err = R_WWDT_Refresh(WWDT_UNIT);
 	for (int i = 0; i < 500; i++) {
 		vTaskDelay(60);  // simulate moderate workload
-		err = R_WWDT_Refresh(R_WWDT20);
+		err = R_WWDT_Refresh(WWDT_UNIT);
 		if (err != 0) break;
 	}
 

@@ -12,8 +12,12 @@
 #include "watchdog/r_wwdt_api.h"
 #include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_state_manager.h"
-#include "r_wwdt_reg.h"
+#include "r_wwdt_private.h"
 #include "board.h"
+
+#if (BOARD == MDP_AIACC_HIL)
+#include "module_controller.h"
+#endif
 
 const uint16_t timeout_ch0_19[] = { 15, 31, 62, 124, 250, 500, 1000, 2000 };
 const uint16_t timeout_ch20[] = { 2, 4, 8, 17, 34, 68, 136, 273 };
@@ -48,11 +52,24 @@ static void r_wdt_wait_cycles(uint8_t cycles)
 	vTaskDelay(delay);
 }
 
+#if (BOARD == MDP_AIACC_HIL)
+static void WwdtRequestClockOn()
+{
+    uint32_t module_num = MODULE_NUM_RT;
+
+    mdlc_ms_module_run_bit(module_num, 10, 2);
+}
+#endif
+
 void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bool irq_75p, wwdt_erm_t err_mode)
 {
 	uint8_t val;
 	uintptr_t wwdt_base_addr = R_WWDT_PRV_GetRegbase(unit);
 	int clock_id, clock_id_0, clock_id_1, ret;
+
+#if (BOARD == MDP_AIACC_HIL)
+	WwdtRequestClockOn();
+#endif
 
 #if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 	clock_id = X5H_CLOCK_ID_MDLC_WDT0;
@@ -60,10 +77,8 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
     if (ret != 0) {
 		printf("Error: Failed to set clock id %d ON.\r\n", clock_id);
     }
-#endif
 
 	switch(unit) {
-#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 		case R_WWDT0:
 			clock_id_0 = X5H_CLOCK_ID_MDLC_WWDT00;
 			clock_id_1 = X5H_CLOCK_ID_MDLC_WWDT01;
@@ -166,7 +181,7 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
 			clock_id_0 = X5H_CLOCK_ID_MDLC_WWDT200;
 			clock_id_1 = X5H_CLOCK_ID_MDLC_WWDT201;
 			break;
-#endif
+
 		default:
 			printf("Wrong Unit for Clock ID\n");
 			break;
@@ -191,7 +206,7 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
         if (ret != 0) {
                printf("Error: Failed to DeassertReset clock id %d.\r\n", clock_id_1);
         }
-
+#endif
 	clk_rate = (wwdt_base_addr == 0xC1380000) ? CLK_LSIOSC : RCLK;
 	val = r_wwdt_read8(wwdt_base_addr + WDTA0MD);
     if (!err_mode) {
