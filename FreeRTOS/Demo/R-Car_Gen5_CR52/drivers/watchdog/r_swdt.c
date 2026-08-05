@@ -14,6 +14,10 @@
 #include "state-manager/r_reset_domain_id.h"
 #include "board.h"
 
+#if (BOARD == MDP_AIACC_HIL)
+#include "module_controller.h"
+#endif
+
 #define SWDT_BASE	0x1C050000U
 #define SWTCNT		0x0U
 
@@ -74,10 +78,23 @@ static void r_swdt_wait_cycles(uint8_t cycles) {
 	vTaskDelay(delay);
 }
 
+#if (BOARD == MDP_AIACC_HIL)
+static void SwdtRequestClockOn()
+{
+    uint32_t module_num = MODULE_NUM_RT;
+
+    mdlc_ms_module_run_bit(module_num, 10, 2);
+}
+#endif
+
 uint8_t R_SWDT_Init(uint8_t timeout_sec) {
 	uint16_t clks_per_sec;
 	uint8_t ret;
 	int clock_id, reset_id;
+
+#if (BOARD == MDP_AIACC_HIL)
+	SwdtRequestClockOn();
+#endif
 
 #if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
 	clock_id = X5H_CLOCK_ID_MDLC_WDT0;

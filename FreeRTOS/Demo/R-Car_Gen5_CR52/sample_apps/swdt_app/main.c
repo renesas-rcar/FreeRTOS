@@ -91,6 +91,10 @@ static void prvSWDTTask( void *pvParameters )
 	uint8_t ping_rate = 5;
 	uint8_t ping_count = 3;
 
+#if (BOARD == MDP_X5H_HIL) || (BOARD == MDP_AIACC_HIL)
+	vTaskDelay(6000);
+#endif
+
 	int timeout = 3000; // 3s
 
 	if ((SWDT_SWTCSRA_REG & (1U << 7)) != 0U)
