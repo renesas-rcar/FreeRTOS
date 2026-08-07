@@ -509,7 +509,6 @@ elseif(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil")
         taud_app
         ecm_app
         sensor_app
-        dummy_app
         ucie
         audio_app
         gic_app
@@ -578,7 +577,6 @@ elseif(BOARD STREQUAL "mdp_aiacc_hil")
         utils_app
         ecm_app
         sensor_app
-        dummy_app
         gic_app
         generic_timer_app
     )
