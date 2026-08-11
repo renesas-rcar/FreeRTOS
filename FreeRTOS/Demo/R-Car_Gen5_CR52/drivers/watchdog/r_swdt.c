@@ -9,61 +9,26 @@
 #include "task.h"
 #include <stdio.h>
 #include "watchdog/r_swdt_api.h"
-#include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_state_manager.h"
-#include "state-manager/r_reset_domain_id.h"
+#include "r_swdt_private.h"
 #include "board.h"
 
 #if (BOARD == MDP_AIACC_HIL)
 #include "module_controller.h"
 #endif
 
-#define SWDT_BASE	0x1C050000U
-#define SWTCNT		0x0U
-
-#define SWTCSRA		0x04U
-#define SWTCSRA_WOVF	(1U << 4)
-#define SWTCSRA_WRFLG	(1U << 5)
-#define SWTCSRA_TME	(1U << 7)
-
-#define SWTCSRB		0x08U
-#define OSCCLK		131570U
-
-#define RST_DM0_BASE	0xC1320000U
-
-#define RST_KCPROT_DIS	0xA5A5A501U
-#define RST_KCPROT_EN	0xA5A5A500U
-#define RST_WDTRSTCR	0x0420U
-#define RST_RESKCPROT0	0x04F0U
-#define SWDT_RSTMSK	(1U << 1)
-#define RST_RESFC	0x0460U
-#define RST_SRES1FC5	(1U << 25)
-
-#define DIV_ROUND_UP(a, b) (((a) + (b) - 1U) / (b))
-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-#define MUL_BY_CLKS_PER_SEC(cks, d) \
-			DIV_ROUND_UP((d) * OSCCLK, clk_divs[(cks)])
-
 static const unsigned int clk_divs[] = { 1, 4, 16, 32, 64, 128, 1024, 4096 };
-
-uint8_t R_SWDT_Init(uint8_t timeout_sec);
-uint8_t R_SWDT_Ping(uint8_t timeout_new_sec);
-uint32_t R_SWDT_Start();
-uint32_t R_SWDT_Stop();
 
 static uint8_t cks;
 static uint8_t init_timeout;
 static void r_swdt_write(uintptr_t Addr, uint32_t val)
 {
 	*((volatile uint32_t *)Addr) = val;
-
-	return;
 }
 
 static uint32_t r_swdt_read(uintptr_t Addr)
 {
-
-    return (Addr == 0x1C050000) ?  *((volatile uint16_t *)Addr) : *((volatile uint8_t *)Addr);
+	return (Addr == (uintptr_t)0x1C050000) ? *((volatile uint16_t *)Addr) : *((volatile uint8_t *)Addr);
 }
 
 static uint32_t r_rst_read(uintptr_t Addr)
@@ -90,31 +55,31 @@ static void SwdtRequestClockOn()
 uint8_t R_SWDT_Init(uint8_t timeout_sec) {
 	uint16_t clks_per_sec;
 	uint8_t ret;
-	int clock_id, reset_id;
+	int clock_id, reset_id_0, reset_id_1;
 
 #if (BOARD == MDP_AIACC_HIL)
 	SwdtRequestClockOn();
 #endif
 
 #if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
-	clock_id = X5H_CLOCK_ID_MDLC_WDT0;
+	clock_id = SWDT_CLK_ID;
 	ret = R_StateManager_ClockOn(clock_id);
 	if (ret != 0U) {
-		printf("Error: Failed to turn clock ID %d ON.\r\n", clock_id);
-	}
-
-	reset_id = X5H_RESET_DOMAIN_ID_SWDT0;
-	ret = R_StateManager_Reset(reset_id);
-	if (ret != 0U) {
-		printf("Error: Failed to reset id %d.\r\n", reset_id);
-	}
-
-	reset_id = X5H_RESET_DOMAIN_ID_SWDT1;
-	ret = R_StateManager_Reset(reset_id);
-	if (ret != 0U) {
-		printf("Error: Failed to reset id %d ON.\r\n", reset_id);
+		(void)printf("Error: Failed to turn clock ID %d ON.\r\n", clock_id);
 	}
 #endif
+
+	reset_id_0 = SWDT0_RST_ID;
+	ret = R_StateManager_Reset(reset_id_0);
+	if (ret != 0U) {
+		(void)printf("Error: Failed to reset id %d ON.\r\n", reset_id_0);
+	}
+
+	reset_id_1 = SWDT1_RST_ID;
+	ret = R_StateManager_Reset(reset_id_1);
+	if (ret != 0U) {
+		(void)printf("Error: Failed to reset id %d ON.\r\n", reset_id_1);
+	}
 
 	/* for SWDT */
 	r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5U << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) & ~SWTCSRA_TME));
@@ -157,13 +122,13 @@ uint8_t R_SWDT_Ping(uint8_t ping_rate) {
 	return 0;
 }
 
-uint32_t R_SWDT_Start() {
+uint32_t R_SWDT_Start(void) {
 	r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5U << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) | SWTCSRA_TME));
 
 	return 0;
 }
 
-uint32_t R_SWDT_Stop() {
+uint32_t R_SWDT_Stop(void) {
 	r_swdt_wait_cycles(3);
 	r_swdt_write(SWDT_BASE + SWTCSRA, 0);
 
