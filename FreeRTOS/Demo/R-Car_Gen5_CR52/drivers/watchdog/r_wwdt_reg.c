@@ -11,9 +11,7 @@
 
 void r_wwdt_write(uintptr_t Addr, uint32_t val)
 {
-	*((volatile uint32_t *)Addr) = val;
-
-	return;
+    *((volatile uint32_t *)Addr) = val;
 }
 
 void r_wwdt_write8(uintptr_t Addr, uint8_t val)
@@ -36,7 +34,7 @@ extern uintptr_t R_WWDT_PRV_GetRegbase(wwdt_unit_t unit)
     uintptr_t ret = 0;
 
     if ((uint32_t)unit < WWDT_CH_NUM) {
-    	ret = wwdt_base_tbl[(uint32_t)unit];
+        ret = wwdt_base_tbl[(uint32_t)unit];
     } else {
         printf("[R_WWDT_PRV_GetRegbase] : Wrong WWDT Unit %d\r\n", unit);
     }
