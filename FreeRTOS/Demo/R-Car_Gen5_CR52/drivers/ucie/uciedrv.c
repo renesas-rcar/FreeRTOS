@@ -1170,6 +1170,56 @@ void Ucie_Setup_PCIE_Post(e_ucie_ch_t ch, e_ucie_mode_t mode)
     mem_write32(ucie_axi_base + 0x8BC, 0x040BFF4E);
 }
 
+void R_UCIE_Setup_EP_BAR(e_ucie_ch_t ch)
+{
+    uint32_t ucie_axi_base = UCIE_AXI_BASE(ch);
+    uint32_t rbar = ucie_axi_base + RBAR_CAP_BASE_ADD;
+    uint32_t dbi2 = ucie_axi_base + UCIE_DBI2_OFS;
+    uint32_t misc = ucie_axi_base + PF0_PORT_LOGIC_MISC_CONTROL_1_OFF_ADD;
+    uint32_t f1   = RCAR_UCIE_FN_OFS(1);
+    uint32_t i, ctrl;
+
+    mem_write32(misc, mem_read32(misc) | 0x1);
+
+    for (i = 0; i < 2; i++) {
+        uint32_t off = RBAR_CTRL_OFF(i);
+
+        ctrl = mem_read32(rbar + off);
+        mem_write32(rbar + off, (ctrl & ~RBAR_CTRL_SIZE_MSK) | RBAR_SIZE_1MB);
+
+        ctrl = mem_read32(rbar + off + f1);
+        mem_write32(rbar + off + f1, (ctrl & ~RBAR_CTRL_SIZE_MSK) | RBAR_SIZE_1MB);
+    }
+
+    for (i = 0; i < PCI_NUM_BARS; i++) {
+        uint32_t off = PCI_BAR_OFF(i);
+
+        mem_write32(dbi2 + off,              0x00000000);
+        mem_write32(ucie_axi_base + off,     0x00000000);
+        mem_write32(dbi2 + off + f1,         0x00000000);
+        mem_write32(ucie_axi_base + off + f1, 0x00000000);
+    }
+
+    mem_write32(dbi2 + PCI_BAR_OFF(PCI_TEST_REG_BAR),      PCI_BAR_MASK_1MB);
+    mem_write32(ucie_axi_base + PCI_BAR_OFF(PCI_TEST_REG_BAR), PCI_BAR_FLAGS_MEM32);
+    mem_write32(dbi2 + PCI_BAR_OFF(PCI_TEST_REG_BAR) + f1, PCI_BAR_MASK_1MB);
+    mem_write32(ucie_axi_base + PCI_BAR_OFF(PCI_TEST_REG_BAR) + f1, PCI_BAR_FLAGS_MEM32);
+
+    mem_write32(dbi2 + PCI_ROM_BAR_OFF,      0x00000000);
+    mem_write32(ucie_axi_base + PCI_ROM_BAR_OFF, 0x00000000);
+    mem_write32(dbi2 + PCI_ROM_BAR_OFF + f1, 0x00000000);
+    mem_write32(ucie_axi_base + PCI_ROM_BAR_OFF + f1, 0x00000000);
+
+    mem_write32(ucie_axi_base + PCICONF3_ADD,
+                mem_read32(ucie_axi_base + PCICONF3_ADD) & ~EP_MULTI_FUNC);
+
+    mem_write32(ucie_axi_base + PCI_CLASS_REVID_ADD,
+                (mem_read32(ucie_axi_base + PCI_CLASS_REVID_ADD) & PCI_REVID_MSK) |
+                PCI_CLASS_OTHERS);
+
+    mem_write32(misc, mem_read32(misc) & ~0x1u);
+}
+
 static void set_pll9_0(uint32_t f_Speed){
 
     // Parameter table for pll9 setting

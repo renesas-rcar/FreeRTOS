@@ -312,6 +312,8 @@ uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg);
  */
 uint32_t R_UCIE_IATU_UnsetRegion(st_ucie_iatu_cfg_t *cfg);
 
+void R_UCIE_Setup_EP_BAR(e_ucie_ch_t ch);
+
 #ifdef __cplusplus
 }
 #endif
