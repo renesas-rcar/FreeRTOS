@@ -35,7 +35,7 @@
 #define DIV_ROUND_UP(a, b) (((a) + (b) - 1U) / (b))
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define MUL_BY_CLKS_PER_SEC(cks, d) \
-			DIV_ROUND_UP((d) * OSCCLK, clk_divs[(cks)])
+            DIV_ROUND_UP((d) * OSCCLK, clk_divs[(cks)])
 
 #define SWDT_CLK_ID		X5H_CLOCK_ID_MDLC_WDT0
 #define SWDT0_RST_ID	X5H_RESET_DOMAIN_ID_SWDT0
