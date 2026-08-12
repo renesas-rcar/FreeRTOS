@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2025 Renesas Electronics Corporation
+ * Copyright (c) 2026 Renesas Electronics Corporation
  *
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-License-Identifier: MIT
  */
 
-/*
- * This is a sample demonstration application that showcases usage of rpmsg
- * This application is meant to run on the remote CPU running baremetal code.
- * This application echoes back data that was sent to it by the host core.
+/**
+ * @brief This sample is for demonstrate rpmsg communicate via ucie
+ *        between two CR core of chiplet. And this is for core run
+ *        with UCIe EP mode.
  */
 
 #include <stdio.h>
@@ -17,23 +17,26 @@
 #include <metal/alloc.h>
 #include <metal/version.h>
 #include "FreeRTOS.h"
+#include "task.h"
 #include "interrupts.h"
 #include "platform_info.h"
+#include "platform_info_common.h"
 #include "rsc_table.h"
 #include "pfc/r_pfc_api.h"
+#include "ucie/r_ucie.h"
+#include "board.h"
+
+#ifndef UCIE_CH
+#define UCIE_CH UCIE_CH0
+#endif
 
 #define RPMSG_SERVICE_NAME         "rpmsg-client-sample"
 #define SHUTDOWN_MSG    0xEF56A55A
 
-#define LPRINTF(format, ...) printf(format, ##__VA_ARGS__); vTaskDelay(10);
-//#define LPRINTF(format, ...)
-#define LPERROR(format, ...) LPRINTF("ERROR: " format, ##__VA_ARGS__)
-
 static struct rpmsg_endpoint lept;
 static int shutdown_req = 0;
-int is_print_result = 1;
 
-#define hello_msg "Hello world from CR52/Free-RTOS!"
+#define hello_msg "Hello world from EP CR52/Free-RTOS!"
 #define goodbye_msg "Good bye!"
 
 /*-----------------------------------------------------------------------------*
@@ -51,19 +54,12 @@ static int rpmsg_endpoint_cb(struct rpmsg_endpoint *ept, void *data, size_t len,
 
     /* On reception of a shutdown we signal the application to terminate */
     if ((*(unsigned int *)data) == SHUTDOWN_MSG) {
-        LPRINTF("shutdown message is received.\r\n");
+        printf("shutdown message is received.\r\n");
         shutdown_req = 1;
         return RPMSG_SUCCESS;
     }
 
-    if(is_print_result == 1)
-    {
-        LPRINTF("TC1 result: PASS\r\n");
-        LPRINTF("TC2: If the TC1 OK log is found on both Core 0 and Core 1, judge as OK. Otherwise, judge as NG.\r\n");
-        LPRINTF("<APP_END>\r\n");
-        is_print_result = 0;
-    }
-    LPRINTF("Incoming msg: %s\r\n", payload);
+    printf("Incoming msg: %s\r\n", payload);
 
     rpmsg_send(ept, hello_msg, strlen(hello_msg));
 
@@ -73,7 +69,7 @@ static int rpmsg_endpoint_cb(struct rpmsg_endpoint *ept, void *data, size_t len,
 static void rpmsg_service_unbind(struct rpmsg_endpoint *ept)
 {
     (void)ept;
-    LPRINTF("unexpected Remote endpoint destroy\r\n");
+    printf("unexpected Remote endpoint destroy\r\n");
     shutdown_req = 1;
 }
 
@@ -88,6 +84,10 @@ static void prvSetupHardware( void )
     Irq_Setup();
 
     (void)pfcInitModules(getModuleConfigs());
+
+#if (UCIE_CH != UCIE_CH0)
+    R_UCIE_Config(UCIE_CH, UCIE_MODE_EP, LINKSPEED_4GTPS, true);
+#endif
 }
 
 /*-----------------------------------------------------------------------------*
@@ -102,79 +102,78 @@ void echoTask( void *pvParameters )
     void *platform;
     struct rpmsg_device *rpdev;
 
-    LPRINTF("openamp lib version: %s (", openamp_version());
-    LPRINTF("Major: %d, ", openamp_version_major());
-    LPRINTF("Minor: %d, ", openamp_version_minor());
-    LPRINTF("Patch: %d)\r\n", openamp_version_patch());
+    void *rsc_table;
+    int len;
 
-    LPRINTF("libmetal lib version: %s (", metal_ver());
-    LPRINTF("Major: %d, ", metal_ver_major());
-    LPRINTF("Minor: %d, ", metal_ver_minor());
-    LPRINTF("Patch: %d)\r\n", metal_ver_patch());
+    printf("openamp lib version: %s (", openamp_version());
+    printf("Major: %d, ", openamp_version_major());
+    printf("Minor: %d, ", openamp_version_minor());
+    printf("Patch: %d)\r\n", openamp_version_patch());
 
-    LPRINTF("Starting application...\r\n");
+    printf("libmetal lib version: %s (", metal_ver());
+    printf("Major: %d, ", metal_ver_major());
+    printf("Minor: %d, ", metal_ver_minor());
+    printf("Patch: %d)\r\n", metal_ver_patch());
+
+    rsc_table = get_resource_table(0, &len);
+    uint32_t address_check = (uint32_t)rsc_table + 0x200;
+
+    /*----- Wait RC trigger create rproc -----*/
+    while (*((volatile uint32_t *)address_check) != 0x1234)
+    {
+        vTaskDelay(1);
+    }
 
     /* Initialize platform */
-    ret = platform_init(MFIS_CHAN, &platform);
+    ret = platform_init(NO_USING_MFIS, &platform);
     if (ret) {
-        LPERROR("Failed to initialize platform.\r\n");
-        ret = -1;
+        printf("Failed to initialize platform.\r\n");
+        goto err1;
     } else {
-        rpdev = platform_create_rpmsg_vdev(platform, 0,
-                           VIRTIO_DEV_DEVICE,
-                           NULL, NULL);
+        rpdev = platform_create_rpmsg_vdev(platform, 0, VIRTIO_DEV_DEVICE, NULL, NULL);
         if (!rpdev) {
-            LPERROR("Failed to create rpmsg virtio device.\r\n");
-            ret = -1;
+            printf("Failed to create rpmsg virtio device.\r\n");
+            goto err2;
         }
     }
 
     /* Initialize RPMSG framework */
-    LPRINTF("Try to create rpmsg endpoint.\r\n");
+    printf("Try to create rpmsg endpoint.\r\n");
 
     ret = rpmsg_create_ept(&lept, rpdev, RPMSG_SERVICE_NAME,
                    RPMSG_ADDR_ANY, RPMSG_ADDR_ANY,
                    rpmsg_endpoint_cb,
                    rpmsg_service_unbind);
     if (ret) {
-        LPERROR("Failed to create endpoint.\r\n");
-        goto task_end;
+        printf("Failed to create endpoint.\r\n");
+        goto err3;
     }
 
-    LPRINTF("Successfully created rpmsg endpoint.\r\n");
+    printf("Successfully created rpmsg endpoint.\r\n");
 
-    LPRINTF("RPMsg device TX buffer size: %#x\r\n", rpmsg_get_tx_buffer_size(&lept));
-    LPRINTF("RPMsg device RX buffer size: %#x\r\n", rpmsg_get_rx_buffer_size(&lept));
+    printf("RPMsg device TX buffer size: %#x\r\n", rpmsg_get_tx_buffer_size(&lept));
+    printf("RPMsg device RX buffer size: %#x\r\n", rpmsg_get_rx_buffer_size(&lept));
 
-    LPRINTF("TC1: Check data tranfer.\r\n");
-    int time_out_test = 10000;
     while(1) {
         platform_poll(platform);
         vTaskDelay(1);
-        time_out_test--;
-        if(time_out_test == 0)
-        {
-            if(is_print_result == 1)
-            {
-                LPRINTF("TC1 result: FAIL\r\n");
-            }     
-        }
         /* we got a shutdown request, exit */
         if (shutdown_req) {
             break;
         }
     }
 
-    LPRINTF("Stopping application...\r\n");
     rpmsg_destroy_ept(&lept);
+err3:
     platform_release_rpmsg_vdev(rpdev, platform);
+err2:
     platform_cleanup(platform);
-
-    goto task_end;
-task_end:
+err1:
+    printf("Stopping application...\r\n");
     while(1)
     {
-        vTaskDelay(10);
+        printf("Task loop\n");
+        vTaskDelay(1000);
     }
 }
 
@@ -187,7 +186,7 @@ int main(void)
     /* Configure the hardware ready to run the demo. */
     prvSetupHardware();
 
-    xTaskCreate( echoTask, "echoTask", configMINIMAL_STACK_SIZE*10, NULL, ( tskIDLE_PRIORITY + 1 ), NULL );
+    xTaskCreate( echoTask, "echoTask", configMINIMAL_STACK_SIZE*100, NULL, ( tskIDLE_PRIORITY + 1 ), NULL );
     /* Start the tasks and timer running. */
     vTaskStartScheduler();
     for( ;; )

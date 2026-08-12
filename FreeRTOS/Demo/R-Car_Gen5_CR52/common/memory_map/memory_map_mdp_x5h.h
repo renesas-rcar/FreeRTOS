@@ -1,11 +1,11 @@
 /*************************************************************************************************************
-* Copyright (c) 2025 Renesas Electronics Corporation
+* Copyright (c) 2026 Renesas Electronics Corporation
 *
 * SPDX-License-Identifier: MIT
  *************************************************************************************************************/
 
-#ifndef MEMORY_MAP_X5H_AI_ACC_H
-#define MEMORY_MAP_X5H_AI_ACC_H
+#ifndef MEMORY_MAP_MDP_X5H_H
+#define MEMORY_MAP_MDP_X5H_H
 
 #include <stdint.h>
 #include "rcar_utils.h"
@@ -34,7 +34,7 @@ typedef struct st_memory_region {
 #define OSAL_MEMORY_ADDRESS         0x6B800000
 #define OSAL_MEMORY_SIZE            0x1D600000  // to 0x88E0_0000
 
-#define LDR_MEMORY_ADDRESS          0x8E200000
+#define LDR_MEMORY_ADDRESS          0x8E200000 
 #define LDR_MEMORY_SIZE             0x00100000  // to 0x8E30_0000
 
 #define SHARE_CR_CA_ADDRESS         0x8E600000
@@ -59,4 +59,4 @@ static const st_memory_region_t RCAR_MEMMORY_ARR[] = {
     {.type = SHARE_MEM,     .mem_addr = {.base_address = (uint32_t) UCIE_SHARE_ADDRESS,  .size = (uint32_t) UCIE_SHARE_SIZE},     .attr = DEVICE_ATTR}
 };
 
-#endif // MEMORY_MAP_AI_ACC_H
+#endif // MEMORY_MAP_MDP_X5H_H

@@ -137,7 +137,12 @@ static int x5h_proc_notify(struct remoteproc *rproc, uint32_t id)
         mfis_trigger_interrupt(mfis, (uint16_t)(id & 0x7FFF));
     }
     else {
-        *((volatile uint32_t*)rproc_rx_addr) = (id << 1) | 0x01;
+        if (rproc_priv->type == VIRTIO_DEV_DEVICE) {
+            *((volatile uint32_t*)rproc_rx_addr) = (id << 1) | 0x01;
+        }
+        else if (rproc_priv->type == VIRTIO_DEV_DRIVER) {
+            *((volatile uint32_t*)rproc_tx_addr) = (id << 1) | 0x01;
+        }
     }
     return 0;
 }

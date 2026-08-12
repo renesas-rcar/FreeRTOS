@@ -37,6 +37,8 @@ extern char __resource_table_end;
 #define RING_RX FW_RSC_U32_ADDR_ANY
 #endif /* RING_RX */
 #define VRING_SIZE 256
+#define VRING_OFFSET 0x1000
+#define VRING_BUF_SIZE  0x4000
 
 #define NUM_TABLE_ENTRIES 1
 
@@ -131,4 +133,11 @@ void *get_resource_table(int rsc_id, int *len)
     *len = (uintptr_t)&__resource_table_end - (uintptr_t)&__resource_table_start;
 
     return (void *)&__resource_table_start;
+}
+
+void update_vring_address(uintptr_t addr)
+{
+    struct remote_resource_table *rcs_tbl = (struct remote_resource_table*)addr;
+    rcs_tbl->rpmsg_vring0.da = addr + VRING_OFFSET;
+    rcs_tbl->rpmsg_vring1.da = addr + VRING_OFFSET + VRING_BUF_SIZE;
 }

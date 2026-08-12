@@ -18,6 +18,7 @@
 /* Define shared DRAM area for each channel. */
 #define SHARED_CH_RAM_BASE (0x40000000UL)
 #define SHARED_CH_RAM_SIZE (0x80000000UL)
+#define VDEV_SHBUF_OFFSET     (0x10000)
 
 /* Remote processor operations from r52 to a720. It defines
  * notification operation and remote processor managementi operations. */
@@ -131,9 +132,17 @@ platform_create_rpmsg_vdev(void *platform, unsigned int vdev_index,
     struct rpmsg_virtio_device *rpmsg_vdev;
     struct virtio_device *vdev;
     void *shbuf;
+    struct rpmsg_virtio_shm_pool *shpool = NULL;
     struct metal_io_region *shbuf_io;
     struct mfis_channel* mfis_ch = (struct mfis_channel*)(rproc->priv);
+    struct remoteproc_priv *priv = rproc->priv;
+    priv->type = role;
     int ret;
+
+    if (role == VIRTIO_DEV_DRIVER)
+    {
+        update_vring_address(priv->shm_addr);
+    }
 
     rpmsg_vdev = metal_allocate_memory(sizeof(*rpmsg_vdev));
     if (!rpmsg_vdev)
@@ -145,7 +154,7 @@ platform_create_rpmsg_vdev(void *platform, unsigned int vdev_index,
         goto err1;
     }
     shbuf = metal_io_phys_to_virt(shbuf_io,
-                      SHARED_CH_RAM_BASE); // Shared buff offset = 0
+                      priv->shm_addr + VDEV_SHBUF_OFFSET); // Shared buff offset = 0
 
     LPRINTF("creating remoteproc virtio\r\n");
     /* TODO: can we have a wrapper for the following two functions? */
@@ -157,14 +166,16 @@ platform_create_rpmsg_vdev(void *platform, unsigned int vdev_index,
 
     // printf("initializing rpmsg shared buffer pool\r\n");
     /* Only RPMsg virtio driver needs to initialize the shared buffers pool */
-    // rpmsg_virtio_init_shm_pool(&shpool, shbuf,
-    //                (SHARED_CH_RAM_SIZE - 0));
+    if (role == VIRTIO_DEV_DRIVER) {
+        shpool = metal_allocate_memory(sizeof(struct rpmsg_virtio_shm_pool));
+        rpmsg_virtio_init_shm_pool(shpool, shbuf, SHARED_CH_RAM_SIZE - VDEV_SHBUF_OFFSET);
+    }
 
     LPRINTF("initializing rpmsg vdev\r\n");
     /* RPMsg virtio device can set shared buffers pool argument to NULL */
     ret =  rpmsg_init_vdev(rpmsg_vdev, vdev, ns_bind_cb,
                    shbuf_io,
-                   NULL);
+                   shpool);
     if (ret) {
         LPRINTF("failed rpmsg_init_vdev\r\n");
         goto err2;
@@ -204,9 +215,18 @@ int platform_poll(void *platform)
     }
     else
     {
-        if ((*((volatile uint32_t*)rproc_tx_addr) & 0x1) == 0x1) {
+        if ((*((volatile uint32_t*)rproc_tx_addr) & 0x1) == 0x1 &&
+                rproc_priv->type == VIRTIO_DEV_DEVICE)
+        {
             remoteproc_get_notification(rproc, RSC_NOTIFY_ID_ANY);
             *(volatile uint32_t*)rproc_tx_addr = 0x0;
+            ret = 0;
+        }
+        else if ((*((volatile uint32_t*)rproc_rx_addr) & 0x1) == 0x1 &&
+                rproc_priv->type == VIRTIO_DEV_DRIVER)
+        {
+            remoteproc_get_notification(rproc, RSC_NOTIFY_ID_ANY);
+            *(volatile uint32_t*)rproc_rx_addr = 0x0;
             ret = 0;
         }
     }

@@ -32,6 +32,7 @@ extern "C" {
 struct remoteproc_priv {
     uint32_t shm_addr;                  /* Share mem address of 2 proc */
     struct mfis_channel *p_mfis;        /* MFIS trigger channel of 2 proc */
+    uint32_t type;                      /* VirtIO dev type */
 };
 
 #if defined __cplusplus

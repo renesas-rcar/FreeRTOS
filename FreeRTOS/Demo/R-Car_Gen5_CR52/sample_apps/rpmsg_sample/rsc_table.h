@@ -39,6 +39,7 @@ struct remote_resource_table {
 
 void init_resource_table(void);
 void *get_resource_table (int rsc_id, int *len);
+void update_vring_address(uintptr_t addr);
 
 #if defined __cplusplus
 }
