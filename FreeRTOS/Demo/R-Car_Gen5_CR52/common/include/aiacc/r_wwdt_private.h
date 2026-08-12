@@ -18,9 +18,9 @@
 
 static const uintptr_t wwdt_base_tbl[] =
 {
-	R_WWDT0_BASE,
-	R_WWDT1_BASE,
-	R_WWDT2_BASE
+    R_WWDT0_BASE,
+    R_WWDT1_BASE,
+    R_WWDT2_BASE
 };
 
 #define WWDT_CH_NUM    ((uint32_t)(sizeof(wwdt_base_tbl) / sizeof(wwdt_base_tbl[0])))
@@ -29,15 +29,15 @@ static const uintptr_t wwdt_base_tbl[] =
 
 typedef struct
 {
-	int clock_id_0;
-	int clock_id_1;
+    int clock_id_0;
+    int clock_id_1;
 } wwdt_clock_t;
 
 static const wwdt_clock_t wwdt_clock_tbl[] =
 {
-	{ AIACC_CLOCK_ID_WWDT00,  AIACC_CLOCK_ID_WWDT01  },
-	{ AIACC_CLOCK_ID_WWDT10,  AIACC_CLOCK_ID_WWDT11  },
-	{ AIACC_CLOCK_ID_WWDT20,  AIACC_CLOCK_ID_WWDT21  },
+    { AIACC_CLOCK_ID_WWDT00,  AIACC_CLOCK_ID_WWDT01  },
+    { AIACC_CLOCK_ID_WWDT10,  AIACC_CLOCK_ID_WWDT11  },
+    { AIACC_CLOCK_ID_WWDT20,  AIACC_CLOCK_ID_WWDT21  },
 };
 
 #define WDTA0WDTE       0
