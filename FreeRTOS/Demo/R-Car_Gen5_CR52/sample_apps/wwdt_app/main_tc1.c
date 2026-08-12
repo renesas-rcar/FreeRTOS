@@ -48,7 +48,7 @@
 
 #define main_WWDT_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 #define printf_delay(fmt, ...)      \
-	vTaskDelay(1);		    \
+    vTaskDelay(1);		    \
 printf(fmt, ##__VA_ARGS__);         \
 /*-----------------------------------------------------------*/
 
@@ -63,66 +63,66 @@ static void prvWWDTTask( void *pvParameters );
 
 int main( void )
 {
-	/* Configure the hardware ready to run the demo. */
-	prvSetupHardware();
+    /* Configure the hardware ready to run the demo. */
+    prvSetupHardware();
 
 
-	xTaskCreate( prvWWDTTask, "prvWWDTTask", configMINIMAL_STACK_SIZE, NULL, main_WWDT_TASK_PRIORITY, NULL);
-	/* Start the tasks and timer running. */
-	vTaskStartScheduler();
-	for( ;; )
-	{
-	}
-	/* Don't expect to reach here. */
-	return 0;
+    xTaskCreate( prvWWDTTask, "prvWWDTTask", configMINIMAL_STACK_SIZE, NULL, main_WWDT_TASK_PRIORITY, NULL);
+    /* Start the tasks and timer running. */
+    vTaskStartScheduler();
+    for( ;; )
+    {
+    }
+    /* Don't expect to reach here. */
+    return 0;
 }
 /*-----------------------------------------------------------*/
 
 static void prvSetupHardware( void )
 {
-	/* Ensure no interrupts execute while the scheduler is in an inconsistent
-	state.  Interrupts are automatically enabled when the scheduler is
-	started. */
-	portDISABLE_INTERRUPTS();
+    /* Ensure no interrupts execute while the scheduler is in an inconsistent
+    state.  Interrupts are automatically enabled when the scheduler is
+    started. */
+    portDISABLE_INTERRUPTS();
 
-	Irq_Setup();
-	(void)pfcInitModules(getModuleConfigs());
+    Irq_Setup();
+    (void)pfcInitModules(getModuleConfigs());
 }
 
 static void prvWWDTTask( void *pvParameters )
 {
-	/* Remove compiler warning about unused parameter. */
-	( void ) pvParameters;
-	uint32_t err;
+    /* Remove compiler warning about unused parameter. */
+    ( void ) pvParameters;
+    uint32_t err;
 
 #if (BOARD == MDP_X5H_HIL) || (BOARD == MDP_AIACC_HIL)
-	vTaskDelay(6000);
+    vTaskDelay(6000);
 #endif
 
-	/* Device driver part */
-	printf("---------- PROGRAM START ----------- \r\n");
+    /* Device driver part */
+    printf("---------- PROGRAM START ----------- \r\n");
 
-	printf("=== Test Case 1: %s, 68ms, 100% window OPEN ===\r\n", XSTR(WWDT_UNIT));
-	R_WWDT_Init(WWDT_UNIT, WINDOW_100P, 68, false, ERM_RESET_MODE);
-	printf("R_WWDT_Init: done\r\n");
-	/* Start the watchdog by calling r_wwdt_fefresh. */
-	err = R_WWDT_Refresh(WWDT_UNIT);
+    printf("=== Test Case 1: %s, 68ms, 100% window OPEN ===\r\n", XSTR(WWDT_UNIT));
+    R_WWDT_Init(WWDT_UNIT, WINDOW_100P, 68, false, ERM_RESET_MODE);
+    printf("R_WWDT_Init: done\r\n");
+    /* Start the watchdog by calling r_wwdt_fefresh. */
+    err = R_WWDT_Refresh(WWDT_UNIT);
 
-	for (int i = 0; i < 1000; i++)
-	{
-		/* Application work here. */
-		vTaskDelay(10); //need to remove this line in actual situation
+    for (int i = 0; i < 1000; i++)
+    {
+        /* Application work here. */
+        vTaskDelay(10); //need to remove this line in actual situation
 
-		/* Refresh before the counter underflows to prevent reset or NMI. */
-		err = R_WWDT_Refresh(WWDT_UNIT);
-		if (err != 0) break;
-		printf(".");
-	}
+        /* Refresh before the counter underflows to prevent reset or NMI. */
+        err = R_WWDT_Refresh(WWDT_UNIT);
+        if (err != 0) break;
+        printf(".");
+    }
 
     printf("<APP_END>\n");
-	for( ;; )
-	{
-	}
+    for( ;; )
+    {
+    }
 }
 
 /*-----------------------------------------------------------*/
