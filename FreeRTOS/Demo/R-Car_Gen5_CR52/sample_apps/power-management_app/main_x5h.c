@@ -295,10 +295,24 @@ static int pmResetTest(int domain_id)
     ret = R_StateManager_ResetAssert(domain_id);
     if (ret) {
         PM_LOG("Error: Failed to assert domain id %d.\r\n",
-                domain_id);
+            domain_id);
         return ret;
     }
     PM_LOG("Assert domain id %d OK!", domain_id);
+
+    /* Get Reset status domain */
+    PM_LOG("**********TC%d %d-4-2: Get Reset status domain id %d.**********\r\n",
+            tc_number, domain_id, domain_id);
+    ret = R_StateManager_Reset_Status_Get(domain_id, &reset_status);
+    if (ret) {
+        PM_LOG("Error: Failed to get status of reset domain id %d.\r\n",
+            domain_id);
+    return ret;
+    }
+    if (RESET_DOMAIN_ASSERTED != reset_status){
+        PM_LOG("Error: Reset status is not asserted.\r\n");
+        return ret;
+    }
 
     /* Deassert domain */
     PM_LOG("**********TC%d %d-2: Deassert domain id %d.**********\r\n",
@@ -306,10 +320,24 @@ static int pmResetTest(int domain_id)
     ret = R_StateManager_ResetDeassert(domain_id);
     if (ret) {
         PM_LOG("Error: Failed to deassert domain id %d.\r\n",
-                domain_id);
+            domain_id);
         return ret;
     }
     PM_LOG("Deassert domain id %d OK!", domain_id);
+
+    /* Get Reset status domain */
+    PM_LOG("**********TC%d %d-4-2: Get Reset status domain id %d.**********\r\n",
+            tc_number, domain_id, domain_id);
+    ret = R_StateManager_Reset_Status_Get(domain_id, &reset_status);
+    if (ret) {
+        PM_LOG("Error: Failed to get status of reset domain id %d.\r\n",
+            domain_id);
+        return ret;
+    }
+    if (RESET_DOMAIN_RELEASED != reset_status){
+        PM_LOG("Error: Reset status is not released.\r\n");
+        return ret;
+    }
 
     /* Reset domain */
     PM_LOG("**********TC%d %d-3: Reset domain id %d.**********\r\n",
@@ -317,128 +345,23 @@ static int pmResetTest(int domain_id)
     ret = R_StateManager_Reset(domain_id);
     if (ret) {
         PM_LOG("Error: Failed to reset domain id %d.\r\n",
-                domain_id);
+            domain_id);
         return ret;
     }
     PM_LOG("Reset domain id %d OK!", domain_id);
 
     /* Get Reset status domain */
-    PM_LOG("**********TC%d %d-4-1: Get Reset status domain id %d when PowerOff.**********\r\n",
+    PM_LOG("**********TC%d %d-4-2: Get Reset status domain id %d.**********\r\n",
             tc_number, domain_id, domain_id);
-    ret = R_StateManager_PowerOff(domain_id);
-    if (ret) {
-        PM_LOG("Error: Failed to PowerOff domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
     ret = R_StateManager_Reset_Status_Get(domain_id, &reset_status);
     if (ret) {
         PM_LOG("Error: Failed to get status of reset domain id %d.\r\n",
-                domain_id);
+            domain_id);
         return ret;
     }
-    if (reset_status == RESET_DOMAIN_ASSERTED) {
-        PM_LOG("Get Reset status of domain id %d, RESET_DOMAIN_ASSERTED: PASS\r\n", domain_id);
-    } else {
-        PM_LOG("Get Reset status of domain id %d, RESET_DOMAIN_RELEASED: PASS\r\n", domain_id);
-    }
-
-    PM_LOG("**********TC%d %d-4-2: Get Reset status domain id %d when PowerOn.**********\r\n",
-            tc_number, domain_id, domain_id);
-    ret = R_StateManager_PowerOn(domain_id);
-    if (ret) {
-        PM_LOG("Error: Failed to PowerOn domain id %d.\r\n",
-                domain_id);
+    if (RESET_DOMAIN_RELEASED != reset_status){
+        PM_LOG("Error: Reset status is not released.\r\n");
         return ret;
-    }
-    ret = R_StateManager_Reset_Status_Get(domain_id, &reset_status);
-    if (ret) {
-        PM_LOG("Error: Failed to get status of reset domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
-    if (reset_status == RESET_DOMAIN_ASSERTED) {
-        PM_LOG("Get Reset status of domain id %d, RESET_DOMAIN_ASSERTED: PASS\r\n", domain_id);
-    } else {
-        PM_LOG("Get Reset status of domain id %d, RESET_DOMAIN_RELEASED: PASS\r\n", domain_id);
-    }
-
-    PM_LOG("**********TC%d %d-4-3: Get Reset status domain id %d when PowerOn, and asserted reset.**********\r\n",
-            tc_number, domain_id, domain_id);
-    ret = R_StateManager_PowerOn(domain_id);
-    if (ret) {
-        PM_LOG("Error: Failed to PowerOn domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
-    ret = R_StateManager_ResetAssert(domain_id);
-    if (ret) {
-        PM_LOG("Error: Failed to assert reset domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
-    ret = R_StateManager_Reset_Status_Get(domain_id, &reset_status);
-    if (ret) {
-        PM_LOG("Error: Failed to get status of reset domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
-    if (reset_status == RESET_DOMAIN_ASSERTED) {
-        PM_LOG("Get Reset status of domain id %d, RESET_DOMAIN_ASSERTED: PASS\r\n", domain_id);
-    } else {
-        PM_LOG("Get Reset status of domain id %d, RESET_DOMAIN_RELEASED: PASS\r\n", domain_id);
-    }
-
-    PM_LOG("**********TC%d %d-4-4: Get Reset status domain id %d when PowerOn, and deasserted reset.**********\r\n",
-            tc_number, domain_id, domain_id);
-    ret = R_StateManager_PowerOn(domain_id);
-    if (ret) {
-        PM_LOG("Error: Failed to PowerOn domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
-    ret = R_StateManager_ResetDeassert(domain_id);
-    if (ret) {
-        PM_LOG("Error: Failed to deassert reset domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
-    ret = R_StateManager_Reset_Status_Get(domain_id, &reset_status);
-    if (ret) {
-        PM_LOG("Error: Failed to get status of reset domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
-    if (reset_status == RESET_DOMAIN_ASSERTED) {
-        PM_LOG("Get Reset status of domain id %d, RESET_DOMAIN_ASSERTED: PASS\r\n", domain_id);
-    } else {
-        PM_LOG("Get Reset status of domain id %d, RESET_DOMAIN_RELEASED: PASS\r\n", domain_id);
-    }
-
-        PM_LOG("**********TC%d %d-4-5: Get Reset status domain id %d when PowerOn, and reset.**********\r\n",
-            tc_number, domain_id, domain_id);
-    ret = R_StateManager_PowerOn(domain_id);
-    if (ret) {
-        PM_LOG("Error: Failed to PowerOn domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
-    ret = R_StateManager_Reset(domain_id);
-    if (ret) {
-        PM_LOG("Error: Failed to reset domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
-    ret = R_StateManager_Reset_Status_Get(domain_id, &reset_status);
-    if (ret) {
-        PM_LOG("Error: Failed to get status of reset domain id %d.\r\n",
-                domain_id);
-        return ret;
-    }
-    if (reset_status == RESET_DOMAIN_ASSERTED) {
-        PM_LOG("Get Reset status of domain id %d, RESET_DOMAIN_ASSERTED: PASS\r\n", domain_id);
-    } else {
-        PM_LOG("Get Reset status of domain id %d, RESET_DOMAIN_RELEASED: PASS\r\n", domain_id);
     }
 
     return 0;
