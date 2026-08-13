@@ -33,21 +33,51 @@ if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "
     if(BOARD STREQUAL "x5h_vdk")
         set(BOARD_ID 1)
         set(PLATFORM_DEVICE "x5h")
+        set(RPMSG_BIN_NAME
+            rpmsg_mfis0_cluster0_core0
+            rpmsg_mfis1_cluster0_core1
+        )
     elseif(BOARD STREQUAL "x5h_ironhide")
         set(BOARD_ID 3)
         set(PLATFORM_DEVICE "x5h")
+        set(RPMSG_BIN_NAME
+            rpmsg_mfis0_cluster0_core0
+            rpmsg_mfis1_cluster0_core1
+            rpmsg_perf_mfis0_cluster0_core0
+            rpmsg_perf_mfis1_cluster0_core1
+        )
     elseif(BOARD STREQUAL "x5h_rfs2")
         set(BOARD_ID 4)
         set(PLATFORM_DEVICE "x5h")
+        set(RPMSG_BIN_NAME
+            rpmsg_mfis0_cluster0_core0
+            rpmsg_mfis1_cluster0_core1
+            rpmsg_perf_mfis0_cluster0_core0
+            rpmsg_perf_mfis1_cluster0_core1
+        )
     elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
         set(BOARD_ID 2)
         set(PLATFORM_DEVICE "aiacc")
+        set(RPMSG_BIN_NAME
+            rpmsg_mfis0_cluster0_core0
+            rpmsg_mfis1_cluster0_core1
+        )
     elseif(BOARD STREQUAL "mdp_aiacc_hil")
         set(BOARD_ID 5)
         set(PLATFORM_DEVICE "aiacc")
+        set(RPMSG_BIN_NAME
+            rpmsg_mfis0_cluster0_core0
+            rpmsg_mfis1_cluster0_core1
+        )
     elseif(BOARD STREQUAL "mdp_x5h_hil")
         set(BOARD_ID 6)
         set(PLATFORM_DEVICE "mdp_x5h")
+        set(RPMSG_BIN_NAME
+            rpmsg_mfis0_cluster0_core0
+            rpmsg_mfis1_cluster0_core1
+            rpmsg_perf_mfis0_cluster0_core0
+            rpmsg_perf_mfis1_cluster0_core1
+        )
     else()
         message(FATAL_ERROR "Invalid BOARD: ${BOARD}.")
     endif()
@@ -390,24 +420,37 @@ install(
     FILES_MATCHING PATTERN "*.ld"
 )
 
-if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2")
-    install(
-        DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/
-        DESTINATION bins
-        FILES_MATCHING
-            PATTERN "*.elf"
-            PATTERN "*.map"
-        PATTERN "CMakeFiles" EXCLUDE
-    )
-else()
-    install(
-        DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/
-        DESTINATION bins
-        FILES_MATCHING
-            PATTERN "*.srec"
-            PATTERN "*.map"
-        PATTERN "CMakeFiles" EXCLUDE
-    )
+# Install sample app bins
+install(
+    DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/
+    DESTINATION bins
+    FILES_MATCHING
+        PATTERN "*.${BIN_TYPE}"
+        PATTERN "*.map"
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "rpmsg_sample" EXCLUDE
+)
+
+# Install RPMsg bins
+if(ENABLE_OPENAMP)
+    foreach(bin IN LISTS RPMSG_BIN_NAME)
+        install(
+            DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/rpmsg_sample/
+            DESTINATION bins/rpmsg_sample/
+            FILES_MATCHING
+                PATTERN "${bin}.elf"
+            PATTERN "CMakeFiles" EXCLUDE
+        )
+        if(BOARD STREQUAL x5h_ironhide OR BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_x5h_hil")
+            install(
+                DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/rpmsg_sample/
+                DESTINATION bins/rpmsg_sample/
+                FILES_MATCHING
+                    PATTERN "${bin}.srec"
+                PATTERN "CMakeFiles" EXCLUDE
+            )
+        endif()
+    endforeach()
 endif()
 
 ################ Function to convert output file to .srec #############################
