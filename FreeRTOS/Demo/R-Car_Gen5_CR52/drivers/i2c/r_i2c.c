@@ -87,9 +87,8 @@ int R_I2C_Open(i2c_master_ctrl_t * const p_ctrl, i2c_master_cfg_t const * const 
     /* For DMA only */
     p_instance_ctrl->p_dmac_handle_irq = NULL;
 
-    RCar_I2C_Init(p_instance_ctrl);
-
-    return 0;
+    int ret = RCar_I2C_Init(p_instance_ctrl);
+    return ret;
 }
 
 int R_I2C_Close(i2c_master_ctrl_t * const p_ctrl) 
@@ -180,7 +179,6 @@ int R_I2C_CallbackSet(i2c_master_ctrl_t * const          p_ctrl,
                     void const * const          p_context,
                     i2c_master_callback_args_t * const p_callback_memory) 
 {
-
     i2c_instance_ctrl_t * p_instance_ctrl = (i2c_instance_ctrl_t *) p_ctrl;
     p_instance_ctrl->p_callback        = p_callback;
     p_instance_ctrl->p_context         = p_context;
@@ -189,9 +187,10 @@ int R_I2C_CallbackSet(i2c_master_ctrl_t * const          p_ctrl,
     /* Only enable interrupt if using DMA */
     if (p_instance_ctrl->p_cfg->dma_single == true) 
     {
-        R_I2C_SetInterruptCallback(p_instance_ctrl->p_cfg->channel, r_i2c_isr_handler, (void *)p_context);
+        return R_I2C_SetInterruptCallback(p_instance_ctrl->p_cfg->channel, r_i2c_isr_handler, (void *)p_context);
     }
-    return 0;
+
+    return -1;
 }
 
 int R_I2C_StatusGet(i2c_master_ctrl_t * const p_ctrl, i2c_master_status_t * p_status) 
@@ -260,7 +259,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
 #endif
         default:
             printf("[R_I2C_PRV_GetClockId] : Wrong I2C Unit %d\r\n", Unit);
-            break;
+            return -1;
     }
 
     ret = R_StateManager_ClockOn(clock_id);
@@ -276,12 +275,10 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
             /* Set Clock Control register */
             R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR, 0x1e);
             break;
-
         case 400000:
 	    /* Set Clock Control register */
 	    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR, 0xae);
             break;
-
         case 1000000:
 	    /* Set SCL Mask Control regiters (Variable Duty ratio only) */
 	    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMPR, 0x13);
@@ -295,10 +292,9 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
 	    /* Set Clock Control register 2 */
 	    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR2, 0x87);
             break;
-
         default:
             printf("Invalid I2C ClockRate\n");
-            break;
+            return -1;
     }
 
     /* Set First Bit Setup Cycle register (1st bit setup cycle = 17*Tcyc) */
@@ -378,8 +374,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
          * condition after the byte has been received */
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x8A);
 
-        /* Clear ICMSR_MAT and ICMSR_MDR bits to resume transfer of
-         * data */
+        /* Clear ICMSR_MAT and ICMSR_MDR bits to resume transfer of data */
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & (uint32_t)0x7f;
         val &= (uint32_t)~(R_I2C_MAT_BIT | R_I2C_MDR_BIT);
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
