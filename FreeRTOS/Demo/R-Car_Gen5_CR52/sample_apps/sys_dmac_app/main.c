@@ -38,6 +38,7 @@
 #include "pfc/r_pfc_api.h"
 #include "device_tree.h"
 #include "rcar_utils.h"
+#include "board.h"
 
 #include "stdio.h"
 #include "stdbool.h"
@@ -399,6 +400,12 @@ static void prvSYSDMACTask( void *pvParameters )
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
     int ret;
+
+    #if (BOARD == MDP_X5H_HIL)
+    {
+        vTaskDelay(3000);
+    }
+    #endif
 
     Context_t usr_context =
     {
