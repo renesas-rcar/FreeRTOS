@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include "watchdog/r_swdt_api.h"
 #include "state-manager/r_state_manager.h"
-#include "r_swdt_private.h"
+#include "r_swdt_reg.h"
 #include "board.h"
 
 #if (BOARD == MDP_AIACC_HIL)

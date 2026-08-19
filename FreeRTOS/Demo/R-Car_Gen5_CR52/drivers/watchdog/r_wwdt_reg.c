@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "r_wwdt_private.h"
+#include "r_wwdt_reg.h"
 
 void r_wwdt_write(uintptr_t Addr, uint32_t val)
 {

@@ -1,0 +1,54 @@
+/*
+ *
+ * Copyright (c) 2025 Renesas Electronics Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ */
+
+#ifndef R_ERROR_ID_H
+#define R_ERROR_ID_H
+
+/**
+ * @defgroup Error_Domain_ID Error Domain ID
+ * @{
+ * @brief This module provides typedef of Error Domain ID.
+ *
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief AIACC Error Domain ID.
+ */
+typedef enum {
+    DBSC5_DSBS0_DFI_DOMAIN_NORMAL_ECM_ERROR = 0,
+    DBSC5_DSBS0_AXI_DOMAIN_NORMAL_ECM_ERROR,
+    DBSC5_DSBS1_DFI_DOMAIN_NORMAL_ECM_ERROR,
+    DBSC5_DSBS1_AXI_DOMAIN_NORMAL_ECM_ERROR,
+    DBSC5_DSBS2_DFI_DOMAIN_NORMAL_ECM_ERROR,
+    DBSC5_DSBS2_AXI_DOMAIN_NORMAL_ECM_ERROR,
+    DBSC5_DSBS3_DFI_DOMAIN_NORMAL_ECM_ERROR,
+    DBSC5_DSBS3_AXI_DOMAIN_NORMAL_ECM_ERROR,
+    DBSC5_DSBS4_DFI_DOMAIN_NORMAL_ECM_ERROR,
+    DBSC5_DSBS4_AXI_DOMAIN_NORMAL_ECM_ERROR,
+    DBSC5_DSBS5_DFI_DOMAIN_NORMAL_ECM_ERROR,
+    DBSC5_DSBS5_AXI_DOMAIN_NORMAL_ECM_ERROR,
+    INTERNAL_BUS_FUSA_ERROR = 29,
+    WWDT1_DETECTS_ERROR_RES_IS_OUTPUT = 56,
+    WWDT0_DETECTS_ERROR_RES_IS_OUTPUT = 57,
+    WWDT0_DETECTS_ERROR_NMI_IS_OUTPUT = 200,
+    WWDT1_DETECTS_ERROR_NMI_IS_OUTPUT = 201,
+    WWDT2_DETECTS_ERROR_NMI_IS_OUTPUT = 726,
+    WWDT2_DETECTS_ERROR_RES_IS_OUTPUT = 733,
+} e_ecm_error_id_t;
+
+#ifdef __cplusplus
+}
+#endif
+
+/** @} */ // end
+
+#endif /* R_ERROR_ID_H */

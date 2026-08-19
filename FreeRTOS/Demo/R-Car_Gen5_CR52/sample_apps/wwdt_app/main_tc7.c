@@ -1,7 +1,5 @@
 /*
- * FreeRTOS Kernel V11.1.0
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
- * Copyright (c) 2025 Renesas Electronics Corporation
+ * Copyright (c) 2026 Renesas Electronics Corporation
  *
  * SPDX-License-Identifier: MIT
  *
@@ -55,6 +53,9 @@
 #define WWDT_ECM_NMI_OUTPUT   WWDT2_DETECTS_ERROR_NMI_IS_OUTPUT
 #endif
 
+#define STR(x) #x
+#define XSTR(x) STR(x)
+
 #define main_ECM_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 
 #define BUSECMSAFINTENCMN00                 (uint32_t)(0xCA4506C0U)
@@ -64,7 +65,7 @@
 #define BUSECMSAFINTENSCP00                 (uint32_t)(0xC12906C0U)
 #define BUSECMSAFINTENTOP00                 (uint32_t)(0xC68106C0U)
 #define printf_delay(fmt, ...)      \
-	vTaskDelay(1);		    \
+    vTaskDelay(1);		    \
 printf(fmt, ##__VA_ARGS__);         \
 
 /*-----------------------------------------------------------*/
@@ -93,34 +94,38 @@ int main( void )
     for( ;; )
     {
     }
-	/* Don't expect to reach here. */
-	return 0;
+    /* Don't expect to reach here. */
+    return 0;
 }
 /*-----------------------------------------------------------*/
 
 static void prvSetupHardware( void )
 {
-	/* Ensure no interrupts execute while the scheduler is in an inconsistent
-	state.  Interrupts are automatically enabled when the scheduler is
-	started. */
-	portDISABLE_INTERRUPTS();
+    /* Ensure no interrupts execute while the scheduler is in an inconsistent
+    state.  Interrupts are automatically enabled when the scheduler is
+    started. */
+    portDISABLE_INTERRUPTS();
 
     R_SERIAL_PortInit(UART_ID);
 
-	Irq_Setup();
+    Irq_Setup();
 
     (void)pfcInitModules(getModuleConfigs());
 }
 
 static void prvEcmTask( void *pvParameters )
 {
-	/* Remove compiler warning about unused parameter. */
-	( void ) pvParameters;
-	uint32_t err;
+    /* Remove compiler warning about unused parameter. */
+    ( void ) pvParameters;
+    uint32_t err;
     uint8_t ret;
 
-    printf("---------- ECM TEST START ----------- \r\n");
-    printf("TC1: R_ECM_DisableAll\n");
+#if (BOARD == MDP_X5H_HIL) || (BOARD == MDP_AIACC_HIL)
+    vTaskDelay(6000);
+#endif
+
+    printf("---------- ECM SETTING START ----------- \r\n");
+    printf("R_ECM_DisableAll\n");
     ret = R_ECM_DisableAll();
     if (ret)
     {
@@ -128,10 +133,10 @@ static void prvEcmTask( void *pvParameters )
     }
     else
     {
-        printf("Result: Passed\n");
+        printf("Result: OK\n");
     }
     
-    printf("TC2: R_ECM_SetInterruptCallback\n");
+    printf("R_ECM_SetInterruptCallback\n");
     ret = R_ECM_SetInterruptCallback(IrqErrorHandler);
     if (ret)
     {
@@ -139,10 +144,10 @@ static void prvEcmTask( void *pvParameters )
     }
     else
     {
-        printf("Result: Passed\n");
+        printf("Result: OK\n");
     }
 
-    printf("TC3: R_ECM_SetDetection\n");
+    printf("R_ECM_SetDetection\n");
     R_ECM_SetDetection(WWDT_ECM_NMI_OUTPUT, 1);
     if (ret)
     {
@@ -150,10 +155,10 @@ static void prvEcmTask( void *pvParameters )
     }
     else
     {
-        printf("Result: Passed\n");
+        printf("Result: OK\n");
     }
 
-    printf("TC4: R_ECM_SetInterruptNotification\n");
+    printf("R_ECM_SetInterruptNotification\n");
     R_ECM_SetInterruptNotification(WWDT_ECM_NMI_OUTPUT, 1);
     if (ret)
     {
@@ -161,13 +166,17 @@ static void prvEcmTask( void *pvParameters )
     }
     else
     {
-        printf("Result: Passed\n");
+        printf("Result: OK\n");
     }
 
-    printf("TC5: Irq Error Handler\n");
-	/* Device driver part */
-	R_WWDT_Init(WWDT_UNIT, WINDOW_100P, 68, false, ERM_NMI_MODE);
-	err = R_WWDT_Refresh(WWDT_UNIT);
+    printf("---------- ECM SETTING END ----------- \r\n");
+
+    printf("---------- PROGRAM START ----------- \r\n");
+
+    printf("=== Test Case 7: %s, 68ms, 50% window OPEN, NMI MODE ===\r\n", XSTR(WWDT_UNIT));
+    /* Device driver part */
+    R_WWDT_Init(WWDT_UNIT, WINDOW_50P, 68, false, ERM_NMI_MODE);
+    err = R_WWDT_Refresh(WWDT_UNIT);
 
     if(xSemaphoreTake(xSemaphore, 2000) == pdTRUE)
     {

@@ -20,6 +20,6 @@ function(add_wwdt_app app_name main_c)
     convert_bin_to_srec(${app_name})
 endfunction()
 
-foreach(num 1 2 3 4)
+foreach(num RANGE 1 8)
     add_wwdt_app(wwdt_tc${num}_app main_tc${num}.c)
 endforeach()
