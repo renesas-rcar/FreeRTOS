@@ -196,7 +196,7 @@ else()
     )
 endif()
 
-if(BOARD STREQUAL "mdp_aiacc_hil")
+if(BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_aiacc_rfs2")
     set(MFIS_SRC
         ${BSP_DIR}/drivers/mfis/mfis_v2.c
     )
@@ -556,6 +556,7 @@ elseif(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil")
         audio_app
         gic_app
         generic_timer_app
+        mfis_app
     )
 elseif(BOARD STREQUAL "x5h_rfs2")
     set(SAMPLE_APPS
@@ -580,6 +581,7 @@ elseif(BOARD STREQUAL "x5h_rfs2")
         audio_app
         gic_app
         generic_timer_app
+        mfis_app
     )
 elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
     set(SAMPLE_APPS
@@ -601,6 +603,7 @@ elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
         dummy_app
         gic_app
         generic_timer_app
+        mfis_app
     )
 elseif(BOARD STREQUAL "mdp_aiacc_hil")
     set(SAMPLE_APPS
@@ -622,6 +625,7 @@ elseif(BOARD STREQUAL "mdp_aiacc_hil")
         sensor_app
         gic_app
         generic_timer_app
+        mfis_app
     )
 else()
     message(FATAL_ERROR "Invalid BOARD: ${BOARD}. Cannot add apps!")
