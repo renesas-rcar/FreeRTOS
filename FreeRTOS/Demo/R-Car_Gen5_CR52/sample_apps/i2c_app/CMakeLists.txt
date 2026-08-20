@@ -6,9 +6,15 @@
 
 set(app_name "i2c_app")
 
-add_executable(${app_name}
-    main.c
-)
+if(BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_aiacc_rfs2")
+    add_executable(${app_name}
+        main_aiacc.c
+    )
+else()
+    add_executable(${app_name}
+        main.c
+    )
+endif()
 
 target_compile_definitions(${app_name}
     PUBLIC
