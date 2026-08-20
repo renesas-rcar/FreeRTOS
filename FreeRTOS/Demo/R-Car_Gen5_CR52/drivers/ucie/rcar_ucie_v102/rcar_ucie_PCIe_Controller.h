@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef __RCAR_UCIE_PCIE_CONTROLLER_H__
-#define __RCAR_UCIE_PCIE_CONTROLLER_H__
+#ifndef RCAR_UCIE_PCIE_CONTROLLER_H
+#define RCAR_UCIE_PCIE_CONTROLLER_H
 
 /*-----  Registers Address-Block Base Address  -----*/
 #define PF0_TYPE1_HDR_BASE_ADD           RCAR_UCIE_BASE_ADD(0x00000000) // 0x0
@@ -17,9 +17,9 @@
 #define PF0_PL32G_CAP_BASE_ADD           RCAR_UCIE_BASE_ADD(0x000001b8) // 0x1b8
 #define PF0_PL64G_CAP_BASE_ADD           RCAR_UCIE_BASE_ADD(0x000001e0) // 0x1e0
 #define PF0_CXL_2_0_EXT_CAP_BASE_ADD     RCAR_UCIE_BASE_ADD(0x00000434) // 0x434
-#define PF0_PORT_LOGIC_BASE_ADD          RCAR_UCIE_BASE_ADD(0x00000700) // 0x700
+#define PF0_PORT_LOGIC_BASE_ADD          RCAR_UCIE_BASE_ADD(0x00000700U) // 0x700
 #define PF0_ATU_CAP_BASE_ADD             RCAR_UCIE_BASE_ADD(0x00300000) // 0x300000
-#define PF0_HDMA_CAP_BASE_ADD            RCAR_UCIE_BASE_ADD(0x00380000) // 0x380000
+#define PF0_HDMA_CAP_BASE_ADD            RCAR_UCIE_BASE_ADD(0x00380000U) // 0x380000
 #define PF0_MEMBAR0_RAS_CAP_BASE_ADD     RCAR_UCIE_BASE_ADD(0x00f01050) // 0xf01050
 
 #define PF0_TYPE1_HDR_BAR0_REG_ADD    	(PF0_TYPE1_HDR_BASE_ADD + 0x10)
@@ -55,31 +55,31 @@
 #define PF0_CXL_2_0_EXT_CAP_CXL_2_0_ALT_MEM_BASE_LIMIT_OFF_ADD             (PF0_CXL_2_0_EXT_CAP_BASE_ADD + 0x10)
 #define PF0_CXL_2_0_EXT_CAP_CXL_2_0_ALT_PREFETCH_MEM_BASE_LIMIT_OFF_ADD    (PF0_CXL_2_0_EXT_CAP_BASE_ADD + 0x14)
 
-#define RBAR_CAP_BASE_ADD                            RCAR_UCIE_BASE_ADD(0x00000578)
-#define RBAR_CTRL_OFF(n)                             (0x08 + (n) * 0x08)
-#define RBAR_CTRL_SIZE_MSK                           (0x3fu << 8)
-#define RBAR_SIZE_1MB                                (0x0u << 8)
+#define RBAR_CAP_BASE_ADD                            RCAR_UCIE_BASE_ADD(0x00000578U)
+#define RBAR_CTRL_OFF(n)                             (0x08U + (n) * 0x08U)
+#define RBAR_CTRL_SIZE_MSK                           ((uint32_t)0x3fu << 8)
+#define RBAR_SIZE_1MB                                ((uint32_t)0x0u << 8)
 
-#define PCICONF3_ADD                                 RCAR_UCIE_BASE_ADD(0x0000000C)
-#define EP_MULTI_FUNC                                (0x1u << 23)
+#define PCICONF3_ADD                                 RCAR_UCIE_BASE_ADD(0x0000000CU)
+#define EP_MULTI_FUNC                                ((uint32_t)0x1u << 23)
 
-#define PCI_CLASS_REVID_ADD                          RCAR_UCIE_BASE_ADD(0x00000008)
+#define PCI_CLASS_REVID_ADD                          RCAR_UCIE_BASE_ADD(0x00000008U)
 #define PCI_REVID_MSK                                (0x000000ffu)
 #define PCI_CLASS_OTHERS                             (0xff000000u)
 
-#define UCIE_DBI2_OFS                                (0x1000)
-#define PCI_NUM_BARS                                 (6)
-#define PCI_BAR_OFF(n)                               (0x10 + (n) * 0x04)
-#define PCI_TEST_REG_BAR                             (4)
-#define PCI_BAR_MASK_1MB                             (0x000fffff)
+#define UCIE_DBI2_OFS                                (0x1000U)
+#define PCI_NUM_BARS                                 (6U)
+#define PCI_BAR_OFF(n)                               ((0x10U + (n) * 0x04U))
+#define PCI_TEST_REG_BAR                             ((uint32_t)4U)
+#define PCI_BAR_MASK_1MB                             (0x000fffffU)
 #define PCI_BAR_FLAGS_MEM32                          (0x00000000)
-#define PCI_ROM_BAR_OFF                              (0x30)
+#define PCI_ROM_BAR_OFF                              (0x30U)
 
 #define PF0_PORT_LOGIC_TRGT_MAP_CTRL_OFF_ADD         (PF0_PORT_LOGIC_BASE_ADD + 0x11c)
-#define PF0_PORT_LOGIC_MISC_CONTROL_1_OFF_ADD        (PF0_PORT_LOGIC_BASE_ADD + 0x1bc)
+#define PF0_PORT_LOGIC_MISC_CONTROL_1_OFF_ADD        (PF0_PORT_LOGIC_BASE_ADD + 0x1bcU)
 #define PF0_PORT_LOGIC_CXL_VLSM_CSR_REG_OFF_ADD      (PF0_PORT_LOGIC_BASE_ADD + 0x548)
 
 #define PF0_MEMBAR0_RAS_CAP_MEMBAR0_RAS_UNCOR_ERROR_MASK_REG_OFF_ADD     (PF0_MEMBAR0_RAS_CAP_BASE_ADD + 0x4)
 #define PF0_MEMBAR0_RAS_CAP_MEMBAR0_RAS_CORR_ERROR_MASK_REG_OFF_ADD      (PF0_MEMBAR0_RAS_CAP_BASE_ADD + 0x10)
 
-#endif /* __RCAR_UCIE_PCIE_CONTROLLER_H__ */
+#endif /* RCAR_UCIE_PCIE_CONTROLLER_H */

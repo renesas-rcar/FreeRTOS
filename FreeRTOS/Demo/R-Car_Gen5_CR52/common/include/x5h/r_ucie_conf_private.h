@@ -12,9 +12,9 @@
 #include "ucie/r_ucie.h"
 #include "ucie_common.h"
 
-static st_ucie_ctrl_t ucie_ctrl_arr[] = {
-    [UCIE_CH0] = {UCIE_MODE_EP, LINKSPEED_4GTPS, false},
-    [UCIE_CH1] = {UCIE_MODE_EP, LINKSPEED_4GTPS, false}
+static st_ucie_ctrl_t ucie_ctrl_arr[UCIE_CH_MAX] = {
+    {UCIE_MODE_RC, LINKSPEED_4GTPS, false},
+    {UCIE_MODE_RC, LINKSPEED_4GTPS, false}
 };
 
 #endif

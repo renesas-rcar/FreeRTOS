@@ -49,7 +49,9 @@ typedef struct st_memory_region {
 #define PERIPHERAL_START_1          0xC0000000
 #define PERIPHERAL_SIZE_1           0x40000000  // to 0x1_0000_0000
 
-static const st_memory_region_t RCAR_MEMMORY_ARR[] = {
+#define MEM_REGION_NUM  7
+
+static const st_memory_region_t RCAR_MEMMORY_ARR[MEM_REGION_NUM] = {
     {.type = OSAL,          .mem_addr = {.base_address = (uint32_t) OSAL_MEMORY_ADDRESS, .size = (uint32_t) OSAL_MEMORY_SIZE},    .attr = RAM_ATTR},
     {.type = SHARE_MEM,     .mem_addr = {.base_address = (uint32_t) LDR_MEMORY_ADDRESS,  .size = (uint32_t) LDR_MEMORY_SIZE},     .attr = RAM_NOCACHE_ATTR},
     {.type = SHARE_MEM,     .mem_addr = {.base_address = (uint32_t) LINUX_CMA_ADDRESS_0, .size = (uint32_t) LINUX_CMA_SIZE_0},    .attr = RAM_NOCACHE_ATTR},
@@ -60,3 +62,4 @@ static const st_memory_region_t RCAR_MEMMORY_ARR[] = {
 };
 
 #endif // MEMORY_MAP_MDP_X5H_H
+

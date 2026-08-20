@@ -55,7 +55,7 @@ e_ucie_linkup_status_t R_UCIE_Retry_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode,
 uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
 {
     (void)cfg;
-    printf("ERROR: This feature isn't supported in this environment\n");
+    (void)printf("ERROR: This feature isn't supported in this environment\n");
     return 0;
 }
 
@@ -210,10 +210,15 @@ uint32_t R_UCIE_IATU_UnsetRegion(st_ucie_iatu_cfg_t *cfg)
 uint32_t R_UCIE_Config(e_ucie_ch_t ch, e_ucie_mode_t mode,
                        e_ucie_linkspeed_t speed, bool init_with_system)
 {
+    (void)ch;
+    (void)mode;
+    (void)speed;
+    (void)init_with_system;
     return 0;
 }
 
 e_ucie_linkup_status_t R_UCIE_Get_Linkup_Status(e_ucie_ch_t ch)
 {
+    (void)ch;
     return LINKUP_SUCCESS;
 }

@@ -25,7 +25,7 @@
 #include "clock_controller/clock_controller.h"
 #endif
 
-static bool ucie_is_setup[] = {
+static bool ucie_is_setup[UCIE_CH_MAX] = {
     [UCIE_CH0] = false,
     [UCIE_CH1] = false
 };
@@ -131,25 +131,25 @@ uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
     e_ucie_hdma_mode_t rw = cfg->rw;
     
     if (ucieCh != UCIE_CH0 && ucieCh != UCIE_CH1) {
-        printf("ERROR: Invalid UCIe channel\n");
+        (void)printf("ERROR: Invalid UCIe channel\n");
         return 1;
     }
 
     if (dmaCh < HDMA_CH0 || dmaCh > HDMA_CH31) {
-        printf("ERROR: Invalid HDMA channel\n");
+        (void)printf("ERROR: Invalid HDMA channel\n");
         return 1;
     }
 
     if (rw != HDMA_WRITE && rw != HDMA_READ) {
-        printf("ERROR: Invalid HDMA transfer mode\n");
+        (void)printf("ERROR: Invalid HDMA transfer mode\n");
         return 1;
     }
 
     base = UCIE_AXI_BASE(ucieCh) + PF0_HDMA_CAP_BASE_ADD + 
-                            (dmaCh * HDMA_CH_BLOCK_SIZE) + (rw * HDMA_RW_BLOCK_SIZE);
+                            ((uint32_t)dmaCh * HDMA_CH_BLOCK_SIZE) + ((uint32_t)rw * HDMA_RW_BLOCK_SIZE);
 
-    if (mem_read32(base + HDMA_STATUS_OFF) == 0x1) {
-        printf("ERROR: Channel is running\n");
+    if (mem_read32(base + HDMA_STATUS_OFF) == 0x1U) {
+        (void)printf("ERROR: Channel is running\n");
         return 1;
     }
 
@@ -883,7 +883,7 @@ uint32_t Ucie_Wait_FreqChange_Req(e_ucie_ch_t ch)
     mask	= 0x000002;
     expect	= 0x000002;
 
-    if ((mem_read32(ucie_apb_base + 0xE1003C) & mask) != expect) {
+    if ((mem_read32(ucie_apb_base + 0xE1003CU) & mask) != expect) {
             ret = 1;
     }
 
@@ -896,6 +896,7 @@ uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed)
     uint32_t ucie_apb_base;
     uint32_t ucie_axi_base;
     uint32_t clock_div;
+    uint32_t speed_val = (uint32_t)speed;
 
     PLLParam pllprm[] = {// there are some parameters that have the same value.
                         {0x296, 0b000, 0b001, 0b0001101, 0b0001000, 0b0101000, 0b1111111, 0x041B600150601009},
@@ -925,19 +926,19 @@ uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed)
     ucie_apb_base = UCIE_APB_BASE(ch);
     ucie_axi_base = UCIE_AXI_BASE(ch);
 
-    mem_write32( ucie_apb_base + 0xE005E8, 0x00004141 );
+    mem_write32( ucie_apb_base + 0xE005E8U, 0x00004141 );
 
-    mem_write32(ucie_axi_base + ACSM_ACSMWAITDLY0_ADD, freqdepprm.AcsmWaitDly0 * (speed + 1));
-    mem_write32(ucie_axi_base + ACSM_ACSMWAITDLY1_ADD, freqdepprm.AcsmWaitDly1 * (speed + 1));
-    mem_write32(ucie_axi_base + MMPL_ZCALCTRL0_ADD, (freqdepprm.zcalcompstartuptime * (speed + 1)) | (freqdepprm.zcalsampletime * (speed + 1) << 12) | (freqdepprm.zcaloffsetsampletime * (speed + 1) << 22));
-    mem_write32(ucie_axi_base + DWORD_0_DWDCCCTRL1_ADD, freqdepprm.dwdcdsettletime * (speed + 1));
-    mem_write32(ucie_axi_base + DWORD_1_DWDCCCTRL1_ADD, freqdepprm.dwdcdsettletimeDW1 * (speed + 1));
-    *(volatile uint32_t*)(ucie_axi_base + DWORD_0_DWDCCCTRL1_ADD) |= freqdepprm.dwdcasettletime * (speed + 1) << 8;
-    *(volatile uint32_t*)(ucie_axi_base + DWORD_1_DWDCCCTRL1_ADD) |= freqdepprm.dwdcasettletimeDW1 * (speed + 1) << 8;
-    *(volatile uint32_t*)(ucie_axi_base + DWORD_0_DWDCCCTRL1_ADD) |= freqdepprm.dwdcdsampletime * (speed + 1) << 16;
-    *(volatile uint32_t*)(ucie_axi_base + DWORD_1_DWDCCCTRL1_ADD) |= freqdepprm.dwdcdsampletimeDW1 * (speed + 1) << 16;
-    mem_write32(ucie_axi_base + ACSM_ACSMTIMEOUTCTRL0_ADD, freqdepprm.acsmpmaborttimeout * (speed + 1) | (freqdepprm.acsmpmentrytimeout * (speed + 1) << 8));
-    mem_write32(ucie_axi_base + ACSM_ACSMTIMEOUTCTRL1_ADD, freqdepprm.acsmltsmstatetimeout * (speed + 1) | (freqdepprm.acsmltsmmsgtimeout * (speed + 1) << 9) | (freqdepprm.acsmlinkerrtimeout * (speed + 1) << 18));
+    mem_write32(ucie_axi_base + ACSM_ACSMWAITDLY0_ADD, freqdepprm.AcsmWaitDly0 * (speed_val + 1U));
+    mem_write32(ucie_axi_base + ACSM_ACSMWAITDLY1_ADD, freqdepprm.AcsmWaitDly1 * (speed_val + 1U));
+    mem_write32(ucie_axi_base + MMPL_ZCALCTRL0_ADD, (freqdepprm.zcalcompstartuptime * (speed_val + 1U)) | (freqdepprm.zcalsampletime * (speed_val + 1U) << 12) | (freqdepprm.zcaloffsetsampletime * (speed_val + 1U) << 22));
+    mem_write32(ucie_axi_base + DWORD_0_DWDCCCTRL1_ADD, freqdepprm.dwdcdsettletime * (speed_val + 1U));
+    mem_write32(ucie_axi_base + DWORD_1_DWDCCCTRL1_ADD, freqdepprm.dwdcdsettletimeDW1 * (speed_val + 1U));
+    *(volatile uint32_t*)(ucie_axi_base + DWORD_0_DWDCCCTRL1_ADD) |= freqdepprm.dwdcasettletime * (speed_val + 1U) << 8;
+    *(volatile uint32_t*)(ucie_axi_base + DWORD_1_DWDCCCTRL1_ADD) |= freqdepprm.dwdcasettletimeDW1 * (speed_val + 1U) << 8;
+    *(volatile uint32_t*)(ucie_axi_base + DWORD_0_DWDCCCTRL1_ADD) |= freqdepprm.dwdcdsampletime * (speed_val + 1U) << 16;
+    *(volatile uint32_t*)(ucie_axi_base + DWORD_1_DWDCCCTRL1_ADD) |= freqdepprm.dwdcdsampletimeDW1 * (speed_val + 1U) << 16;
+    mem_write32(ucie_axi_base + ACSM_ACSMTIMEOUTCTRL0_ADD, freqdepprm.acsmpmaborttimeout * (speed_val + 1U) | (freqdepprm.acsmpmentrytimeout * (uint32_t)(speed_val + 1U) << 8));
+    mem_write32(ucie_axi_base + ACSM_ACSMTIMEOUTCTRL1_ADD, freqdepprm.acsmltsmstatetimeout * (speed_val + 1U) | (freqdepprm.acsmltsmmsgtimeout * (uint32_t)(speed_val + 1U) << 9) | (freqdepprm.acsmlinkerrtimeout * (speed_val + 1U) << 18));
 
 #ifdef RCAR_UCIE_V100
     mem_write32(ucie_axi_base + MMPL_PLLCTRL1_ADD, pllprm[speed].div_sel | (pllprm[speed].v2i_mode << 10) | (pllprm[speed].vco_low_freq << 13));
@@ -946,7 +947,7 @@ uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed)
     mem_write32(ucie_axi_base + MMPL_PLLCTRL3_ADD, pllprm[speed].upll_prog);
     mem_write32(ucie_axi_base + MMPL_PLLCTRL4_ADD, pllprm[speed].upll_prog >> 32);
 
-    mem_write32( ucie_apb_base + 0xE21004, 0x00000001 ); // ack=1 -> req will negate after 1clk cycle
+    mem_write32( ucie_apb_base + 0xE21004U, 0x00000001 ); // ack=1 -> req will negate after 1clk cycle
 
     return ret;
 }
@@ -1087,9 +1088,9 @@ uint32_t Ucie_Setup_PCIE_Wait_LinkUp(e_ucie_ch_t ch)
 
     //;UCIEICR00b
 #ifdef RCAR_UCIE_V100
-    val = mem_read32(ucie_apb_base + 0xE10004);
+    val = mem_read32(ucie_apb_base + 0xE10004U);
 #else
-    val = mem_read32(ucie_apb_base + 0xE10010);
+    val = mem_read32(ucie_apb_base + 0xE10010U);
 #endif
 
     if ((val & mask) != expect) {
@@ -1172,16 +1173,22 @@ void Ucie_Setup_PCIE_Post(e_ucie_ch_t ch, e_ucie_mode_t mode)
 
 void R_UCIE_Setup_EP_BAR(e_ucie_ch_t ch)
 {
-    uint32_t ucie_axi_base = UCIE_AXI_BASE(ch);
-    uint32_t rbar = ucie_axi_base + RBAR_CAP_BASE_ADD;
-    uint32_t dbi2 = ucie_axi_base + UCIE_DBI2_OFS;
-    uint32_t misc = ucie_axi_base + PF0_PORT_LOGIC_MISC_CONTROL_1_OFF_ADD;
-    uint32_t f1   = RCAR_UCIE_FN_OFS(1);
+    uint32_t ucie_axi_base;
+    uint32_t rbar;
+    uint32_t dbi2;
+    uint32_t misc;
+    uint32_t f1;
     uint32_t i, ctrl;
 
-    mem_write32(misc, mem_read32(misc) | 0x1);
+    ucie_axi_base = UCIE_AXI_BASE(ch);
+    rbar = ucie_axi_base + RBAR_CAP_BASE_ADD;
+    dbi2 = ucie_axi_base + UCIE_DBI2_OFS;
+    misc = ucie_axi_base + PF0_PORT_LOGIC_MISC_CONTROL_1_OFF_ADD;
+    f1   = RCAR_UCIE_FN_OFS(1);
 
-    for (i = 0; i < 2; i++) {
+    mem_write32(misc, mem_read32(misc) | 0x1U);
+
+    for (i = 0; i < 2U; i++) {
         uint32_t off = RBAR_CTRL_OFF(i);
 
         ctrl = mem_read32(rbar + off);
@@ -1361,6 +1368,7 @@ void Ucie_PowerOn(e_ucie_ch_t ucie_ch)
     uint32_t pll_num;
     uint32_t ucie_ms_core_bit;
     uint32_t ucie_ms_peri_bit;
+    uint32_t ucie_pwrmng_addr;
     volatile uintptr_t uciepwrmngctrl;
     uint32_t ucie_apb_base;
     uint32_t val;
@@ -1369,13 +1377,13 @@ void Ucie_PowerOn(e_ucie_ch_t ucie_ch)
         pll_num = 19;
         ucie_ms_peri_bit=2;
         ucie_ms_core_bit=0;
-        ucie_apb_base=0xDC000000;
+        ucie_apb_base=0xDC000000U;
     } else {
         ucixcoreclkcr = 0xDE201084U;
         pll_num = 20;
         ucie_ms_peri_bit=6;
         ucie_ms_core_bit=4;
-        ucie_apb_base=0xDD000000;
+        ucie_apb_base=0xDD000000U;
     }
 
     /* ms ucie core reset*/
@@ -1389,13 +1397,14 @@ void Ucie_PowerOn(e_ucie_ch_t ucie_ch)
     mdlc_transition_ms(16, 2, ucie_ms_peri_bit, 0x3);
     mdlc_check_ms_status(16, 2, ucie_ms_peri_bit);
 
-    uciepwrmngctrl=ucie_apb_base+0x00E00070U;
+    ucie_pwrmng_addr = ucie_apb_base+0x00E00070U;
+    uciepwrmngctrl= (uintptr_t)(ucie_pwrmng_addr);
     val = mem_read32(uciepwrmngctrl);
     val &= ~(1U<<4);                 // Clear sys_aux_pwr_det bit (bit 4 )
-    val |=  (1U<<6);                 // Set app_ready_entr_l23 bit (bit 6)
+    val |=  (uint32_t)(1U<<6);                 // Set app_ready_entr_l23 bit (bit 6)
     mem_write32(uciepwrmngctrl, val);
 
-    switch_clock_source_pll(pll_num);
+    (void)switch_clock_source_pll(pll_num);
 
     /* ms ucie core run */
     mdlc_transition_ms(16, 2, ucie_ms_core_bit, 0x3);
@@ -1464,13 +1473,13 @@ void Ucie_PowerOFF(e_ucie_ch_t ch)
         pll_num = 19;
         ucie_ms_peri_bit=2;
         ucie_ms_core_bit=0;
-        ucie_apb_base=0xDC000000;
+        ucie_apb_base=0xDC000000U;
     } else {
         ucixcoreclkcr = 0xDE201084U;
         pll_num = 20;
         ucie_ms_peri_bit=6;
         ucie_ms_core_bit=4;
-        ucie_apb_base=0xDD000000;
+        ucie_apb_base=0xDD000000U;
     }
 
     mdlc_transition_ms(16, 2, ucie_ms_core_bit, 0x1);
@@ -1561,14 +1570,14 @@ e_ucie_linkup_status_t R_UCIE_Setup(e_ucie_ch_t ch, e_ucie_mode_t mode,
     Ucie_Start_Linkup(ch, mode, speed);
 
     /* [Step 3] UCIe Wait FreqChange Req */
-    Ucie_Wait_FreqChange_Req(ch);
+    (void)Ucie_Wait_FreqChange_Req(ch);
 
     /* [Step 4] UCIe Ack FreqChange */
-    Ucie_Ack_FreqChange(ch, speed);
+    (void)Ucie_Ack_FreqChange(ch, speed);
 
     wait_time(0x8000);
     /* [Step 5] UCIe Wait Linkup */
-    Ucie_Wait_Linkup(ch);
+    (void)Ucie_Wait_Linkup(ch);
     wait_time(0x8000);
 
     /*  PCIE linkup */

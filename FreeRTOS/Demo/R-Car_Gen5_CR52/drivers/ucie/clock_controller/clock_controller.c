@@ -9,10 +9,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "clock_controller/clock_controller.h"
-#include "clock_controller/clock_controller_register.h"
-#include "module_controller/module_controller.h"
 
-#define NOTICE(...)     printf(__VA_ARGS__)
+#define NOTICE(...)     (void)printf(__VA_ARGS__)
 
 static uint32_t mem_read32(const volatile uintptr_t addr)
 {
@@ -28,8 +26,11 @@ static void mem_write32(volatile uintptr_t addr, uint32_t data)
 
 static void panic(void)
 {
-	printf("PANIC\n");
-	while(1);
+	(void)printf("PANIC\n");
+	while(1)
+    {
+        __asm__ volatile("nop");
+    }
 }
 
 uint32_t switch_clock_source_pll(uint32_t pll_num)
@@ -83,7 +84,7 @@ uint32_t switch_clock_source_pll(uint32_t pll_num)
         cnt++;
         if(cnt > PLL_RETRY_MAX)
         {
-            NOTICE("CPGM = %s:, Give up waiting for switching to PLL. (PLLnSCRegister.PLLnSELACT). Retry count: %d, Func: %s, Line: %d\r\n", get_cpgm_name(pll_num), cnt, __func__);
+            NOTICE("CPGM = %s:, Give up waiting for switching to PLL. (PLLnSCRegister.PLLnSELACT). Retry count: %d, Func: %s, Line: %d\r\n", get_cpgm_name(pll_num), cnt, __func__, __LINE__);
             break;
         }
     } while (clk_src_stat != PLL_SCR_PLLSELACT_CLK_PLL);
@@ -143,6 +144,7 @@ uint32_t get_pd_hier_from_pll(uint32_t pll_num)
         default:
             //NOTICE("PD_hier = %s (%d): Unknown PD_Hier error. Func: %s\r\n", get_hier_name(pd_hier), pd_hier, __func__);
             panic;
+            break;
     }
 
     return pd_hier;
@@ -152,7 +154,7 @@ uint32_t get_pd_hier_from_pll(uint32_t pll_num)
 
 const char* get_cpgm_name(uint32_t pll_num)
 {
-    const char* cpgm_name;
+    const char* cpgm_name = NULL;
 
     if(pll_num < PLL_MAX)
     {

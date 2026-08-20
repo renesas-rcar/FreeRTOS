@@ -29,8 +29,9 @@ extern "C" {
  * This enum includes a list of UCIe channel using for UCIe operations.
  */
 typedef enum e_ucie_ch {
-    UCIE_CH0,   /**< UCIe Channel 0 */
-    UCIE_CH1    /**< UCIe Channel 1 */
+    UCIE_CH0,       /**< UCIe Channel 0 */
+    UCIE_CH1,       /**< UCIe Channel 1 */
+    UCIE_CH_MAX     /**< End of Channel */
 } e_ucie_ch_t;
 
 /**
