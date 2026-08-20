@@ -29,7 +29,7 @@
 #define RST_RESKCPROT0	0x04F0U
 #define SWDT_RSTMSK	(1U << 1)
 #define RST_RESFC	0x0460U
-#define RST_SRES1FC5	(1U << 25)
+#define RST_SRES1FC5	((uint32_t)1U << 25)
 
 #define DIV_ROUND_UP(a, b) (((a) + (b) - 1U) / (b))
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))

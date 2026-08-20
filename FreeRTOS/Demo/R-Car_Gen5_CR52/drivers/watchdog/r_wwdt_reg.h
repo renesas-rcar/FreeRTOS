@@ -12,9 +12,9 @@
 #include "watchdog/r_wwdt_api.h"
 #include "r_wwdt_private.h"
 
-#define WDTA0WDTE       0
-#define WDTA0RUN        0xAC
-#define WDTA0MD		0xC
+#define WDTA0WDTE       0x0U
+#define WDTA0RUN        0xACU
+#define WDTA0MD		0xCU
 #define WDTA0ERM	(1U << 2)
 #define WDTA0WIE	(1U << 3)
 #define WDTA0OVF(x) ((((uint32_t)(x)) & 0x7U) << 4)

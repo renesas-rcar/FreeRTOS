@@ -116,7 +116,7 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
     if (!err_mode) {
         val &= ~WDTA0ERM;
     }
-    val |= WDTA0OVF(timeout_to_x(timeout_msec, wwdt_base_addr)) | wsize;
+    val |= (uint8_t)WDTA0OVF(timeout_to_x(timeout_msec, wwdt_base_addr)) | (uint8_t)wsize;
     if (irq_75p) {
         val |= WDTA0WIE;
     }

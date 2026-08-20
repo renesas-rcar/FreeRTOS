@@ -38,7 +38,7 @@ static uint32_t r_rst_read(uintptr_t Addr)
 
 static void r_swdt_wait_cycles(uint8_t cycles) {
     uint8_t delay;
-    delay = DIV_ROUND_UP(cycles * 10000000U, OSCCLK);
+    delay = (uint8_t)DIV_ROUND_UP((uint32_t)cycles * 10000000U, OSCCLK);
 
     vTaskDelay(delay);
 }
@@ -89,11 +89,11 @@ uint8_t R_SWDT_Init(uint8_t timeout_sec) {
     r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5U << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) & ~SWTCSRA_WOVF));
     r_swdt_write(SWDT_BASE + SWTCSRB, (0xA5A5A5U << 8U) | 0U);
 
-    for (uint8_t i = ARRAY_SIZE(clk_divs) - 1; i >= 0; i--) {
-        clks_per_sec = OSCCLK / clk_divs[i];
+    for (uint8_t i = (uint8_t)ARRAY_SIZE(clk_divs); i > 0U; i--) {
+        clks_per_sec = OSCCLK / clk_divs[i - 1U];
 
-        if (clks_per_sec && clks_per_sec < 65536) {
-            cks = i;
+        if (clks_per_sec && clks_per_sec < 65536U) {
+            cks = i - 1U;
             break;
         }
     }
