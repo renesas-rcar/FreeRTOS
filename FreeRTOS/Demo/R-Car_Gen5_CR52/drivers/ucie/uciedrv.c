@@ -14,6 +14,8 @@
 #include "ucie_private.h"
 #include "ucie_common.h"
 #include "r_ucie_conf_private.h"
+#include "ucie_hdma.h"
+#include "ucie_apb_register.h"
 
 #include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_power_domain_id.h"
@@ -79,12 +81,12 @@ uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
     base = UCIE_AXI_BASE(ucieCh) + PF0_HDMA_CAP_BASE_ADD + 
                             (dmaCh * HDMA_CH_BLOCK_SIZE) + (rw * HDMA_RW_BLOCK_SIZE);
 
-    if (mem_read32(base + HDMA_STATUS_OFF) == 0x1) {
+    if (mem_read32(base + (uintptr_t)HDMA_STATUS_OFF) == HDMA_STATUS_RUNNING) {
         printf("ERROR: Channel is running\n");
         return 1;
     }
 
-    mem_write32(base + HDMA_EN_OFF, 0x00000001);
+    mem_write32(base + (uintptr_t)HDMA_EN_OFF, HDMA_EN_ENABLE);
 
     mem_write32(base + HDMA_XFERSIZE_OFF, size);
     mem_write32(base + HDMA_SAR_LOW_OFF, (uint32_t)(srcAddr & 0xFFFFFFFF));
@@ -102,7 +104,7 @@ uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
     mem_write32(base + HDMA_QOS_OFF, 0x00000000);
 
     mem_write32(base + HDMA_WATERMARK_EN_OFF, 0x00000000);
-    mem_write32(base + HDMA_INT_SETUP_OFF, 0x00000078);	
+    mem_write32(base + (uintptr_t)HDMA_INT_SETUP_OFF, HDMA_INT_SETUP_RSIE | HDMA_INT_SETUP_LSIE | HDMA_INT_SETUP_RAIE | HDMA_INT_SETUP_LAIE);
 
     mem_write32(base + HDMA_MSI_STOP_LOW_OFF, MSI_STOP_BASE);
     mem_write32(base + HDMA_MSI_STOP_HIGH_OFF, 0x00000000);
@@ -125,7 +127,7 @@ uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
 
 uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
 {
-    uintptr_t base;
+    uint32_t base;
     e_ucie_ch_t ucieCh = cfg->ucie_ch;
     e_ucie_hdma_ch_t dmaCh = cfg->hdma_ch;
     e_ucie_hdma_mode_t rw = cfg->rw;
@@ -148,12 +150,12 @@ uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
     base = UCIE_AXI_BASE(ucieCh) + PF0_HDMA_CAP_BASE_ADD + 
                             ((uint32_t)dmaCh * HDMA_CH_BLOCK_SIZE) + ((uint32_t)rw * HDMA_RW_BLOCK_SIZE);
 
-    if (mem_read32(base + HDMA_STATUS_OFF) == 0x1U) {
+    if (mem_read32(base + (uintptr_t)HDMA_STATUS_OFF) == HDMA_STATUS_RUNNING) {
         (void)printf("ERROR: Channel is running\n");
         return 1;
     }
 
-    mem_write32(base + HDMA_DOORBELL_OFF, 0x00000001);
+    mem_write32(base + (uintptr_t)HDMA_DOORBELL_OFF, HDMA_DOORBELL_DB_START);
 
     return 0;
 }
@@ -189,7 +191,7 @@ uint32_t R_UCIE_HDMA_WaitStop(st_ucie_hdma_cfg_t *cfg)
                             (dmaCh * HDMA_CH_BLOCK_SIZE) + (rw * HDMA_RW_BLOCK_SIZE);
 
     timeout = 4500000; // ~3sec
-    while (mem_read32(base + HDMA_STATUS_OFF) != 0x3) {
+    while (mem_read32(base + (uintptr_t)HDMA_STATUS_OFF) != HDMA_STATUS_STOPPED) {
         timeout--;
         if (timeout == 0) {
             ret = 1;
@@ -198,7 +200,7 @@ uint32_t R_UCIE_HDMA_WaitStop(st_ucie_hdma_cfg_t *cfg)
     }
 
     val = mem_read32(base + HDMA_INT_STATUS_OFF);
-    mem_write32(base + HDMA_INT_CLEAR_OFF, (val & 0x7));
+    mem_write32(base + (uintptr_t)HDMA_INT_CLEAR_OFF, (val & HDMA_INT_CLR_ABORT_WATERMARK_STOP_FIELD));
 
     return ret;
 }
@@ -230,56 +232,56 @@ uint32_t R_UCIE_HDMA_Stop(st_ucie_hdma_cfg_t *cfg)
 
     mem_write32(base + HDMA_DOORBELL_OFF, 0x00000002);
     mem_write32(base + HDMA_DOORBELL_OFF, 0x00000000);
-    mem_write32(base + HDMA_EN_OFF, 0x00000000);
+    mem_write32(base + (uintptr_t)HDMA_EN_OFF, HDMA_EN_DISABLE);
 
     return 0;
 }
 
 void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
 {
-    uintptr_t ucie_axi_base;
+    uint32_t ucie_axi_base;
     uintptr_t ucie_apb_base;
 
     ucie_axi_base = UCIE_AXI_BASE(ch);
     ucie_apb_base = UCIE_APB_BASE(ch);
 
     //; axi adr = 41
-    mem_write32(ucie_apb_base + 0xE005E8, 0x00000000);
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00000000);
 
-    mem_write32(ucie_apb_base + 0xE005E8, 0x00004141);
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00004141);
 
     //; axi adr = 0
-    mem_write32(ucie_apb_base + 0xE005E8, 0x00000000);
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00000000);
 
     //; UCIe0/1 apb setting
     if (mode == UCIE_MODE_RC)
     {
         //; UCIEFMIS
-        mem_write32(ucie_apb_base + 0xE00308, 0x019A0000); // UCIEFMIS
+        mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEFMIS_OFFSET, 0x019A0000); // UCIEFMIS
 
-        mem_write32(ucie_apb_base + 0xE00000, 0x00000010); // UCIE0 -> RC
+        mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEMSR0_OFFSET, 0x00000010); // UCIE0 -> RC
 
         //; UCIEPCR00
-        mem_write32(ucie_apb_base + 0xE21000, 0x00000001); // set UCIe device Endpoint enable
+        mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEPCR00_OFFSET, UCIEPCR00_ROOT_PORT_ENABLE_MASK); // set UCIe device root port enable
 
         //; UCIECSR00
-        mem_write32(ucie_apb_base + 0xE20000, 0x00000001); // select CXL mode
+        mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIECSR00_OFFSET, UCIECSR00_CXL_MODE_MASK); // select CXL mode
     }
     else
     {
         //; UCIEFMIS
-        mem_write32(ucie_apb_base + 0xE00308, 0x015C0000); // UCIEFMIS
+        mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEFMIS_OFFSET, 0x015C0000); // UCIEFMIS
 
-        mem_write32(ucie_apb_base + 0xE00000, 0x00000000);
+        mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEMSR0_OFFSET, 0x00000000);
 
         //; UCIEPCR00
-        mem_write32(ucie_apb_base + 0xE21000, 0x00000002); // set UCIe device Endpoint enable
+        mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEPCR00_OFFSET, UCIEPCR00_ENDPOINT_ENABLE_MASK); // set UCIe device Endpoint enable
 
         //; UCIECSR00
-        mem_write32(ucie_apb_base + 0xE20000, 0x00000001); // select CXL mode
+        mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIECSR00_OFFSET, UCIECSR00_CXL_MODE_MASK); // select CXL mode
     }
     //; UCIEICR27
-    mem_write32(ucie_apb_base + 0xE1007C, 0x00000002); // interrupt output enable freq_change_req
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEICR27_OFFSET, UCIEICR27_INTERRUPT_OUTPUT_ENABLE_MASK); // interrupt output enable freq_change_req
 
     //; UCIe0/1 axi setting 00
     if (mode == UCIE_MODE_RC)
@@ -316,7 +318,7 @@ void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
 
     //; UCIe0 axi setting 01
     //;  axi0 addres ON
-    mem_write32(ucie_apb_base + 0xE005E8, 0x00004141);
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00004141);
 
     mem_write32(ucie_axi_base + IMP_SPECIFIC_SB_UNIT_IMP_SB_CONFIG3_ADD, 0x00018001);
 
@@ -334,7 +336,7 @@ void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     mem_write32(ucie_axi_base + IMP_SPECIFIC_MB_UNIT_IMP_MB_CONFIG4_ADD, 0x00023500);
 
     //;  axi0 addres OFF
-    mem_write32(ucie_apb_base + 0xE005E8, 0x00000000);
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00000000);
 
     mem_write32(ucie_axi_base + DVSEC_UNIT_DSP_DVSEC_UCIE_LINK_CONTROL_ADD, 0x00004000);
 
@@ -347,7 +349,7 @@ void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
 #endif
     //; UCIe0 axi setting 02
     //;  axi addres ON
-    mem_write32(ucie_apb_base + 0xE005E8, 0x00004141);
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00004141);
 
 #if defined(RCAR_UCIE_V101) || defined(RCAR_UCIE_V102)
     mem_write32( ucie_axi_base + IMP_SPECIFIC_MB_UNIT_IMP_MB_CONFIG11_ADD, 0x00103001 );
@@ -587,7 +589,7 @@ void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     mem_write32( ucie_axi_base + DWORD_1_DWRXLATCTRL_ADD, reg_val );
     
     //// d. Write 00800000 to UcieTrainingSetup1 to program PPGC pattern.
-    mem_write32( ucie_apb_base+0xE005E8, 0x00004040 );
+    mem_write32( ucie_apb_base+(uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00004040 );
     
     // adr 0x4070_1*** is none in .h file
     mem_write32( ucie_axi_base + RCAR_UCIE_BASE_ADD(0x40701000) + 0x010, 0x00800000 );
@@ -599,7 +601,7 @@ void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
     mem_write32( ucie_axi_base + RCAR_UCIE_BASE_ADD(0x40701000) + 0x024, 0x00010000 );
 
     //// f. Write DwMiscCtrl0.DwTxCkParkLevel=1'b1, clock is parked at its inactive level.
-    mem_write32( ucie_apb_base+0xE005E8, 0x00004141 );
+    mem_write32( ucie_apb_base+(uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00004141 );
     
     mem_write32( ucie_axi_base + DWORD_0_DWMISCCTRL0_ADD, 0x3D00A001 );
     
@@ -861,7 +863,7 @@ void Ucie_Start_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode, e_ucie_linkspeed_t sp
     ucie_apb_base = UCIE_APB_BASE(ch);
 
     //;  axi0 addres OFF
-    mem_write32( ucie_apb_base + 0xE005E8, 0x00000000 );
+    mem_write32( ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00000000 );
 
     uint32_t dvsecLinkControl = ((speed & LINKSPEED_MASK) << LINKSPEED_OFFSET) | 0x00004000;
     mem_write32( ucie_axi_base + DVSEC_UNIT_DSP_DVSEC_UCIE_LINK_CONTROL_ADD, dvsecLinkControl);
@@ -883,7 +885,7 @@ uint32_t Ucie_Wait_FreqChange_Req(e_ucie_ch_t ch)
     mask	= 0x000002;
     expect	= 0x000002;
 
-    if ((mem_read32(ucie_apb_base + 0xE1003CU) & mask) != expect) {
+    if ((mem_read32(ucie_apb_base + (uint32_t)UCIE_APB_UCIEICR13_OFFSET) & mask) != expect) {
             ret = 1;
     }
 
@@ -926,7 +928,7 @@ uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed)
     ucie_apb_base = UCIE_APB_BASE(ch);
     ucie_axi_base = UCIE_AXI_BASE(ch);
 
-    mem_write32( ucie_apb_base + 0xE005E8U, 0x00004141 );
+    mem_write32( ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00004141 );
 
     mem_write32(ucie_axi_base + ACSM_ACSMWAITDLY0_ADD, freqdepprm.AcsmWaitDly0 * (speed_val + 1U));
     mem_write32(ucie_axi_base + ACSM_ACSMWAITDLY1_ADD, freqdepprm.AcsmWaitDly1 * (speed_val + 1U));
@@ -947,7 +949,7 @@ uint32_t Ucie_Ack_FreqChange(e_ucie_ch_t ch, e_ucie_linkspeed_t speed)
     mem_write32(ucie_axi_base + MMPL_PLLCTRL3_ADD, pllprm[speed].upll_prog);
     mem_write32(ucie_axi_base + MMPL_PLLCTRL4_ADD, pllprm[speed].upll_prog >> 32);
 
-    mem_write32( ucie_apb_base + 0xE21004U, 0x00000001 ); // ack=1 -> req will negate after 1clk cycle
+    mem_write32( ucie_apb_base + (uint32_t)UCIE_APB_UCIEPTR00_OFFSET, 0x00000001 ); // ack=1 -> req will negate after 1clk cycle
 
     return ret;
 }
@@ -963,7 +965,7 @@ uint32_t Ucie_Wait_Linkup(e_ucie_ch_t ch)
     ucie_apb_base = UCIE_APB_BASE(ch);
     
     //;  axi0 addres ON
-    mem_write32(ucie_apb_base + 0xE005E8, 0x00004141);
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00004141);
 
     mask = 0x00001F;
     expect = 0x000016;
@@ -986,14 +988,14 @@ void Ucie_Setup_PCIE_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode)
 
     //; After linkup
     //;  axi0 addres ON
-    mem_write32(ucie_apb_base + 0xE005E8, 0x00004141);
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00004141);
 
     mem_write32(ucie_axi_base + DWORD_0_DWPUBMODECTRL_ADD, 0x00000000);
 
     mem_write32(ucie_axi_base + DWORD_1_DWPUBMODECTRL_ADD, 0x00000000);
 
     //; UCIEDBIADR
-    mem_write32(ucie_apb_base + 0xE005E8, 0x00000000);
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00000000);
 
     if (mode == UCIE_MODE_RC)
     {
@@ -1057,12 +1059,12 @@ void Ucie_Setup_PCIE_Start_LinkUp(e_ucie_ch_t ch, e_ucie_mode_t mode)
     if (mode == UCIE_MODE_RC)
     {
         //;UCIEPCR00
-        mem_write32(ucie_apb_base + 0xE21000, 0x00000011);
+        mem_write32(ucie_apb_base + (uint32_t)UCIE_APB_UCIEPCR00_OFFSET, 0x00000011);
     }
     else
     {
         //;UCIEPCR00
-        mem_write32(ucie_apb_base + 0xE21000, 0x00000012);
+        mem_write32(ucie_apb_base + (uint32_t)UCIE_APB_UCIEPCR00_OFFSET, 0x00000012);
     }
 }
 
@@ -1088,7 +1090,7 @@ uint32_t Ucie_Setup_PCIE_Wait_LinkUp(e_ucie_ch_t ch)
 
     //;UCIEICR00b
 #ifdef RCAR_UCIE_V100
-    val = mem_read32(ucie_apb_base + 0xE10004U);
+    val = mem_read32(ucie_apb_base + (uint32_t)UCIE_APB_UCIEICR00b_OFFSET);
 #else
     val = mem_read32(ucie_apb_base + 0xE10010U);
 #endif
@@ -1110,7 +1112,7 @@ void Ucie_Setup_PCIE_Post(e_ucie_ch_t ch, e_ucie_mode_t mode)
     ucie_apb_base = UCIE_APB_BASE(ch);
 
     //;  axi0 addres ON
-    mem_write32(ucie_apb_base + 0xE005E8, 0x00000000);
+    mem_write32(ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00000000);
 
     mem_write32(ucie_axi_base + PF0_PCIE_CAP_DEVICE_CONTROL_DEVICE_STATUS_ADD, 0x00102150);
 

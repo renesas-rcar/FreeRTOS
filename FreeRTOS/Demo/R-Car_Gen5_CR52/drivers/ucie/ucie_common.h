@@ -137,6 +137,8 @@ typedef struct
 
 #define IATU_ADDR_MASK              (0xFFF)
 
+#define BIT_MASK(n)                 (1U << (n))
+
 void Ucie_PowerOFF(e_ucie_ch_t ch);
 void Ucie_PowerOn(e_ucie_ch_t ucie_ch);
 void Ucie_Setup_Pre(e_ucie_ch_t ch, e_ucie_mode_t mode);
