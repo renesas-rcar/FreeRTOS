@@ -1,0 +1,244 @@
+{
+    "sample_apps": [
+        {
+            "module": "Boot up",
+            "name": "hello_world",
+            "bin": [
+                "hello_world.elf",
+                "hello_world_core1.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "GIC",
+            "name": "gic_app",
+            "bin": [
+                "gic_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "Generic Timer",
+            "name": "generic_timer_app",
+            "bin": [
+                "generic_timer_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "GPIO",
+            "name": "gpio_app",
+            "bin": [
+                "gpio_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Skip"
+        },
+        {
+            "module": "I2C",
+            "name": "i2c_app",
+            "bin": [
+                "i2c_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Skip"
+        },
+        {
+            "module": "Logging",
+            "name": "logging_app",
+            "bin": [
+                "logging_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "MFIS",
+            "name": "mfis_app",
+            "bin": [
+                "mfis_cr_cr.elf",
+                "mfis_cr_cr_core1.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "Posix",
+            "name": "posix",
+            "dependency": "No",
+            "status": "Skip"
+        },
+        {
+            "module": "RPMsg",
+            "name": "rpmsg_sample",
+            "bin": [
+                "rpmsg_echo_aiacc0_0.elf",
+                "rpmsg_echo_aiacc1_0.elf"
+            ],
+            "dependency": "open_amp",
+            "status": "Test"
+        },
+        {
+            "module": "RT-DMA",
+            "name": "rt_dmac_app",
+            "bin": [
+                "rt_dmac_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "SCIF",
+            "name": "uart_app",
+            "bin": [
+                "uart_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "SCP",
+            "name": "power-management_app",
+            "bin": [
+                "power-management_app_core0.elf",
+                "power-management_app_core1.elf",
+                "deepstop_test_core0.elf",
+                "deepstop_test_core1.elf"
+            ],
+            "dependency": "No",
+            "status": "Skip"
+        },
+        {
+            "module": "SMMU Native",
+            "name": "smmu_app",
+            "bin": [
+                "smmu_app.elf",
+                "smmu_rt_core0_app.elf",
+                "smmu_rt_core1_app.elf",
+                "smmu_rt_dmac_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Skip"
+        },
+        {
+            "module": "SWDT",
+            "name": "swdt_app",
+            "bin": [
+                "swdt_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "SYS-DMA",
+            "name": "sys_dmac_app",
+            "bin": [
+                "sys_dmac_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Skip"
+        },
+        {
+            "module": "UCIe/CXL",
+            "name": "ucie",
+            "bin": [
+                "ucie_mdp_aiacc0.elf",
+                "ucie_mdp_aiacc1.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "WCRC",
+            "name": "wcrc_app",
+            "bin": [
+                "wcrc_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "WWDT",
+            "name": "wwdt_app",
+            "bin": [
+                "wwdt_tc1_app.elf",
+                "wwdt_tc2_app.elf",
+                "wwdt_tc3_app.elf",
+                "wwdt_tc4_app.elf",
+                "wwdt_tc5_app.elf",
+                "wwdt_tc6_app.elf",
+                "wwdt_tc7_app.elf",
+                "wwdt_tc8_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
+        },
+        {
+            "module": "Audio",
+            "name": "audio_app",
+            "bin": [
+                "audio_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Skip"
+        },
+        {
+            "module": "Utils",
+            "name": "utils_app",
+            "bin": [
+                "utils_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Skip"
+        },
+        {
+            "module": "ECM",
+            "name": "ecm_app",
+            "bin": [
+                "ecm_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Skip"
+        },
+        {
+            "module": "Virtio IOMMU BE",
+            "name": "virtio_iommu_backend_sample",
+            "bin": [
+                "virtio_iommu_backend_app_mfis0_cluster0_core0.elf",
+                "virtio_iommu_backend_frontend_app_cluster0_core0.elf"
+            ],
+            "dependency": "open_amp",
+            "status": "Skip"
+        },
+        {
+            "module": "Virtio IOMMU FE",
+            "name": "virtio_iommu_frontend_sample",
+            "bin": [
+                "virtio_iommu_frontend_app_mfis1_cluster0_core1.elf"
+            ],
+            "dependency": "open_amp",
+            "status": "Skip"
+        },
+        {
+            "module": "Virtio BE",
+            "name": "virtio_rpmsg",
+            "bin": [
+                "virtio_rpmsg.elf"
+            ],
+            "dependency": "open_amp",
+            "status": "Skip"
+        },
+        {
+            "module": "Sensor",
+            "name": "sensor_app",
+            "bin": [
+                "sensor_app.elf"
+            ],
+            "dependency": "No",
+            "status": "Skip"
+        }
+    ]
+}

@@ -29,55 +29,32 @@ if(NOT DEFINED RAM_REGION)
     set(RAM_REGION 1)
 endif()
 set(LDFILE ${BSP_DIR}/common/linker/lscript_sram.ld)
+
 if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2" OR BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_x5h_hil")
     if(BOARD STREQUAL "x5h_vdk")
         set(BOARD_ID 1)
         set(PLATFORM_DEVICE "x5h")
-        set(RPMSG_BIN_NAME
-            rpmsg_mfis0_cluster0_core0
-            rpmsg_mfis1_cluster0_core1
-        )
+        set(CONFIG_APPS_FILE "x5h_vdk_sample_apps.json")
     elseif(BOARD STREQUAL "x5h_ironhide")
         set(BOARD_ID 3)
         set(PLATFORM_DEVICE "x5h")
-        set(RPMSG_BIN_NAME
-            rpmsg_mfis0_cluster0_core0
-            rpmsg_mfis1_cluster0_core1
-            rpmsg_perf_mfis0_cluster0_core0
-            rpmsg_perf_mfis1_cluster0_core1
-        )
+        set(CONFIG_APPS_FILE "x5h_hil_sample_apps.json")
     elseif(BOARD STREQUAL "x5h_rfs2")
         set(BOARD_ID 4)
         set(PLATFORM_DEVICE "x5h")
-        set(RPMSG_BIN_NAME
-            rpmsg_mfis0_cluster0_core0
-            rpmsg_mfis1_cluster0_core1
-            rpmsg_perf_mfis0_cluster0_core0
-            rpmsg_perf_mfis1_cluster0_core1
-        )
+        set(CONFIG_APPS_FILE "x5h_rfs2x_sample_apps.json")
     elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
         set(BOARD_ID 2)
         set(PLATFORM_DEVICE "aiacc")
-        set(RPMSG_BIN_NAME
-            rpmsg_mfis0_cluster0_core0
-            rpmsg_mfis1_cluster0_core1
-        )
+        set(CONFIG_APPS_FILE "aiacc_rfs2x_sample_apps.json")
     elseif(BOARD STREQUAL "mdp_aiacc_hil")
         set(BOARD_ID 5)
         set(PLATFORM_DEVICE "aiacc")
-        set(RPMSG_BIN_NAME
-            rpmsg_mfis0_cluster0_core0
-            rpmsg_mfis1_cluster0_core1
-        )
+        set(CONFIG_APPS_FILE "aiacc_hil_sample_apps.json")
     elseif(BOARD STREQUAL "mdp_x5h_hil")
         set(BOARD_ID 6)
         set(PLATFORM_DEVICE "mdp_x5h")
-        set(RPMSG_BIN_NAME
-            rpmsg_mfis0_cluster0_core0
-            rpmsg_mfis1_cluster0_core1
-            rpmsg_perf_mfis0_cluster0_core0
-            rpmsg_perf_mfis1_cluster0_core1
-        )
+        set(CONFIG_APPS_FILE "mdp_x5h_hil_sample_apps.json")
     else()
         message(FATAL_ERROR "Invalid BOARD: ${BOARD}.")
     endif()
@@ -364,7 +341,171 @@ if(ENABLE_OPENAMP)
     )
 endif()
 
-### Installation config
+################ User define common CMake functions #############################
+
+function(convert_bin_to_srec app_name)
+    if(NOT CMAKE_EXECUTABLE_SUFFIX)
+        set(CMAKE_EXECUTABLE_SUFFIX "")
+    endif()
+
+    set(BIN_FILE "${CMAKE_CURRENT_BINARY_DIR}/${app_name}${CMAKE_EXECUTABLE_SUFFIX}")
+    set(SREC_FILE "${CMAKE_CURRENT_BINARY_DIR}/${app_name}.srec")
+
+    add_custom_command(
+        OUTPUT ${SREC_FILE}
+        COMMAND ${CMAKE_OBJCOPY} -O srec --srec-forceS3
+                --remove-section .resource_table
+                --remove-section .resource_table1
+                --remove-section .resource_table2
+                ${BIN_FILE} ${SREC_FILE}
+        DEPENDS ${app_name}
+        COMMENT "Converting ${BIN_FILE} to SREC format"
+        VERBATIM
+    )
+
+    add_custom_target(${app_name}_srec ALL
+        DEPENDS ${SREC_FILE}
+    )
+endfunction()
+
+function(add_subdirectory_from_list list_app)
+    foreach(app IN LISTS ${list_app})
+        add_subdirectory(sample_apps/${app})
+    endforeach()
+endfunction()
+
+
+function(validate_folder_app_name json_file folder_name)
+    #message(STATUS "APP_FOLDER: ${folder_name}")
+    #message(STATUS "JSON file : ${json_file}")
+
+    set(APP_FOLDER
+        "${BSP_DIR}/sample_apps/${folder_name}"
+    )
+
+    #message(STATUS "APP_FOLDER: ${APP_FOLDER}")
+
+    if(NOT IS_DIRECTORY "${APP_FOLDER}")
+        message(FATAL_ERROR
+            "Folder '${folder_name}' not found "
+            "from JSON file '${json_file}'"
+        )
+    endif()
+endfunction()
+
+function(get_infor_sample_apps json_file to_app_list to_bin_list)
+    set(SAMPLE_APPS_JSON
+        "${CMAKE_SOURCE_DIR}/config_sample_apps/${json_file}"
+    )
+
+    file(READ
+        "${SAMPLE_APPS_JSON}"
+        SAMPLE_APPS_JSON_CONTENT
+    )
+
+    string(JSON SAMPLE_APP_COUNT
+        LENGTH
+        "${SAMPLE_APPS_JSON_CONTENT}"
+        sample_apps
+    )
+
+    set(APP_LIST)
+    set(BIN_LIST)
+
+    math(EXPR LAST_INDEX "${SAMPLE_APP_COUNT} - 1")
+
+    foreach(index RANGE 0 ${LAST_INDEX})
+        string(JSON APP_NAME
+            GET
+            "${SAMPLE_APPS_JSON_CONTENT}"
+            sample_apps ${index} name
+        )
+
+        string(JSON APP_DEPENDENCY
+            GET
+            "${SAMPLE_APPS_JSON_CONTENT}"
+            sample_apps ${index} dependency
+        )
+
+        string(JSON APP_STATUS
+            GET
+            "${SAMPLE_APPS_JSON_CONTENT}"
+            sample_apps ${index} status
+        )
+
+        if(APP_STATUS STREQUAL "Test") 
+            validate_folder_app_name(${json_file} ${APP_NAME})
+
+            # Collect app folder name from json file
+            if(APP_DEPENDENCY STREQUAL "No")
+                list(APPEND APP_LIST "${APP_NAME}")
+            endif()
+
+            # Collect app folder name from json file
+            if(APP_DEPENDENCY STREQUAL "open_amp" AND ENABLE_OPENAMP)
+                list(APPEND APP_LIST "${APP_NAME}")
+            endif()
+
+            # Collect binary name from json file
+            string(JSON BIN_COUNT
+                LENGTH
+                "${SAMPLE_APPS_JSON_CONTENT}"
+                sample_apps ${index} bin
+            )
+            math(EXPR LAST_BIN_INDEX "${BIN_COUNT} - 1")
+
+            foreach(bin_index RANGE 0 ${LAST_BIN_INDEX})
+                string(JSON BIN_NAME
+                    GET
+                    "${SAMPLE_APPS_JSON_CONTENT}"
+                    sample_apps ${index} bin ${bin_index}
+                )
+
+                list(APPEND BIN_LIST "${BIN_NAME}")
+            endforeach()
+
+        endif()
+
+    endforeach()
+
+    # Use for Debugging
+    #message(STATUS "Num of apps: ${SAMPLE_APP_COUNT}")
+    #message(STATUS "Apps to build: ${APP_LIST}")
+    #message(STATUS "BIN_LIST: ${BIN_LIST}")
+
+    set(${to_app_list} "${APP_LIST}" PARENT_SCOPE)
+    set(${to_bin_list} "${BIN_LIST}" PARENT_SCOPE)
+endfunction()
+
+################################ Add subdirectory for applications below #################################
+if(ENABLE_OPENAMP)
+    add_subdirectory(libraries/libmetal)
+    add_subdirectory(libraries/openamp)
+    add_custom_target(openamp_full)
+    add_dependencies(openamp_full libmetal_build openamp_build)
+    add_dependencies(freertos_bsp openamp_full)
+endif()
+
+if(ENABLE_FULL_DEMO)
+    add_subdirectory(Full_Demo)
+endif()
+
+# Store sample apps information to variables SAMPLE_APPS, BINARIES_LIST
+get_infor_sample_apps(
+    ${CONFIG_APPS_FILE}
+    SAMPLE_APPS
+    BINARIES_LIST
+)
+
+
+# Use for Debugging
+#message(STATUS "Apps to build: ${SAMPLE_APPS}")
+#message(STATUS "Binaries list: ${BINARIES_LIST}")
+add_subdirectory_from_list(SAMPLE_APPS)
+
+add_subdirectory(Blinky)
+
+################################ Installation config #################################
 # Kernel
 install(
     DIRECTORY ${KERNEL_DIR}/include
@@ -434,221 +575,24 @@ install(
 )
 
 # Install sample app bins
-install(
-    DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/
+foreach(bin IN LISTS BINARIES_LIST)
+    # Validate binary name first
+    install(
+        CODE "
+            include(\"${CMAKE_SOURCE_DIR}/check_binaries.cmake\")
+            validate_bin_name(
+                \"${CONFIG_APPS_FILE}\"
+                \"${bin}\"
+            )
+        "
+    )
+
+    # Then install binary name
+    install(
+    DIRECTORY "${CMAKE_BINARY_DIR}/sample_apps/"
     DESTINATION bins
     FILES_MATCHING
-        PATTERN "*.${BIN_TYPE}"
-        PATTERN "*.map"
-    PATTERN "CMakeFiles" EXCLUDE
-    PATTERN "rpmsg_sample" EXCLUDE
-)
-
-# Install RPMsg bins
-if(ENABLE_OPENAMP)
-    foreach(bin IN LISTS RPMSG_BIN_NAME)
-        install(
-            DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/rpmsg_sample/
-            DESTINATION bins/rpmsg_sample/
-            FILES_MATCHING
-                PATTERN "${bin}.elf"
-            PATTERN "CMakeFiles" EXCLUDE
-        )
-        if(BOARD STREQUAL x5h_ironhide OR BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_x5h_hil")
-            install(
-                DIRECTORY ${CMAKE_BINARY_DIR}/sample_apps/rpmsg_sample/
-                DESTINATION bins/rpmsg_sample/
-                FILES_MATCHING
-                    PATTERN "${bin}.srec"
-                PATTERN "CMakeFiles" EXCLUDE
-            )
-        endif()
-    endforeach()
-endif()
-
-################ Function to convert output file to .srec #############################
-
-function(convert_bin_to_srec app_name)
-    if(NOT CMAKE_EXECUTABLE_SUFFIX)
-        set(CMAKE_EXECUTABLE_SUFFIX "")
-    endif()
-
-    set(BIN_FILE "${CMAKE_CURRENT_BINARY_DIR}/${app_name}${CMAKE_EXECUTABLE_SUFFIX}")
-    set(SREC_FILE "${CMAKE_CURRENT_BINARY_DIR}/${app_name}.srec")
-
-    add_custom_command(
-        OUTPUT ${SREC_FILE}
-        COMMAND ${CMAKE_OBJCOPY} -O srec --srec-forceS3
-                --remove-section .resource_table
-                --remove-section .resource_table1
-                --remove-section .resource_table2
-                ${BIN_FILE} ${SREC_FILE}
-        DEPENDS ${app_name}
-        COMMENT "Converting ${BIN_FILE} to SREC format"
-        VERBATIM
+        PATTERN "${bin}"
+        PATTERN "CMakeFiles" EXCLUDE
     )
-
-    add_custom_target(${app_name}_srec ALL
-        DEPENDS ${SREC_FILE}
-    )
-endfunction()
-
-function(add_subdirectory_from_list list_app)
-    foreach(app IN LISTS ${list_app})
-        add_subdirectory(sample_apps/${app})
-    endforeach()
-endfunction()
-
-#######################################################################################
-# Add subdirectory for applications below
-if(ENABLE_OPENAMP)
-    add_subdirectory(libraries/libmetal)
-    add_subdirectory(libraries/openamp)
-    add_subdirectory(sample_apps/rpmsg_sample)
-    add_subdirectory(sample_apps/virtio_iommu_frontend_sample)
-    add_subdirectory(sample_apps/virtio_iommu_backend_sample)
-    add_subdirectory(sample_apps/virtio_rpmsg)
-    add_custom_target(openamp_full)
-    add_dependencies(openamp_full libmetal_build openamp_build)
-    add_dependencies(freertos_bsp openamp_full)
-endif()
-
-if(ENABLE_FULL_DEMO)
-    add_subdirectory(Full_Demo)
-endif()
-
-if(BOARD STREQUAL "x5h_vdk")
-    set(SAMPLE_APPS
-        hello_world
-        uart_app
-        logging_app
-        mpu_app
-        gpio_app
-        ak4619_app
-        cpp_app
-        i2c_app
-        sys_dmac_app
-        rt_dmac_app
-        swdt_app
-        wwdt_app
-        smmu_app
-        power-management_app
-        wcrc_app
-        utils_app
-        taud_app
-        ecm_app
-        sensor_app
-        dummy_app
-        cxl_app
-        audio_app
-        gic_app
-        generic_timer_app
-    )
-elseif(BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "mdp_x5h_hil")
-    set(SAMPLE_APPS
-        hello_world
-        uart_app
-        logging_app
-        mpu_app
-        gpio_app
-        ak4619_app
-        cpp_app
-        i2c_app
-        sys_dmac_app
-        rt_dmac_app
-        swdt_app
-        wwdt_app
-        smmu_app
-        power-management_app
-        wcrc_app
-        utils_app
-        taud_app
-        ecm_app
-        sensor_app
-        ucie
-        audio_app
-        gic_app
-        generic_timer_app
-        mfis_app
-    )
-elseif(BOARD STREQUAL "x5h_rfs2")
-    set(SAMPLE_APPS
-        hello_world
-        uart_app
-        logging_app
-        mpu_app
-        gpio_app
-        cpp_app
-        i2c_app
-        sys_dmac_app
-        rt_dmac_app
-        swdt_app
-        wwdt_app
-        smmu_app
-        wcrc_app
-        utils_app
-        taud_app
-        ecm_app
-        dummy_app
-        ucie
-        audio_app
-        gic_app
-        generic_timer_app
-        mfis_app
-    )
-elseif(BOARD STREQUAL "mdp_aiacc_rfs2")
-    set(SAMPLE_APPS
-        hello_world
-        uart_app
-        logging_app
-        mpu_app
-        gpio_app
-        cpp_app
-        i2c_app
-        rt_dmac_app
-        swdt_app
-        wwdt_app
-        smmu_app
-        wcrc_app
-        utils_app
-        ecm_app
-        ucie
-        dummy_app
-        gic_app
-        generic_timer_app
-        mfis_app
-    )
-elseif(BOARD STREQUAL "mdp_aiacc_hil")
-    set(SAMPLE_APPS
-        hello_world
-        uart_app
-        logging_app
-        mpu_app
-        gpio_app
-        cpp_app
-        i2c_app
-        rt_dmac_app
-        swdt_app
-        wwdt_app
-        smmu_app
-        power-management_app
-        wcrc_app
-        utils_app
-        ecm_app
-        sensor_app
-        gic_app
-        generic_timer_app
-        mfis_app
-        ucie
-    )
-else()
-    message(FATAL_ERROR "Invalid BOARD: ${BOARD}. Cannot add apps!")
-endif()
-
-add_subdirectory_from_list(SAMPLE_APPS)
-
-add_subdirectory(Blinky)
-
-# TODO: Delete application makefile
-# TODO: Remove porting code in Kernel
-# TODO: Remove rcar code in FreeRTOS_POSIX repo
+endforeach()
