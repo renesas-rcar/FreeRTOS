@@ -108,12 +108,6 @@ static void writel(const uint32_t value, const uintptr_t address);
 
 static uint32_t readl(const uintptr_t Address);
 
-static void setbit_l(uint32_t addr, uint32_t pos);
-
-static uint32_t getbit_l(uint32_t addr, uint32_t pos);
-
-static void clearbit_l(uint32_t addr, uint32_t pos);
-
 static void writel(const uint32_t value, const uintptr_t address)
 {
     *((volatile unsigned int*) address)  = value;
@@ -122,23 +116,6 @@ static void writel(const uint32_t value, const uintptr_t address)
 static uint32_t readl(const uintptr_t address)
 {
     return *((volatile unsigned int*)address);
-}
-
-static void setbit_l(uint32_t addr, uint32_t pos)
-{
-    writel(readl(addr) | BIT(pos), addr);
-}
-
-static uint32_t getbit_l(uint32_t addr, uint32_t pos)
-{
-    return !!(readl(addr) & BIT(pos));
-}
-
-static void clearbit_l(uint32_t addr, uint32_t pos)
-{
-    uint32_t val = readl(addr);
-
-    writel(val &= ~BIT(pos), addr);
 }
 
 static uint32_t getPfcRegister(rcar_pfc_group_t grp, uint32_t offset)
