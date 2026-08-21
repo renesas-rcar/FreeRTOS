@@ -116,13 +116,6 @@ void echoTask( void *pvParameters )
     printf("Patch: %d)\r\n", metal_ver_patch());
 
     rsc_table = get_resource_table(0, &len);
-    uint32_t address_check = (uint32_t)rsc_table + 0x200;
-
-    /*----- Wait RC trigger create rproc -----*/
-    while (*((volatile uint32_t *)address_check) != 0x1234)
-    {
-        vTaskDelay(1);
-    }
 
     /* Initialize platform */
     ret = platform_init(NO_USING_MFIS, &platform);
