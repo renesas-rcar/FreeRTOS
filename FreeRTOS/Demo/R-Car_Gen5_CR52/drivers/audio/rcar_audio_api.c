@@ -375,18 +375,22 @@ int r_deinit(void)
 	if(audio_ssi_conf->playback != NULL)
 	{
 		free(audio_ssi_conf->playback);
+		audio_ssi_conf->playback = NULL;
 	}
 	if(audio_ssi_conf->capture != NULL)
 	{
 		free(audio_ssi_conf->capture);
+		audio_ssi_conf->capture = NULL;
 	}
 	if(audio_ssi_conf != NULL)
 	{
 		free(audio_ssi_conf);
+		audio_ssi_conf = NULL;
 	}
 	if(audio_adg_conf != NULL)
 	{
 		free(audio_adg_conf);
+		audio_adg_conf = NULL;
 	}
 
 	ak4619_module_deinit();
