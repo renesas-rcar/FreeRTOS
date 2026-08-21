@@ -107,8 +107,8 @@ elseif(BOARD STREQUAL "mdp_aiacc_hil")
         set (UCIE_CONW "CONW_RCAR_UCIE_V100")
     endif()
 else()
-    set(UCIE_VER "NONE")
-    set(UCIE_CONW "NONE")
+    set(UCIE_VER "UCIE_VER_NONE")
+    set(UCIE_CONW "UCIE_CONW_NONE")
 endif()
 
 
