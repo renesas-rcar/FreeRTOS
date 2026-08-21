@@ -226,9 +226,8 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
     r_i2c_Unit_t Unit = p_instance_ctrl->p_cfg->channel;
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint8_t ret;
-
-    switch (Unit) {
 #if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
+    switch (Unit) {
         case R_I2C_IF0:
             clock_id = X5H_CLOCK_ID_MDLC_I2C0;
             break;
@@ -256,7 +255,6 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
         case R_I2C_IF8:
             clock_id = X5H_CLOCK_ID_MDLC_I2C8;
             break;
-#endif
         default:
             printf("[R_I2C_PRV_GetClockId] : Wrong I2C Unit %d\r\n", Unit);
             return -1;
@@ -267,7 +265,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
     {
         printf("Error: Failed to set clock id %d ON.\r\n", clock_id);
     }
-
+#endif
     uint32_t I2C_ClockRate = p_instance_ctrl->p_cfg->rate;
     switch (I2C_ClockRate)
     {
