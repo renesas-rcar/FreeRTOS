@@ -18,6 +18,8 @@ MEMORY
    remote_proc_rsc_table_ucie_0_0 : ORIGIN = 0x9E600000, LENGTH = 0x1000
    remote_proc_rsc_table_ucie_1_0 : ORIGIN = 0x9F600000, LENGTH = 0x1000
    remote_proc_rsc_table_ucie_1_1 : ORIGIN = 0xA0600000, LENGTH = 0x1000
+   remote_proc_rsc_table_ucie_ca_aiacc0 : ORIGIN = 0x8E600000, LENGTH = 0x1000
+   remote_proc_rsc_table_ucie_ca_aiacc1 : ORIGIN = 0x8E650000, LENGTH = 0x1000
 }
 
 /* --- BSP Configuration Symbols --- */
