@@ -362,7 +362,7 @@ target_link_options(${app_name} BEFORE
 )
 
 convert_bin_to_srec(${app_name})
-
+if(CORE EQUAL 0)
 set(app_name "rpmsg_ucie_x5h_ca_aiacc_core_0")
 
 add_executable(${app_name}
@@ -402,7 +402,7 @@ target_link_options(${app_name} BEFORE
 )
 
 convert_bin_to_srec(${app_name})
-
+endif()
 set(app_name "rpmsg_ucie_cr_x5h_rc1")
 
 add_executable(${app_name}
@@ -442,9 +442,10 @@ target_link_options(${app_name} BEFORE
 )
 
 convert_bin_to_srec(${app_name})
-
+elseif(CORE EQUAL 1)
 set(app_name "rpmsg_ucie_x5h_ca_aiacc_core_1")
 
+set(TEMP_LDFILE ${BSP_DIR}/common/linker/lscript_dram.ld)
 add_executable(${app_name}
     rpmsg_ucie_cr_ep.c
     platform_rcar.c
@@ -471,6 +472,11 @@ target_link_libraries(${app_name}
     m
 )
 
+set_target_properties(${app_name} PROPERTIES
+        LINK_OPTIONS ""  # Clear all link options
+        LINK_FLAGS "-lnosys --specs=nosys.specs -L${BSP_DIR}/common/linker/ -T ${TEMP_LDFILE} -Wl,--no-warn-rwx-segments"
+    )
+
 target_link_options(${app_name}
     PRIVATE
     -T${BSP_DIR}/common/linker/lscript_rsc_table_ucie_ca_aiacc1.ld
@@ -482,6 +488,7 @@ target_link_options(${app_name} BEFORE
 )
 
 convert_bin_to_srec(${app_name})
+endif
 
 set(app_name "rpmsg_ucie_cr_aiacc1_ep0")
 
