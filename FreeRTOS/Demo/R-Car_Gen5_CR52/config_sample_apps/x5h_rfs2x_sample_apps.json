@@ -241,6 +241,16 @@
             ],
             "dependency": "No",
             "status": "Skip"
+        },
+        {
+            "module": "Dummy",
+            "name": "dummy_app",
+            "bin": [
+                "dummy_app_core0.elf",
+                "dummy_app_core1.elf"
+            ],
+            "dependency": "No",
+            "status": "Test"
         }
     ]
 }
