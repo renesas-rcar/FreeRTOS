@@ -22,6 +22,7 @@
 #include "pfc/r_pfc_api.h"
 #include "ucie/r_ucie.h"
 #include "ucie_common.h"
+#include "rcar_utils.h"
 
 #define CNTCR_ADDR   ((volatile uint32_t *)0x1C000000) // Counter Control Register
 #define SILENT_CONSOLE_ON (1U)
@@ -232,7 +233,9 @@ void ucie0_setup_task( void *pvParameters )
 
     st_ucie_ctrl_t ucie_conf = ucie_get_config(UCIE_CH0);
 
-    if (ucie_conf.init_with_system)
+    uint32_t cpu_id = R_UTILS_GetCpuID();
+
+    if (ucie_conf.init_with_system && cpu_id == 0)
     {
         if (ucie_conf.mode == UCIE_MODE_RC)
         {
@@ -275,7 +278,9 @@ void ucie1_setup_task( void *pvParameters )
 
     st_ucie_ctrl_t ucie_conf = ucie_get_config(UCIE_CH1);
 
-    if (ucie_conf.init_with_system)
+    uint32_t cpu_id = R_UTILS_GetCpuID();
+
+    if (ucie_conf.init_with_system && cpu_id == 0)
     {
         if (ucie_conf.mode == UCIE_MODE_RC)
         {
