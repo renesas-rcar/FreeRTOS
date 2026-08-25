@@ -76,7 +76,9 @@
             "name": "rpmsg_sample",
             "bin": [
                 "rpmsg_echo_aiacc0_0.elf",
-                "rpmsg_echo_aiacc1_0.elf"
+                "rpmsg_echo_aiacc1_0.elf",
+                "rpmsg_echo_aiacc0_1.elf",
+                "rpmsg_echo_aiacc1_1.elf"
             ],
             "dependency": "open_amp",
             "status": "Test"
