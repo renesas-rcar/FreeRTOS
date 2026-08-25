@@ -235,7 +235,7 @@ void ucie0_setup_task( void *pvParameters )
 
     uint32_t cpu_id = R_UTILS_GetCpuID();
 
-    if (ucie_conf.init_with_system && cpu_id == 0)
+    if ((ucie_conf.init_with_system == true) && (cpu_id == 0))
     {
         if (ucie_conf.mode == UCIE_MODE_RC)
         {
@@ -280,7 +280,7 @@ void ucie1_setup_task( void *pvParameters )
 
     uint32_t cpu_id = R_UTILS_GetCpuID();
 
-    if (ucie_conf.init_with_system && cpu_id == 0)
+    if ((ucie_conf.init_with_system == true) && (cpu_id == 0))
     {
         if (ucie_conf.mode == UCIE_MODE_RC)
         {
