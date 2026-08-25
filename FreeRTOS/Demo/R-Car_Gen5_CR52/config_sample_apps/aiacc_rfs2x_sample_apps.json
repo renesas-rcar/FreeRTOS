@@ -231,7 +231,7 @@
                 "virtio_rpmsg.elf"
             ],
             "dependency": "open_amp",
-            "status": "Skip"
+            "status": "Test"
         },
         {
             "module": "Sensor",
