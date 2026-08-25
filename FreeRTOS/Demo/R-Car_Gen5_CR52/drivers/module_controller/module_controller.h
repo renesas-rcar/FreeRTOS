@@ -289,21 +289,21 @@ static const MDLC_MS_REG_TABLE ms_reg_table[MODULE_NUM_MAX][MS_REG_MAX_NUM] =
 /*****************************************************************************
  * Module Controller common
  *****************************************************************************/
-const char* get_class_group_name(uint32_t module_num);
-const char *get_hier_name(uint32_t pd_hier);
+const char* get_class_group_name_f(uint32_t module_num);
+const char *get_hier_name_f(uint32_t pd_hier);
 
 /*****************************************************************************
  * Module Controller common
  *****************************************************************************/
-const char* get_class_group_name(uint32_t module_num);
+const char* get_class_group_name_f(uint32_t module_num);
 
 /*****************************************************************************
  * Module Standby
  *****************************************************************************/
-void mdlc_ms_module_run_bit(uint32_t module_num, uint32_t reg_num, uint32_t bit_num);
+void mdlc_ms_module_run_bit_f(uint32_t module_num, uint32_t reg_num, uint32_t bit_num);
 
-void mdlc_check_ms_status(uint32_t module_num, uint32_t reg_num, uint32_t bit_num);
-void mdlc_transition_ms(uint32_t module_num, uint32_t reg_num, uint32_t bit_num, uint32_t ms_dest);
-void mdlc_ms_reg_write(uint32_t module_num, uint32_t reg_addr, uint32_t reg_val);
+void mdlc_check_ms_status_f(uint32_t module_num, uint32_t reg_num, uint32_t bit_num);
+void mdlc_transition_ms_f(uint32_t module_num, uint32_t reg_num, uint32_t bit_num, uint32_t ms_dest);
+void mdlc_ms_reg_write_f(uint32_t module_num, uint32_t reg_addr, uint32_t reg_val);
 
 #endif  /* MODULE_CONTROLLER_H_ */

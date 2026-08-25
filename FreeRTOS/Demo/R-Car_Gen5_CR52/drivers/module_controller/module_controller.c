@@ -48,7 +48,7 @@ static void panic(void)
 /*****************************************************************************
  * Module Controller common
  *****************************************************************************/
-const char* get_class_group_name(uint32_t module_num)
+const char* get_class_group_name_f(uint32_t module_num)
 {
     const char* class_group_name;
 
@@ -65,7 +65,7 @@ const char* get_class_group_name(uint32_t module_num)
     return class_group_name;
 }
 
-void mdlc_ms_module_run_bit(uint32_t module_num, uint32_t reg_num, uint32_t bit_num)
+void mdlc_ms_module_run_bit_f(uint32_t module_num, uint32_t reg_num, uint32_t bit_num)
 {
     uint32_t ms_stat_reg = ms_reg_table[module_num][reg_num].ms_stat_reg_addr;
     uint32_t bit_assign = ms_reg_table[module_num][reg_num].ms_reg_bit_assign;
@@ -91,13 +91,13 @@ void mdlc_ms_module_run_bit(uint32_t module_num, uint32_t reg_num, uint32_t bit_
                 NOTICE("BIT: %d, STAT: 0x%x, Module Standby -> Module Reset -> Module RUN\r\n", bit_num, ms_stat_val);
 
                 /* Check MDLC[n]MSRESS[l] = MDLC[n]MSRES[l]?                */
-                mdlc_check_ms_status(module_num, reg_num, bit_num);
+                mdlc_check_ms_status_f(module_num, reg_num, bit_num);
 
                 /* Set MDLC[n]MSRES[l]                                      */
-                mdlc_transition_ms(module_num, reg_num, bit_num, MS_RESET);
+                mdlc_transition_ms_f(module_num, reg_num, bit_num, MS_RESET);
 
                 /* Wait MDLC[n]MSRESS[l] = MDLC[n]MSRES[l]?                 */
-                mdlc_check_ms_status(module_num, reg_num, bit_num);
+                mdlc_check_ms_status_f(module_num, reg_num, bit_num);
 
                 /* Completion of Destination State                          */
                 /* Check Module Standby status                              */
@@ -109,10 +109,10 @@ void mdlc_ms_module_run_bit(uint32_t module_num, uint32_t reg_num, uint32_t bit_
                 /* Start of Module RUN.                                     */
 
                 /* Set MDLC[n]MSRESS[l]                                     */
-                mdlc_transition_ms(module_num, reg_num, bit_num, MS_RUN);
+                mdlc_transition_ms_f(module_num, reg_num, bit_num, MS_RUN);
 
                 /* Wait MDLC[n]MSRESS[l] = MDLC[n]MSRES[l]?                 */
-                mdlc_check_ms_status(module_num, reg_num, bit_num);
+                mdlc_check_ms_status_f(module_num, reg_num, bit_num);
 
                 /* Completion of Destination State                          */
                 /* Check Module Standby status                              */
@@ -130,13 +130,13 @@ void mdlc_ms_module_run_bit(uint32_t module_num, uint32_t reg_num, uint32_t bit_
                 NOTICE("BIT: %d, STAT: 0x%x, Module Reset -> Module RUN\r\n", bit_num, ms_stat_val);
 
                 /* Check MDLC[n]MSRESS[l] = MDLC[n]MSRES[l]?                */
-                mdlc_check_ms_status(module_num, reg_num, bit_num);
+                mdlc_check_ms_status_f(module_num, reg_num, bit_num);
 
                 /* Set MDLC[n]MSRESS[l]                                     */
-                mdlc_transition_ms(module_num, reg_num, bit_num, MS_RUN);
+                mdlc_transition_ms_f(module_num, reg_num, bit_num, MS_RUN);
 
                 /* Wait MDLC[n]MSRESS[l] = MDLC[n]MSRES[l]?                 */
-                mdlc_check_ms_status(module_num, reg_num, bit_num);
+                mdlc_check_ms_status_f(module_num, reg_num, bit_num);
 
                 /* Completion of Destination State                          */
                 /* Check Module Standby status                              */
@@ -154,13 +154,13 @@ void mdlc_ms_module_run_bit(uint32_t module_num, uint32_t reg_num, uint32_t bit_
                 NOTICE("BIT: %d, STAT: 0x%x, Module STOP -> Module RUN\r\n", bit_num, ms_stat_val);
 
                 /* Check MDLC[n]MSRESS[l] = MDLC[n]MSRES[l]?                */
-                mdlc_check_ms_status(module_num, reg_num, bit_num);
+                mdlc_check_ms_status_f(module_num, reg_num, bit_num);
 
                 /* Set MDLC[n]MSRESS[l]                                     */
-                mdlc_transition_ms(module_num, reg_num, bit_num, MS_RUN);
+                mdlc_transition_ms_f(module_num, reg_num, bit_num, MS_RUN);
 
                 /* Wait MDLC[n]MSRESS[l] = MDLC[n]MSRES[l]?                 */
-                mdlc_check_ms_status(module_num, reg_num, bit_num);
+                mdlc_check_ms_status_f(module_num, reg_num, bit_num);
 
                 /* Completion of Destination State                          */
                 /* Check Module Standby status                              */
@@ -175,7 +175,7 @@ void mdlc_ms_module_run_bit(uint32_t module_num, uint32_t reg_num, uint32_t bit_
                 NOTICE("BIT: %d, STAT: 0x%x, Already Module RUN\r\n", bit_num, ms_stat_val);
                 break;
             default:
-                NOTICE("Unknown MS Status Error! Module Number: %d, Class Group: %s, REG: %d, BIT: %d, STAT: 0x%x, Func: %s\r\n", module_num, get_class_group_name(module_num), reg_num, bit_num, ms_stat_val, __func__);
+                NOTICE("Unknown MS Status Error! Module Number: %d, Class Group: %s, REG: %d, BIT: %d, STAT: 0x%x, Func: %s\r\n", module_num, get_class_group_name_f(module_num), reg_num, bit_num, ms_stat_val, __func__);
                 panic;
                 break;
         }
@@ -188,7 +188,7 @@ void mdlc_ms_module_run_bit(uint32_t module_num, uint32_t reg_num, uint32_t bit_
     return;
 }
 
-void mdlc_transition_ms(uint32_t module_num, uint32_t reg_num, uint32_t bit_num, uint32_t ms_dest)
+void mdlc_transition_ms_f(uint32_t module_num, uint32_t reg_num, uint32_t bit_num, uint32_t ms_dest)
 {
     uint32_t ms_reset_reg = ms_reg_table[module_num][reg_num].ms_reset_reg_addr;
     uint32_t ms_stat_reg = ms_reg_table[module_num][reg_num].ms_stat_reg_addr;
@@ -205,7 +205,7 @@ void mdlc_transition_ms(uint32_t module_num, uint32_t reg_num, uint32_t bit_num,
         ms_mask = ~(MS_BIT_MASK << bit_num);
         ms_reset_val = mem_read32(ms_reset_reg) & ms_mask;
         ms_reset_val |= (ms_dest << bit_num);
-        mdlc_ms_reg_write(module_num, ms_reset_reg, ms_reset_val);
+        mdlc_ms_reg_write_f(module_num, ms_reset_reg, ms_reset_val);
     }
     else
     {
@@ -216,7 +216,7 @@ void mdlc_transition_ms(uint32_t module_num, uint32_t reg_num, uint32_t bit_num,
 }
 
 /* Write protect is released and write to MS register of MDLC. */
-void mdlc_ms_reg_write(uint32_t pd_hier, uint32_t reg_addr, uint32_t reg_val)
+void mdlc_ms_reg_write_f(uint32_t pd_hier, uint32_t reg_addr, uint32_t reg_val)
 {
     /* Enable write access of protected MS registers. */
     mem_write32(mdlcnpkcprot1_reg[pd_hier], WRITE_KEY_CODE_EN);
@@ -226,9 +226,9 @@ void mdlc_ms_reg_write(uint32_t pd_hier, uint32_t reg_addr, uint32_t reg_val)
 
     /* Disable write access of protected MS registers. */
     mem_write32(mdlcnpkcprot1_reg[pd_hier], WRITE_KEY_CODE_DIS);
-} /* End of function mdlc_ms_reg_write(uint32_t pd_hier, uint32_t reg_addr, uint32_t reg_val) */
+} /* End of function mdlc_ms_reg_write_f(uint32_t pd_hier, uint32_t reg_addr, uint32_t reg_val) */
 
-void mdlc_check_ms_status(uint32_t module_num, uint32_t reg_num, uint32_t bit_num)
+void mdlc_check_ms_status_f(uint32_t module_num, uint32_t reg_num, uint32_t bit_num)
 {
     uint32_t ms_reset_reg = ms_reg_table[module_num][reg_num].ms_reset_reg_addr;
     uint32_t ms_stat_reg = ms_reg_table[module_num][reg_num].ms_stat_reg_addr;
@@ -244,7 +244,7 @@ void mdlc_check_ms_status(uint32_t module_num, uint32_t reg_num, uint32_t bit_nu
         cnt++;
         if(cnt > MDLC_RETRY_MAX)
         {
-            NOTICE("MS Give up Error! Module Number: %d, Class Group: %s, REG: %d, BIT: %d, STAT: 0x%x, Func: %s\r\n", module_num, get_class_group_name(module_num), reg_num, bit_num, ms_stat_val, __func__);
+            NOTICE("MS Give up Error! Module Number: %d, Class Group: %s, REG: %d, BIT: %d, STAT: 0x%x, Func: %s\r\n", module_num, get_class_group_name_f(module_num), reg_num, bit_num, ms_stat_val, __func__);
             break;
         }
     } while (ms_stat_val != ms_reset_val);
@@ -252,7 +252,7 @@ void mdlc_check_ms_status(uint32_t module_num, uint32_t reg_num, uint32_t bit_nu
     return;
 }
 
-const char *get_hier_name(uint32_t pd_hier)
+const char *get_hier_name_f(uint32_t pd_hier)
 {
     const char *hier_name;
 
@@ -267,4 +267,4 @@ const char *get_hier_name(uint32_t pd_hier)
     }
 
     return hier_name;
-} /* End of function get_hier_name(uint32_t pd_hier) */
+} /* End of function get_hier_name_f(uint32_t pd_hier) */

@@ -48,7 +48,7 @@ static void SwdtRequestClockOn()
 {
     uint32_t module_num = MODULE_NUM_RT;
 
-    mdlc_ms_module_run_bit(module_num, 10, 2);
+    mdlc_ms_module_run_bit_f(module_num, 10, 2);
 }
 #endif
 

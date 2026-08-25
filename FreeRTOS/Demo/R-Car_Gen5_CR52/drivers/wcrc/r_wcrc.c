@@ -419,19 +419,19 @@ static void WcrcRequestClockOn()
     uint32_t module_num = MODULE_NUM_RT;
 
     //WCRC
-    mdlc_ms_module_run_bit(module_num, 12, 26);
-    mdlc_ms_module_run_bit(module_num, 12, 28);
-    mdlc_ms_module_run_bit(module_num, 12, 30);
+    mdlc_ms_module_run_bit_f(module_num, 12, 26);
+    mdlc_ms_module_run_bit_f(module_num, 12, 28);
+    mdlc_ms_module_run_bit_f(module_num, 12, 30);
 
     //CRC
-    mdlc_ms_module_run_bit(module_num, 13, 16);
-    mdlc_ms_module_run_bit(module_num, 13, 18);
-    mdlc_ms_module_run_bit(module_num, 13, 20);
+    mdlc_ms_module_run_bit_f(module_num, 13, 16);
+    mdlc_ms_module_run_bit_f(module_num, 13, 18);
+    mdlc_ms_module_run_bit_f(module_num, 13, 20);
 
     //KCRC
-    mdlc_ms_module_run_bit(module_num, 14, 6);
-    mdlc_ms_module_run_bit(module_num, 14, 8);
-    mdlc_ms_module_run_bit(module_num, 14, 10);
+    mdlc_ms_module_run_bit_f(module_num, 14, 6);
+    mdlc_ms_module_run_bit_f(module_num, 14, 8);
+    mdlc_ms_module_run_bit_f(module_num, 14, 10);
 }
 #endif
 
