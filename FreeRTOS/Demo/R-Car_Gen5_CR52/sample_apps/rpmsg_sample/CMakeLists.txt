@@ -363,7 +363,7 @@ target_link_options(${app_name} BEFORE
 
 convert_bin_to_srec(${app_name})
 
-set(app_name "rpmsg_ucie_x5h_ca_aiacc_core_0_user_space")
+set(app_name "rpmsg_ucie_x5h_ca_aiacc_core0_channel0")
 set(TEMP_LDFILE ${BSP_DIR}/common/linker/lscript_dram3.ld)
 
 add_executable(${app_name}
@@ -409,7 +409,7 @@ target_link_options(${app_name} BEFORE
 
 convert_bin_to_srec(${app_name})
 
-set(app_name "rpmsg_ucie_x5h_ca_aiacc_core_0_kernel_space")
+set(app_name "rpmsg_ucie_x5h_ca_aiacc_core0_channel1")
 set(TEMP_LDFILE ${BSP_DIR}/common/linker/lscript_dram3.ld)
 
 add_executable(${app_name}
