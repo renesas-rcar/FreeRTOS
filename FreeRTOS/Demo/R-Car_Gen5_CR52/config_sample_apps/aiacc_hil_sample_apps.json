@@ -75,14 +75,10 @@
             "module": "RPMsg",
             "name": "rpmsg_sample",
             "bin": [
-                "rpmsg_echo_aiacc0_0.srec",
-                "rpmsg_echo_aiacc1_0.srec",
-                "rpmsg_echo_aiacc0_0.elf",
-                "rpmsg_echo_aiacc1_0.elf",
-                "rpmsg_ucie_cr_aiacc0_ep0.srec",
-                "rpmsg_ucie_cr_aiacc1_ep0.srec",
-                "rpmsg_ucie_cr_aiacc0_ep0.elf",
-                "rpmsg_ucie_cr_aiacc1_ep0.elf"
+                "rpmsg_ucie_x5h_ca_aiacc_core0_channel0.srec",
+                "rpmsg_ucie_x5h_ca_aiacc_core0_channel1.srec",
+                "rpmsg_ucie_x5h_ca_aiacc_core0_channel0.elf",
+                "rpmsg_ucie_x5h_ca_aiacc_core0_channel1.elf"
             ],
             "dependency": "open_amp",
             "status": "Test"
