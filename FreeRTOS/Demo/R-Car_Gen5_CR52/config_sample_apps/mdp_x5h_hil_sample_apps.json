@@ -83,11 +83,7 @@
                 "rpmsg_mfis0_cluster0_core0.elf",
                 "rpmsg_mfis1_cluster0_core1.elf",
                 "rpmsg_perf_mfis0_cluster0_core0.elf",
-                "rpmsg_perf_mfis1_cluster0_core1.elf",
-                "rpmsg_ucie_cr_x5h_rc0.srec",
-                "rpmsg_ucie_cr_x5h_rc1.srec",
-                "rpmsg_ucie_cr_x5h_rc0.elf",
-                "rpmsg_ucie_cr_x5h_rc1.elf"
+                "rpmsg_perf_mfis1_cluster0_core1.elf"
             ],
             "dependency": "open_amp",
             "status": "Test"

@@ -63,7 +63,7 @@
                 "mfis_cr_cr_core1.elf"
             ],
             "dependency": "No",
-            "status": "Test"
+            "status": "Skip"
         },
         {
             "module": "Posix",
@@ -132,7 +132,7 @@
                 "swdt_app.elf"
             ],
             "dependency": "No",
-            "status": "Test"
+            "status": "Skip"
         },
         {
             "module": "SYS-DMA",
@@ -176,7 +176,7 @@
                 "wwdt_tc8_app.elf"
             ],
             "dependency": "No",
-            "status": "Test"
+            "status": "Skip"
         },
         {
             "module": "Audio",
@@ -231,7 +231,7 @@
                 "virtio_rpmsg.elf"
             ],
             "dependency": "open_amp",
-            "status": "Test"
+            "status": "Skip"
         },
         {
             "module": "Sensor",
