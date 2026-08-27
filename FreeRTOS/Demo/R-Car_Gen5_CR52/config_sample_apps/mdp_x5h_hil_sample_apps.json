@@ -33,7 +33,8 @@
             "module": "GPIO",
             "name": "gpio_app",
             "bin": [
-                "gpio_app.srec"
+                "gpio_app.srec",
+                "mdp_x5h_test_aiacc_pins.srec"
             ],
             "dependency": "No",
             "status": "Test"

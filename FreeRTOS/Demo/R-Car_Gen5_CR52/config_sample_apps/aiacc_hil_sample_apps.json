@@ -129,7 +129,7 @@
                 "swdt_app.srec"
             ],
             "dependency": "No",
-            "status": "Skip"
+            "status": "Test"
         },
         {
             "module": "SYS-DMA",
