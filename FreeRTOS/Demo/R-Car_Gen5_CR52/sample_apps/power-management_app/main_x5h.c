@@ -169,6 +169,42 @@ static int pmPowerDomainSkip(int domain_id) {
     return ret;
 }
 
+static int pmResetDomainSkip(int domain_id) {
+    int ret = 0;
+    int cpu_id = R_UTILS_GetCpuID();
+    if (((cpu_id == 0) &&
+        ((X5H_RESET_DOMAIN_ID_CR52TOP0 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52TOP0_BD == domain_id) ||
+        (X5H_RESET_DOMAIN_ID_CR52CORE0 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52CORE0_PO == domain_id) ||
+        (X5H_RESET_DOMAIN_ID_CR52SHADOW0 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52SHADOW0_PO == domain_id)))
+        ||
+        ((cpu_id == 1) &&
+        ((X5H_RESET_DOMAIN_ID_CR52TOP1 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52TOP1_DEB == domain_id) ||
+        (X5H_RESET_DOMAIN_ID_CR52CORE1 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52CORE1_PO == domain_id) ||
+        (X5H_RESET_DOMAIN_ID_CR52SHADOW1 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52SHADOW1_PO == domain_id)))) {
+        /* Do nothing */
+    } else {
+        ret = 1;
+    }
+    return ret;
+}
+
+static int pmClockDomainSkip(int clock_id) {
+    int ret = 0;
+    int cpu_id = R_UTILS_GetCpuID();
+    if (((cpu_id == 0) &&
+        ((X5H_CLOCK_ID_MDLC_CR52CORE0 == clock_id) || (X5H_CLOCK_ID_MDLC_CR52CORE0_PO == clock_id) ||
+        (X5H_CLOCK_ID_MDLC_CR52SHADOW0 == clock_id) || (X5H_CLOCK_ID_MDLC_CR52SHADOW0_PO == clock_id)))
+        ||
+        ((cpu_id == 1) &&
+        ((X5H_CLOCK_ID_MDLC_CR52CORE1 == clock_id) || (X5H_CLOCK_ID_MDLC_CR52CORE1_PO == clock_id) ||
+        (X5H_CLOCK_ID_MDLC_CR52SHADOW1 == clock_id) || (X5H_CLOCK_ID_MDLC_CR52SHADOW1_PO == clock_id)))) {
+        /* Do nothing */
+    } else {
+        ret = 1;
+    }
+    return ret;
+}
+
 static int pmClockTest(int clock_id, uint32_t *rate_set)
 {
     int ret;
@@ -243,11 +279,7 @@ static int pmClockTest(int clock_id, uint32_t *rate_set)
     PM_LOG("**********TC%d %d-5: set clock id %d OFF.**********\r\n",
             tc_number, clock_id, clock_id);
     if ((X5H_CLOCK_ID_MDLC_VIPN_MSYNC == clock_id) ||
-        (X5H_CLOCK_ID_MDLC_VIPS_MSYNC == clock_id) ||
-        (X5H_CLOCK_ID_MDLC_CR52CORE0 == clock_id) ||
-        (X5H_CLOCK_ID_MDLC_CR52CORE0_PO == clock_id) ||
-        (X5H_CLOCK_ID_MDLC_CR52SHADOW0 == clock_id) ||
-        (X5H_CLOCK_ID_MDLC_CR52SHADOW0_PO == clock_id)) {
+        (X5H_CLOCK_ID_MDLC_VIPS_MSYNC == clock_id)) {
         PM_LOG("Currently not supported this operation.\r\n");
     } else {
         ret = R_StateManager_ClockOff(clock_id);
@@ -395,7 +427,8 @@ static void pmAppExample(void)
         if (((X5H_POWER_DOMAIN_ID_P_RPU_CORE00 <= domain_id) &&
             (X5H_POWER_DOMAIN_ID_Q_APU_P07 >= domain_id))) {
             PM_LOG("Skip domain id %d \r\n", domain_id);
-        } else if (0 == pmPowerDomainSkip(domain_id)) {
+        } else if ((0 == pmPowerDomainSkip(domain_id)) ||
+        ((X5H_POWER_DOMAIN_ID_RC00 == domain_id) || (X5H_POWER_DOMAIN_ID_RC01 == domain_id))) {
             PM_LOG("Skip domain id %d, because this sample is running on core %d \r\n",
                 domain_id, R_UTILS_GetCpuID());
         } else {
@@ -412,7 +445,8 @@ static void pmAppExample(void)
         if (((X5H_POWER_DOMAIN_ID_P_RPU_CORE00 <= domain_id) &&
             (X5H_POWER_DOMAIN_ID_Q_APU_P07 >= domain_id))) {
             PM_LOG("Skip domain id %d \r\n", domain_id);
-        } else if (0 == pmPowerDomainSkip(domain_id)) {
+        } else if ((0 == pmPowerDomainSkip(domain_id)) ||
+         ((X5H_POWER_DOMAIN_ID_RC00 == domain_id) || (X5H_POWER_DOMAIN_ID_RC01 == domain_id))) {
             PM_LOG("Skip domain id %d, because this sample is running on core %d \r\n",
                 domain_id, R_UTILS_GetCpuID());
         } else {
@@ -456,9 +490,8 @@ static void pmAppExample(void)
         if ((X5H_CLOCK_ID_MDLC_HSCIF0 == domain_id) ||
             (X5H_CLOCK_ID_MDLC_SCIF0 == domain_id) ||
             (X5H_CLOCK_ID_MDLC_SCIF1 == domain_id) ||
-            (X5H_CLOCK_ID_MDLC_INTAP1 <= domain_id)
-            )
-        {
+            (X5H_CLOCK_ID_MDLC_INTAP1 <= domain_id) ||
+            (0 == pmClockDomainSkip(domain_id))) {
             continue;
         }
 
@@ -482,12 +515,12 @@ static void pmAppExample(void)
             (X5H_RESET_DOMAIN_ID_SCIF1 == domain_id) ||
             (X5H_RESET_DOMAIN_ID_CSITOP2 == domain_id) ||
             (domain_id >= X5H_RESET_DOMAIN_ID_VCON0 && domain_id <= X5H_RESET_DOMAIN_ID_VCON9) ||
-            (X5H_RESET_DOMAIN_ID_CR52TOP0 == domain_id) ||
-            (X5H_RESET_DOMAIN_ID_CR52CORE0 == domain_id) ||
-            (X5H_RESET_DOMAIN_ID_CR52CORE0_PO == domain_id) ||
-            (X5H_RESET_DOMAIN_ID_INTAP1 <= domain_id)
+            (X5H_RESET_DOMAIN_ID_INTAP1 <= domain_id) ||
+            (0 == pmResetDomainSkip(domain_id)) ||
+            (domain_id >= X5H_RESET_DOMAIN_ID_CR52TOP0 && domain_id <= X5H_RESET_DOMAIN_ID_CR52TOP1_DEB)
             ) {
-            continue;
+                printf("Skip domain id %d \r\n", domain_id);
+                continue;
         }
         pmResetTest(domain_id);
     }
