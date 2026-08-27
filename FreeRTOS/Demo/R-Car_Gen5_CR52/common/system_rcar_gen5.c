@@ -268,7 +268,7 @@ void ucie0_setup_task( void *pvParameters )
         Ucie_Setup_PCIE_Post(UCIE_CH0, ucie_conf.mode);
     }
 
-    vTaskDelete(NULL);
+    vTaskSuspend(NULL);
 }
 
 void ucie1_setup_task( void *pvParameters )
@@ -313,7 +313,7 @@ void ucie1_setup_task( void *pvParameters )
         Ucie_Setup_PCIE_Post(UCIE_CH1, ucie_conf.mode);
     }
 
-    vTaskDelete(NULL);
+    vTaskSuspend(NULL);
 }
 #endif
 
