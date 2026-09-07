@@ -146,7 +146,7 @@ void R_PCIE_EPF_Test_CmdHandler(struct st_pcie_ep *ep)
 	bar0_reg->status = 0;
 
 	vTaskDelay(10);
-	if (command & COMMAND_READ) {
+	if ((command & COMMAND_READ) != 0U) {
 	    printf_delay("[%s]: Received Read Request\n",__func__);
 	    ret = ucie_epf_test_read(ep, bar0_reg);
         if (!ret) {
@@ -157,7 +157,7 @@ void R_PCIE_EPF_Test_CmdHandler(struct st_pcie_ep *ep)
 	    ucie_epf_test_raise_irq(ep, bar0_reg);
 	    vTaskDelay(2);
 
-	} else if (command & COMMAND_WRITE) {
+	} else if ((command & COMMAND_WRITE) != 0U) {
 	    printf_delay("[%s]: Received Write Request\n",__func__);
 	    ret = ucie_epf_test_write(ep, bar0_reg);
         if (!ret) {
@@ -380,7 +380,7 @@ void R_PCIE_EP_Init(struct st_pcie_ep *ep, uint16_t channel)
 
     //rcar_ucie_ep_hw_enable(channel);
 
-    if (rcar_ucie_ep_init(ep, channel)) {
+    if (rcar_ucie_ep_init(ep, channel) != 0) {
 	printf_delay("Failed to initialize UCIe EP!\n");
     }
 

@@ -42,7 +42,7 @@ e_ucie_linkup_status_t R_UCIE_Retry_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode,
 {
     e_ucie_linkup_status_t ret;
 
-    while(retry--) {
+    while((retry--) != 0U) {
         ret = R_UCIE_Setup(ch, mode, speed);
         if (ret != LINKUP_TIMEOUT) {
             return ret;
@@ -111,7 +111,7 @@ uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg)
     base = UCIE_APB_BASE(ucie_ch) +  ((uint32_t)rgn * IATU_RGN_OFFSET);
 
     val = *(volatile uint32_t*)(base + UCIE_MAPPING_EN_OFF);
-    if (val & (1 << UCIE_MAPPING_STATUS_BIT)) {
+    if ((val & (1 << UCIE_MAPPING_STATUS_BIT)) != 0U) {
         printf("ERROR: This region has been used\n");
         return 1;
     }
@@ -124,9 +124,9 @@ uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg)
     *(volatile uint32_t*)(base + UCIE_MAPPING_EN_OFF)     = (1 << UCIE_MAPPING_EN_BIT);
     
     timeout = 1000000;
-    while(timeout) {
+    while(timeout != 0U) {
         val = *(volatile uint32_t*)(base + UCIE_MAPPING_EN_OFF);
-        if (val & (1 << UCIE_MAPPING_STATUS_BIT)) {
+        if ((val & (1 << UCIE_MAPPING_STATUS_BIT)) != 0U) {
             break;
         }
         timeout--;
@@ -136,9 +136,9 @@ uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg)
     }
 
     timeout = 1000000;
-    while (timeout) {
+    while (timeout != 0U) {
         val = *(volatile uint32_t*)(base + UCIE_INT_STS_OFF);
-        if (val & (1 << UCIE_MAPPING_INT_BIT)) {
+        if ((val & (1 << UCIE_MAPPING_INT_BIT)) != 0U) {
             break;
         }
         timeout--;
@@ -180,7 +180,7 @@ uint32_t R_UCIE_IATU_UnsetRegion(st_ucie_iatu_cfg_t *cfg)
     *(volatile uint32_t*)(base + UCIE_MAPPING_EN_OFF) = val & (~(1 << UCIE_MAPPING_EN_BIT));
     
     timeout = 1000000;
-    while(timeout) {
+    while(timeout != 0U) {
         val = *(volatile uint32_t*)(base + UCIE_MAPPING_EN_OFF);
         if ((val & (1 << UCIE_MAPPING_STATUS_BIT)) == 0) {
             break;
@@ -192,9 +192,9 @@ uint32_t R_UCIE_IATU_UnsetRegion(st_ucie_iatu_cfg_t *cfg)
     }
     
     timeout = 1000000;
-    while (timeout) {
+    while (timeout != 0U) {
         val = *(volatile uint32_t*)(base + UCIE_INT_STS_OFF);
-        if (val & (1 << UCIE_MAPPING_INT_BIT)) {
+        if ((val & (1 << UCIE_MAPPING_INT_BIT)) != 0U) {
             break;
         }
         timeout--;

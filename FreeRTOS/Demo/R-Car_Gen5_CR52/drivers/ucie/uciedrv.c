@@ -94,7 +94,7 @@ uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
     mem_write32(base + HDMA_DAR_LOW_OFF, (uint32_t)(dstAddr & 0xFFFFFFFF));
     mem_write32(base + HDMA_DAR_HIGH_OFF, (uint32_t)(dstAddr >> 32));
 
-    if (rw) {
+    if (rw == HDMA_READ) {
         mem_write32(base + HDMA_CONTROL1_OFF, 0x00070010);
     } else {
         mem_write32(base + HDMA_CONTROL1_OFF, 0x00040010);
@@ -1250,14 +1250,14 @@ static void set_pll9_0(uint32_t f_Speed){
 
     // 2-2
     while(1){
-        if((*(volatile uint32_t*)HSCS_APB_PLL9_0_CR2) & 0x80000000){
+        if(((*(volatile uint32_t*)HSCS_APB_PLL9_0_CR2) & 0x80000000U) != 0U){
             break;
         }
     }
     *(volatile uint32_t *)HSCS_APB_PLL9_0SCR = 0x00000001;
 
     while(1){
-        if((*(volatile uint32_t*)HSCS_APB_PLL9_0SCR) & 0x00010000){
+        if(((*(volatile uint32_t*)HSCS_APB_PLL9_0SCR) & 0x00010000U) != 0U){
             break;
         }
     }
@@ -1286,7 +1286,7 @@ static void set_pll9_0(uint32_t f_Speed){
     *(volatile uint32_t *)HSCS_APB_PLL9_0_CR2 = 0x10000000;
 
     while(1){
-        if((*(volatile uint32_t*)HSCS_APB_PLL9_0_CR2) & 0x80000000){
+        if(((*(volatile uint32_t*)HSCS_APB_PLL9_0_CR2) & 0x80000000U) != 0U){
             break;
         }
     }
@@ -1318,20 +1318,20 @@ static void set_pll9_1(uint32_t f_Speed)
 
     // 2-5
     while(1){
-        if((*(volatile uint32_t*)HSCS_APB_PLL9_1_CR2) & 0x80000000){
+        if(((*(volatile uint32_t*)HSCS_APB_PLL9_1_CR2) & 0x80000000U) != 0U){
             break;
         }
     }
     *(volatile uint32_t *)HSCS_APB_PLL9_1SCR = 0x00000001;
     while(1){
-        if((*(volatile uint32_t*)HSCS_APB_PLL9_1SCR) & 0x00010000){
+        if(((*(volatile uint32_t*)HSCS_APB_PLL9_1SCR) & 0x00010000U) != 0U){
             break;
         }
     }
     *(volatile uint32_t *)HSCS_APB_PLL9_1_CR2 = 0x20000000;
 
     while(1){
-        if((*(volatile uint32_t*)HSCS_APB_PLL9_1_CR2) & 0x80000000){
+        if(((*(volatile uint32_t*)HSCS_APB_PLL9_1_CR2) & 0x80000000U) != 0U){
             break;
         }
     }
@@ -1351,7 +1351,7 @@ static void set_pll9_1(uint32_t f_Speed)
     }
     *(volatile uint32_t *)HSCS_APB_PLL9_1_CR2 = 0x10000000;
     while(1){
-        if((*(volatile uint32_t*)HSCS_APB_PLL9_1_CR2) & 0x80000000){
+        if(((*(volatile uint32_t*)HSCS_APB_PLL9_1_CR2) & 0x80000000U) != 0U){
             break;
         }
     }
@@ -1607,7 +1607,7 @@ e_ucie_linkup_status_t R_UCIE_Retry_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode,
 {
     e_ucie_linkup_status_t ret;
 
-    while(retry--) {
+    while((retry--) != 0U) {
         ret = R_UCIE_Setup(ch, mode, speed);
         if (ret != LINKUP_TIMEOUT) {
             return ret;
