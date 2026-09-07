@@ -280,6 +280,8 @@ uint32_t R_GIC_EnableInt(uint32_t ID, uint32_t rd) {
        gic_rdist[rd].sgi_ppi.GICR_ISENABLER[0] = ((uint32_t)1 << ID);
     } else if (ID < 1020) {
       GIC_EnableIRQ(gic_dist, ID);
+    } else {
+      return 1;
     }
 
     return result;
@@ -293,6 +295,10 @@ uint32_t R_GIC_DisableInt(uint32_t ID, uint32_t rd) {
     else if (ID < 1020)
     {
       GIC_DisableIRQ(gic_dist, ID);
+    }
+    else
+    {
+      return 1;
     }
 
     return 0;
@@ -316,6 +322,10 @@ uint32_t R_GIC_SetIntPriority(uint32_t ID, uint32_t rd, uint8_t priority) {
     else if (ID < 1020)
     {
       gic_dist->GICD_IPRIORITYR[ID] = priority;
+    }
+    else
+    {
+      return 1;
     }
 
     return 0;
@@ -359,6 +369,10 @@ uint32_t R_GIC_SetIntGroup(uint32_t ID, uint32_t rd, uint32_t security) {
     {
       gic_dist->GICD_IGROUPR[ID / 32U] |= ((uint32_t)1 << (ID % 32U));
       gic_dist->GICD_IGRPMODR[ID / 2U] &= ((uint32_t)1 << (ID % 32U));
+    }
+    else
+    {
+      return 1;
     }
 
   return 0;

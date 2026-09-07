@@ -7,6 +7,8 @@
 
 #include <audio/rcar_audio.h>
 #include "rcar_audio_api.h"
+/* Logging Function include. */
+#include "logging_stack.h"
 
 int R_Audio_Init(st_audio_instance_ctrl_t * const p_instance_ctrl, st_audio_cfg_t const * const p_cfg)
 {
@@ -16,21 +18,21 @@ int R_Audio_Init(st_audio_instance_ctrl_t * const p_instance_ctrl, st_audio_cfg_
 	ret = r_audio_clock_on();
 	if(ret < 0)
 	{
-		printf("Can't turn on clock for Audio driver!\n");
+		LogDebug(("Can't turn on clock for Audio driver!\n"));
 		return ret;
 	}
 
 	ret = r_ak4619_init(p_cfg);
 	if(ret < 0)
 	{
-		printf("Can't set up AK4619 for Audio driver!\n");
+		LogDebug(("Can't set up AK4619 for Audio driver!\n"));
 		return ret;
 	}
 	
 	ret = r_adg_init(p_cfg);
 	if(ret < 0)
 	{
-		printf("Can't init ADG module!\n");
+		LogDebug(("Can't init ADG module!\n"));
 		return ret;
 	}
 	
@@ -40,13 +42,13 @@ int R_Audio_Init(st_audio_instance_ctrl_t * const p_instance_ctrl, st_audio_cfg_
 	}
 	else
 	{
-		printf("This mode is currently not supported!\n");
+		LogDebug(("This mode is currently not supported!\n"));
 		ret = -1;
 	}
 	
 	if(ret < 0)
 	{
-		printf("Can't init SSI module!\n");
+		LogDebug(("Can't init SSI module!\n"));
 		return ret;
 	}
 	
@@ -59,13 +61,13 @@ int R_Audio_Start(st_audio_instance_ctrl_t * const p_instance_ctrl, const uint8_
 	int i;
 	if(p_instance_ctrl->p_cfg == NULL)
 	{
-		printf("p_instance_ctrl->p_cfg = NULL!\n");
+		LogDebug(("p_instance_ctrl->p_cfg = NULL!\n"));
 		return -1;
 	}
 	ret = r_ssi_start((st_audio_cfg_t*)(p_instance_ctrl->p_cfg));
 	if(ret < 0)
 	{
-		printf("Start audio failed!\n");
+		LogDebug(("Start audio failed!\n"));
 		return ret;
 	}
 
@@ -97,6 +99,11 @@ int R_Audio_Start(st_audio_instance_ctrl_t * const p_instance_ctrl, const uint8_
 					ret = r_ssi_trans(data);
 				}
 			}
+			else
+			{
+				LogDebug(("Unsupported format!\n"));
+				return -1;
+			}
 		}
 		else if(word_size == FOUR_BYTES_PER_SAMPLE)
 		{
@@ -115,16 +122,26 @@ int R_Audio_Start(st_audio_instance_ctrl_t * const p_instance_ctrl, const uint8_
 					ret = r_ssi_trans(data);
 				}
 			}
+			else
+			{
+				LogDebug(("Unsupported format!\n"));
+				return -1;
+			}
+		}
+		else
+		{
+			LogDebug(("Unsupported word size!\n"));
+			return -1;
 		}
 	}
 	else if(((st_audio_cfg_t*)(p_instance_ctrl->p_cfg))->mode == CAPTURE_MODE)
 	{
-		printf("This mode is currently not supported!\n");
+		LogDebug(("This mode is currently not supported!\n"));
 		ret = -1;
 	}
 	else
 	{
-		printf("Unknow mode!\n");
+		LogDebug(("Unknow mode!\n"));
 		ret = -1;
 	}
 	
@@ -136,7 +153,7 @@ int R_Audio_Stop(st_audio_instance_ctrl_t * const p_instance_ctrl)
 	int ret;
 	if(p_instance_ctrl->p_cfg == NULL)
 	{
-		printf("p_instance_ctrl->p_cfg = NULL!\n");
+		LogDebug(("p_instance_ctrl->p_cfg = NULL!\n"));
 		return -1;
 	}
 	ret = r_ssi_stop((st_audio_cfg_t*)(p_instance_ctrl->p_cfg));
@@ -153,14 +170,14 @@ int R_Audio_Config(st_audio_instance_ctrl_t * const p_instance_ctrl)
 	}
 	else
 	{
-		printf("This mode is currently not supported!\n");
+		LogDebug(("This mode is currently not supported!\n"));
 		ret = -1;
 	}
 	
 	
 	if(ret < 0)
 	{
-		printf("Can't config SSI module!\n");
+		LogDebug(("Can't config SSI module!\n"));
 		return ret;
 	}
 	return ret;

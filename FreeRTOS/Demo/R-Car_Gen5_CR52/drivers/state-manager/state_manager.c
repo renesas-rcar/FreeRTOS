@@ -25,16 +25,16 @@
 #include "FreeRTOS.h"
 
 #define SM_LOG_INFO(format, ...) \
-    {\
-        printf("SM: I [%s:%d] ", __func__, __LINE__);\
-        printf(format "\r\n", ##__VA_ARGS__);\
-    }
+    do { \
+        (void)printf("SM: I [%s:%d] ", __func__, __LINE__); \
+        (void)printf(format "\r\n", ##__VA_ARGS__); \
+    } while(0)
 
 #define SM_LOG_ERR(format, ...) \
-    {\
-        printf("SM: E [%s:%d] ", __func__, __LINE__);\
-        printf(format "\r\n", ##__VA_ARGS__);\
-    }
+    do { \
+        (void)printf("SM: E [%s:%d] ", __func__, __LINE__); \
+        (void)printf(format "\r\n", ##__VA_ARGS__); \
+    } while(0)
 
 #define VALIDATE_ID(id, max) \
     do { \
@@ -347,6 +347,10 @@ int R_StateManager_Power_Get(int domain_id, e_power_state_t *state)
 		*state = POWER_ON;
 	} else if (pwr_cfg.power_state == SCMI_POWER_STATE_OFF) {
 		*state = POWER_OFF;
+	} else {
+		SM_LOG_ERR("Unexpected power state 0x%x for domain %d\r\n",
+            (unsigned int)pwr_cfg.power_state, domain_id);
+		return -1;
 	}
 
 	return 0;

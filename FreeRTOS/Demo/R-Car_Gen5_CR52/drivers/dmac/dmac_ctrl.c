@@ -85,11 +85,11 @@ void R_DMAC_RcarInterruptHandler(void* p_context)
             R_RTDMAC_Clear_RDMCHCR_TE(dev, ch);
             if (DRV_RTDMAC_REG_RDMCHCR_DPM_REP != (Value & DRV_RTDMAC_REG_RDMCHCR_DPM))
             {
-                Value = R_RTDMAC_Clear_RDMCHCR_DE(dev, ch);
+                (void)R_RTDMAC_Clear_RDMCHCR_DE(dev, ch);
             }
         }
         /* Check DSE Interrupt */
-        else if (0 != (Value & DRV_RTDMAC_REG_RDMCHCR_DSE))
+        if (0U != (Value & DRV_RTDMAC_REG_RDMCHCR_DSE))
         {
             R_RTDMAC_Clear_RDMCHCR_DSE(dev, ch);
             if (DRV_RTDMAC_REG_RDMCHCR_DPM_READ == (Value & DRV_RTDMAC_REG_RDMCHCR_DPM))

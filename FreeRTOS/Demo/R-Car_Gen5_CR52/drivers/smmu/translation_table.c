@@ -73,6 +73,12 @@ static void Assign_Entry_Table(uint64_t *entry, uint64_t *table)
     *entry = (unsigned long)table | ENTRY_TYPE_TABLE;
 }
 
+static inline uint64_t *walk_to_next_level(uint64_t *table, uint16_t entry_idx, uint8_t *tbl_level)
+{
+    (*tbl_level)++;
+    return (uint64_t *)(uintptr_t)(*(table + entry_idx) & ENTRY_ADDR_MASK);
+}
+
 static e_smmu_map_fault_code_t Map_Region(uint64_t *ttb, struct st_mm_region *region_map)
 {
     uint16_t entry_idx;
@@ -101,8 +107,7 @@ static e_smmu_map_fault_code_t Map_Region(uint64_t *ttb, struct st_mm_region *re
             Assign_Entry_Table(table, new_table);
         }
 
-        tbl_level++;
-        table = (uint64_t *)(uintptr_t)(*(table + entry_idx) & ENTRY_ADDR_MASK);
+        table = walk_to_next_level(table, entry_idx, &tbl_level);
 
         while (tbl_level < 4 && mem_size)
         {
@@ -143,6 +148,9 @@ static e_smmu_map_fault_code_t Map_Region(uint64_t *ttb, struct st_mm_region *re
                     return MAP_ERR_NULL;
                 }
                 Assign_Entry_Table(table + entry_idx, new_table);
+
+                table = walk_to_next_level(table, entry_idx, &tbl_level);
+                continue;
             }
             else if (get_entry_type(table + entry_idx) == ENTRY_TYPE_BLOCK)
             {
@@ -150,9 +158,10 @@ static e_smmu_map_fault_code_t Map_Region(uint64_t *ttb, struct st_mm_region *re
                 // ERROR: Cannot unmap a larger block to map a smaller block
                 return MAP_ERR_DUPLICATE;
             }
-
-            tbl_level++;
-            table = (uint64_t *)(uintptr_t)(*(table + entry_idx) & ENTRY_ADDR_MASK);
+            else
+            {
+                table = walk_to_next_level(table, entry_idx, &tbl_level);
+            }
         }
     }
 

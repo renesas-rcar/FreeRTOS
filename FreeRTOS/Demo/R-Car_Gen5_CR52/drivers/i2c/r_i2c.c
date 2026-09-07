@@ -913,7 +913,7 @@ static void rcar_i2c_irq_recv(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
         return;
     }
 
-    else if (final_phase_read == false && read_done == false)
+    if (final_phase_read == false && read_done == false)
     {
         /* Make STOP condition */
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x8A);
@@ -950,7 +950,7 @@ static void rcar_i2c_irq_recv(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
         return;
     }
 
-    else if (read_done == true)
+    else /*read_done == true */
     {
         /* Disable all interrupt I2C */
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, 0);
@@ -968,8 +968,7 @@ static void rcar_i2c_irq_recv(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
                 .p_context = p_instance_ctrl->p_context /* p_context is &g_i2c_device_ctrl_x */
             };
             p_instance_ctrl->p_callback(&args);
-        }
-
+        }        
         return;
     }
 }
@@ -1063,6 +1062,10 @@ static void rcar_i2c_irq_send(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
                 };
                 p_instance_ctrl->p_callback(&args);
             }
+            return;
+        }
+        else
+        {
             return;
         }
     }
