@@ -50,6 +50,13 @@
 #define PIO_AIACC0_RC1_WRITE_DATA   0x11111111
 #define PIO_AIACC1_EP1_WRITE_DATA   0x22222222
 
+#define X5H_RC0_ADDR        0x90000000ULL
+#define AIACC0_EP0_ADDR     0x6B800000ULL
+#define X5H_RC1_ADDR        0x90001000ULL
+#define AIACC1_EP0_ADDR     0x6B801000ULL
+#define AIACC0_RC1_ADDR     0x90005000ULL
+#define AIACC1_EP1_ADDR     0x6B805000ULL
+
 /*-----------------------------------------------------------*/
 
 /*
@@ -103,12 +110,6 @@ static void ucie_comm_task(void *pvParameters)
     uint32_t timeout;
     uint32_t timer_freq = R_UTILS_GetTimerFrequency();
     uint64_t start;
-    uint64_t x5h_rc0_addr    =  0x90000000;
-    uint64_t aiacc0_ep0_addr =  0x63800000;
-    uint64_t x5h_rc1_addr    =  0x90001000;
-    uint64_t aiacc1_ep0_addr =  0x63801000;
-    uint64_t aiacc0_rc1_addr =  0x90005000;
-    uint64_t aiacc1_ep1_addr =  0x63805000;
 
     printf("<----- [X5H] TC1: UCIE0 INIT ----->\n");
     ret = R_UCIE_Setup(UCIE_CH0, UCIE_MODE_RC, LINKSPEED_16GTPS);
@@ -164,42 +165,42 @@ static void ucie_comm_task(void *pvParameters)
     st_ucie_iatu_cfg_t cfg = {
         .ucie_ch = UCIE_CH0,
         .rgn = IATU_RGN0,
-        .mSrcAddr = x5h_rc0_addr,
-        .mDestAddr = aiacc0_ep0_addr,
+        .mSrcAddr = X5H_RC0_ADDR,
+        .mDestAddr = AIACC0_EP0_ADDR,
         .size = 0x1000
     };
 
     ret1 = R_UCIE_IATU_SetRegion(&cfg);
 
     printf("X5H-UCIE0 RC write 0x%X to PIO region\n", PIO_X5H_RC0_WRITE_DATA);
-    *(volatile uint32_t*)(uintptr_t)x5h_rc0_addr = PIO_X5H_RC0_WRITE_DATA;
+    *(volatile uint32_t*)(uintptr_t)X5H_RC0_ADDR = PIO_X5H_RC0_WRITE_DATA;
 
     /* Setup PIO region for X5H-AIACC1 */
     st_ucie_iatu_cfg_t cfg1 = {
         .ucie_ch = UCIE_CH1,
         .rgn = IATU_RGN0,
-        .mSrcAddr = x5h_rc1_addr,
-        .mDestAddr = aiacc1_ep0_addr,
+        .mSrcAddr = X5H_RC1_ADDR,
+        .mDestAddr = AIACC1_EP0_ADDR,
         .size = 0x1000
     };
 
     ret2 = R_UCIE_IATU_SetRegion(&cfg1);
 
     printf("X5H-UCIE1 RC write 0x%X to PIO region\n", PIO_X5H_RC1_WRITE_DATA);
-    *(volatile uint32_t*)(uintptr_t)x5h_rc1_addr = PIO_X5H_RC1_WRITE_DATA;
+    *(volatile uint32_t*)(uintptr_t)X5H_RC1_ADDR = PIO_X5H_RC1_WRITE_DATA;
 
     printf("<----- [X5H] TC7: UCIE0 PIO Transfer ----->\n");
 
     ret3 = 1;
     start = R_UTILS_GetTimerCounter();
-    while ((R_UTILS_GetTimerCounter() - start)/timer_freq < 3) {
-        if (*(volatile uint32_t*)(uintptr_t)x5h_rc0_addr == PIO_AIACC0_EP0_WRITE_DATA) {
+    while ((R_UTILS_GetTimerCounter() - start)/timer_freq < 5) {
+        if (*(volatile uint32_t*)(uintptr_t)X5H_RC0_ADDR == PIO_AIACC0_EP0_WRITE_DATA) {
             ret3 = 0;
             break;
         }
     }
 
-    printf("Value at 0x%llX: 0x%X\n", x5h_rc0_addr, *(volatile uint32_t*)(uintptr_t)x5h_rc0_addr);
+    printf("Value at 0x%llX: 0x%X\n", X5H_RC0_ADDR, *(volatile uint32_t*)(uintptr_t)X5H_RC0_ADDR);
 
     if (ret1 || ret3) {
         printf("Result: FAILED\n");
@@ -212,14 +213,14 @@ static void ucie_comm_task(void *pvParameters)
 
     ret4 = 1;
     start = R_UTILS_GetTimerCounter();
-    while ((R_UTILS_GetTimerCounter() - start)/timer_freq < 3) {
-        if (*(volatile uint32_t*)(uintptr_t)x5h_rc1_addr == PIO_AIACC1_EP0_WRITE_DATA) {
+    while ((R_UTILS_GetTimerCounter() - start)/timer_freq < 5) {
+        if (*(volatile uint32_t*)(uintptr_t)X5H_RC1_ADDR == PIO_AIACC1_EP0_WRITE_DATA) {
             ret4 = 0;
             break;
         }
     }
 
-    printf("Value at 0x%llX: 0x%X\n", x5h_rc1_addr, *(volatile uint32_t*)(uintptr_t)x5h_rc1_addr);
+    printf("Value at 0x%llX: 0x%X\n", X5H_RC1_ADDR, *(volatile uint32_t*)(uintptr_t)X5H_RC1_ADDR);
 
     if (ret2 || ret4) {
         printf("Result: FAILED\n");
