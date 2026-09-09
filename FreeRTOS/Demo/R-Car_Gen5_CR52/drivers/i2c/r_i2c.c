@@ -39,12 +39,14 @@
 
 /* ==================== STATIC VARIABLES ==================== */
 static int clock_id;
+static int reset_id;
 
 /* ==================== STATIC FUNCTION PROTOTYPES ==================== */
 /* Helper functions */
 static int32_t  loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask);
 static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes);
 static uint32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read);
+static uint32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit);
 
 /* DMA functions */
 static void rcar_i2c_dma_callback(void *p_context);
@@ -533,6 +535,14 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint32_t val;
     int r;
+    uint8_t ret;
+
+    ret = rcar_i2c_reset_unit(Unit);
+
+    if (ret != 0U)
+    {
+        return ret;
+    }
 
     /* Clear Master Status register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
@@ -545,10 +555,6 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
 
     /* Load the first byte into the shift register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICTXD, Bytes[0]);
-
-    do {
-        val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
-    } while ((val & R_I2C_FSDA_BIT) != (uint32_t)0);
 
     if (p_instance_ctrl->p_cfg->dma_single == true) 
     {
@@ -669,6 +675,14 @@ static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint3
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint32_t val;
     int r;
+    uint8_t ret;
+
+    ret = rcar_i2c_reset_unit(Unit);
+
+    if (ret != 0U)
+    {
+        return ret;
+    }
 
     /* Clear Master Status register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
@@ -682,10 +696,6 @@ static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint3
 
     /* Load the slave register address into the shift register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICTXD, SlaveReg);
-
-    do {
-        val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
-    } while ((val & R_I2C_FSDA_BIT) != (uint32_t)0);
     
     if (p_instance_ctrl->p_cfg->dma_single == true) 
     {
@@ -746,6 +756,14 @@ static uint32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *By
 {
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint32_t val;
+    uint8_t ret;
+
+    ret = rcar_i2c_reset_unit(Unit);
+
+    if (ret != 0U)
+    {
+        return ret;
+    }
 
     /* Clear Master Status register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
@@ -755,10 +773,6 @@ static uint32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *By
 
     /* Set Master Address register (slave addr + 0x01 read mode) */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, ((SlaveAddr << 1) + 1) & ICMAR_MASK_READ);
-
-    do {
-        val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
-    } while ((val & R_I2C_FSDA_BIT) != 0U);
 
     /* Set Master Control register (MDBS=1, MIE=1, ESG=1) */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x89);
@@ -1239,4 +1253,25 @@ static void r_i2c_isr_handler(void * const p_context)
     // if (p_instance_ctrl->p_callback != NULL) {
     //     p_instance_ctrl->p_callback(p_context);
     // }
+}
+
+static uint32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit)
+{
+    int ret;
+
+    if ((uint32_t)Unit >= R_I2C_LAST)
+    {
+        LogDebug(("Wrong I2C Unit %d\r\n", Unit));
+        return -1;
+    }
+
+    reset_id = i2c_reset_domain_id[Unit];
+
+    ret = R_StateManager_Reset(reset_id);
+    if (ret != 0)
+    {
+        return ret;
+    }
+
+    return 0;
 }
