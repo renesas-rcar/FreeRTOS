@@ -240,72 +240,21 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
     r_i2c_Unit_t Unit = p_instance_ctrl->p_cfg->channel;
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint8_t ret;
-#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
-    switch (Unit) {
-        case R_I2C_IF0:
-            clock_id = X5H_CLOCK_ID_MDLC_I2C0;
-            break;
-        case R_I2C_IF1:
-            clock_id = X5H_CLOCK_ID_MDLC_I2C1;
-            break;
-        case R_I2C_IF2:
-            clock_id = X5H_CLOCK_ID_MDLC_I2C2;
-            break;
-        case R_I2C_IF3:
-            clock_id = X5H_CLOCK_ID_MDLC_I2C3;
-            break;
-        case R_I2C_IF4:
-            clock_id = X5H_CLOCK_ID_MDLC_I2C4;
-            break;
-        case R_I2C_IF5:
-            clock_id = X5H_CLOCK_ID_MDLC_I2C5;
-            break;
-        case R_I2C_IF6:
-            clock_id = X5H_CLOCK_ID_MDLC_I2C6;
-            break;
-        case R_I2C_IF7:
-            clock_id = X5H_CLOCK_ID_MDLC_I2C7;
-            break;
-        case R_I2C_IF8:
-            clock_id = X5H_CLOCK_ID_MDLC_I2C8;
-            break;
-        default:
-            LogDebug(("[R_I2C_PRV_GetClockId] : Wrong I2C Unit %d\r\n", Unit));
-            return -1;
+
+    if ((uint32_t)Unit >= R_I2C_LAST)
+    {
+        LogDebug(("Wrong I2C Unit %d\r\n", Unit));
+        return -1;
     }
+
+    clock_id = i2c_clock_domain_id[Unit];
 
     ret = R_StateManager_ClockOn(clock_id);
     if (ret != 0U)
     {
-        LogDebug(("Error: Failed to set clock id %d ON.\r\n", clock_id));
-    }
-#elif (BOARD == MDP_AIACC_HIL)
-    switch (Unit) {
-        case R_I2C_IF0:
-            clock_id = AIACC_CLOCK_ID_I2C0;
-            break;
-        case R_I2C_IF1:
-            clock_id = AIACC_CLOCK_ID_I2C1;
-            break;
-        case R_I2C_IF2:
-            clock_id = AIACC_CLOCK_ID_I2C2;
-            break;
-        case R_I2C_IF3:
-            clock_id = AIACC_CLOCK_ID_I2C3;
-            break;
-        default:
-            printf("[R_I2C_PRV_GetClockId] : Wrong I2C Unit %d\r\n", Unit);
-            return -1;
+        return ret;
     }
 
-    ret = R_StateManager_ClockOn(clock_id);
-    if (ret != 0U)
-    {
-        printf("Error: Failed to set clock id %d ON.\r\n", clock_id);
-    }
-#else
-    /* Do nothing */
-#endif
     uint32_t I2C_ClockRate = p_instance_ctrl->p_cfg->rate;
     switch (I2C_ClockRate)
     {

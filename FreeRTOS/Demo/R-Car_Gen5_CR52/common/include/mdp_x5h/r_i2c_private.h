@@ -17,6 +17,7 @@
 
 #include "stdint.h"
 #include "dmac/sysdmac_ctrl.h"
+#include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_reset_domain_id.h"
 #include "interrupt_id.h"
 
@@ -66,6 +67,19 @@ static const uint32_t i2c_base[I2C_CH_NUM] =
     R_I2C_IF6_BASE,
     R_I2C_IF7_BASE,
     R_I2C_IF8_BASE
+};
+
+static const uint32_t i2c_clock_domain_id[] =
+{
+    X5H_CLOCK_ID_MDLC_I2C0,
+    X5H_CLOCK_ID_MDLC_I2C1,
+    X5H_CLOCK_ID_MDLC_I2C2,
+    X5H_CLOCK_ID_MDLC_I2C3,
+    X5H_CLOCK_ID_MDLC_I2C4,
+    X5H_CLOCK_ID_MDLC_I2C5,
+    X5H_CLOCK_ID_MDLC_I2C6,
+    X5H_CLOCK_ID_MDLC_I2C7,
+    X5H_CLOCK_ID_MDLC_I2C8
 };
 
 static const uint32_t i2c_reset_domain_id[] =
