@@ -43,6 +43,7 @@
 #include "dmac/dmac_common.h"
 #include "dmac/rtdmac_ctrl.h"
 #include "dmac/sysdmac_ctrl.h"
+#include "board.h"                    
 
 #define main_VIOMMUFE_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 
@@ -53,6 +54,61 @@
 #define DESTINATION_OFFSET             0x01000000
 #define SOURCE_OFFSET_MAPPING          0x10000000
 #define DESTINATION_OFFSET_MAPPING     0x11000000
+
+/* DMAC configuration for each board */
+#if (BOARD == MDP_AIACC_HIL || BOARD == MDP_AIACC_RFS2)
+
+    /* DMAC hardware configuration */
+    #define DMAC_CHANNEL_UNIT    RT_DMAC0
+    #define DMAC_INTID           INTID_RTDMA0_CH1
+    #define DMAC_SUB_CHANNEL     DMAC_CH1
+
+    /* Memory and SMMU configuration */
+    #define DMAC_SRC_ADDR(base)  (base)
+    #define DMAC_STREAM_ID       (0x00E01)
+    #define DMAC_SMMU_DOMAIN     SMMU_RT
+
+    /* DMAC API abstraction */
+    #define DMAC_CTRL_INIT(unit, prio) \
+        R_RTDMAC_RcarDmacCtrlInit((unit), (prio))
+
+    #define DMAC_CALLBACK_SET(handler, callback, context) \
+        R_RTDMAC_RcarCallBackSet((handler), (callback), (context))
+
+    #define DMAC_EXEC(unit, subch, cfg, option) \
+        R_RTDMAC_RcarDmacExec((unit), (subch), (cfg), (option))
+
+    #define DMAC_STOP(unit, subch) \
+        R_RTDMAC_RcarDmacStop((unit), (subch))
+        
+#elif (BOARD == X5H_IRONHIDE || BOARD == MDP_X5H_HIL || BOARD == X5H_RFS2)
+
+    /* DMAC hardware configuration */
+
+    #define DMAC_CHANNEL_UNIT SYS_DMAC3
+    #define DMAC_INTID INTID_SYSDMA3_CH1
+    #define DMAC_SUB_CHANNEL DMAC_CH1
+    /* Memory and SMMU configuration */
+    #define DMAC_STREAM_ID       (0x50001)
+    #define DMAC_SMMU_DOMAIN     SMMU_PERW
+
+    /* DMAC API abstraction */
+    #define DMAC_CTRL_INIT(unit, prio) \
+        R_SYSDMAC_RcarDmacCtrlInit((unit), (prio))
+
+    #define DMAC_CALLBACK_SET(handler, callback, context) \
+        R_SYSDMAC_RcarCallBackSet((handler), (callback), (context))
+
+    #define DMAC_EXEC(unit, subch, cfg, option) \
+        R_SYSDMAC_RcarDmacExec((unit), (subch), (cfg), (option))
+
+    #define DMAC_STOP(unit, subch) \
+        R_SYSDMAC_RcarDmacStop((unit), (subch))
+
+#else
+    #error "BOARD is not supported"
+
+#endif
 
 void dmacUserCallback(void *data);
 
@@ -75,9 +131,9 @@ rDmacCfg_t cfg =
 
 rDmacIrqCfg_t rDmacIrqHandler_t_irq =
 {
-    .Unit = SYS_DMAC3,
-    .SubCh = DMAC_CH1,
-    .irq_channel = INTID_SYSDMA3_CH1
+    .Unit = DMAC_CHANNEL_UNIT,
+    .SubCh = DMAC_SUB_CHANNEL,
+    .irq_channel = DMAC_INTID
 };
 
 bool isr_flag = false;
@@ -143,8 +199,8 @@ static void prvVIOMMUFETask( void *pvParameters )
     int ret = 0;
     virtio_iommu_frontend_instance_ctrl_t *virtio_iommu_inst = NULL;
     st_smmu_streamid_instance_ctrl_t smmu_ctrl = {
-        .stream_id = 0x50001,
-        .smmu_domain = SMMU_PERW,
+        .stream_id = DMAC_STREAM_ID,
+        .smmu_domain = DMAC_SMMU_DOMAIN,
         .is_secure = false,
     };
 
@@ -175,7 +231,7 @@ static void prvVIOMMUFETask( void *pvParameters )
     {
         printf("VIRTIO IOMMU Frontend:  Result: Passed\r\n");
     };
-    
+
     printf("VIRTIO IOMMU Frontend:  * Test case 2: Test R_VIRTIO_IOMMU_Attach\n");
     ret = R_VIRTIO_IOMMU_Attach(&smmu_ctrl);
     if (ret == 0) {
@@ -193,8 +249,8 @@ static void prvVIOMMUFETask( void *pvParameters )
     }
     /*----------------------------------------------------------*/
 
-    /*SYSDMA setup*/
-    R_SYSDMAC_RcarDmacCtrlInit(SYS_DMAC3, DRV_RTDMAC_PRIO_FIX);
+    DMAC_CTRL_INIT(rDmacIrqHandler_t_irq.Unit, DRV_RTDMAC_PRIO_FIX);
+
     volatile uint32_t *pa_src_ptr = (volatile uint32_t *)(cfg.mSrcAddr + SOURCE_OFFSET_MAPPING);
     volatile uint32_t *pa_dst_ptr = (volatile uint32_t *)(cfg.mSrcAddr + DESTINATION_OFFSET_MAPPING);
     *(volatile uint32_t *)pa_src_ptr = 0x7012;
@@ -207,9 +263,9 @@ static void prvVIOMMUFETask( void *pvParameters )
 
     printf("VIRTIO IOMMU Frontend:  * Test case 4: Test transaction data *\r\n");
     printf("VIRTIO IOMMU Frontend:  Before DMA: pa dst address: 0x%lx, dst data: 0x%lx\n",pa_dst_ptr, *(volatile uint32_t *)pa_dst_ptr);
-    ret = R_SYSDMAC_RcarCallBackSet(&rDmacIrqHandler_t_irq, dmacUserCallback, &usr_context);
 
-    int dmaStatus = R_SYSDMAC_RcarDmacExec(SYS_DMAC3, DMAC_CH1, &cfg, 0);
+    ret = DMAC_CALLBACK_SET(&rDmacIrqHandler_t_irq, dmacUserCallback, &usr_context);
+    int dmaStatus = DMAC_EXEC(rDmacIrqHandler_t_irq.Unit, rDmacIrqHandler_t_irq.SubCh, &cfg, 0);
 
     while(!isr_flag) {
         __asm__ volatile("nop");
@@ -236,13 +292,12 @@ static void prvVIOMMUFETask( void *pvParameters )
     printf("VIRTIO IOMMU Frontend:  * Test case 5: Test R_VIRTIO_IOMMU_UnMap\n");
     ret = R_VIRTIO_IOMMU_UnMap(&smmu_ctrl, cfg.mSrcAddr, cfg.mSrcAddr + SOURCE_OFFSET_MAPPING, 0x5000000);
     if (ret == 0) {
-        R_SYSDMAC_RcarDmacStop(SYS_DMAC3, DMAC_CH1);
-
+        DMAC_STOP(rDmacIrqHandler_t_irq.Unit, rDmacIrqHandler_t_irq.SubCh);
         *(volatile uint32_t *)pa_src_ptr = 0x111;
         *(volatile uint32_t *)cfg.mSrcAddr = 0x222;
         *(volatile uint32_t *)pa_dst_ptr = 0x555; // Value goes to cache; DMA may miss it if dont invalidate cache
         printf("VIRTIO IOMMU Frontend:  Before DMA: pa dst address: 0x%lx, dst data: 0x%lx\n",pa_dst_ptr, *(volatile uint32_t *)pa_dst_ptr);
-        dmaStatus = R_SYSDMAC_RcarDmacExec(SYS_DMAC3, DMAC_CH1, &cfg, 0);
+        dmaStatus = DMAC_EXEC(rDmacIrqHandler_t_irq.Unit, rDmacIrqHandler_t_irq.SubCh, &cfg, 0);
 
         while(!isr_flag) {
             __asm__ volatile("nop");
@@ -268,18 +323,17 @@ static void prvVIOMMUFETask( void *pvParameters )
     } else {
         printf("VIRTIO IOMMU Frontend:  Result: Failed\r\n");
     }
-    
+
     printf("VIRTIO IOMMU Frontend:  * Test case 6: R_SMMU_Map(Re-map after unmap for verification). *\r\n");
-    
+
     ret = R_VIRTIO_IOMMU_Map(&smmu_ctrl, cfg.mSrcAddr, cfg.mSrcAddr + SOURCE_OFFSET_MAPPING, 0x5000000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
     if (ret == 0) {
-        R_SYSDMAC_RcarDmacStop(SYS_DMAC3, DMAC_CH1);
-
+        DMAC_STOP(rDmacIrqHandler_t_irq.Unit, rDmacIrqHandler_t_irq.SubCh);
         *(volatile uint32_t *)pa_src_ptr = 0x123;
         *(volatile uint32_t *)cfg.mSrcAddr = 0x456;
         *(volatile uint32_t *)pa_dst_ptr = 0x777; // Value goes to cache; DMA may miss it if dont invalidate cache
         printf("VIRTIO IOMMU Frontend:  Before DMA: pa dst address: 0x%lx, dst data: 0x%lx\n",pa_dst_ptr, *(volatile uint32_t *)pa_dst_ptr);
-        dmaStatus = R_SYSDMAC_RcarDmacExec(SYS_DMAC3, DMAC_CH1, &cfg, 0);
+        dmaStatus = DMAC_EXEC(rDmacIrqHandler_t_irq.Unit, rDmacIrqHandler_t_irq.SubCh, &cfg, 0);
 
         while(!isr_flag) {
             __asm__ volatile("nop");
@@ -332,4 +386,3 @@ void vDeleteCallingTask( void )
 {
      vTaskDelete( NULL );
 }
-
