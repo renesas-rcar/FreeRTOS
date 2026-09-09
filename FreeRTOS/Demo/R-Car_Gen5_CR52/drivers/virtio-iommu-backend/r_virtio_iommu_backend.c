@@ -134,14 +134,29 @@ uint32_t VirtIO_SMMU_Handler(st_virtio_msg_t *msg) {
     return ret;
 }
 
+
 static int virtio_smmu_attach(st_virtio_smmu_payload_req_t* data)
 {
     int ret = 0;
-    /*----- Init and enable SMMU -----*/
-    R_SMMU_Init(SMMU_PERW, false);
-    R_SMMU_InvalidateTLB(SMMU_PERW, false);
-    R_SMMU_Enable(SMMU_PERW, false);
-    st_smmu_streamid_instance_ctrl_t *p_ctrl = &(data->p_ctrl);
+
+    e_smmu_domain_t domain    = data->p_ctrl.smmu_domain;
+    bool            is_secure = data->p_ctrl.is_secure;
+
+    ret = R_SMMU_Init(domain, is_secure);
+    if (ret != 0) {
+        return ret;
+    }
+
+    ret = R_SMMU_InvalidateTLB(domain, is_secure);
+    if (ret != 0) {
+        return ret;
+    }
+
+    ret = R_SMMU_Enable(domain, is_secure);
+    if (ret != 0) {
+        return ret;
+    }
+
     ret = R_SMMU_Attach(&(data->p_ctrl));
     return ret;
 }
