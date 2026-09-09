@@ -13,19 +13,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-
-typedef enum {
-    R_I2C_IF0 = 0,  /**< channel 0 */
-    R_I2C_IF1,      /**< channel 1 */
-    R_I2C_IF2,      /**< channel 2 */
-    R_I2C_IF3,      /**< channel 3 */
-    R_I2C_IF4,      /**< channel 4 */
-    R_I2C_IF5,      /**< channel 5 */
-    R_I2C_IF6,      /**< channel 6 */
-    R_I2C_IF7,      /**< channel 7 */
-    R_I2C_IF8,      /**< channel 8 */
-    R_I2C_LAST      /**< delimiter */
-} r_i2c_Unit_t;
+#include "r_i2c_private.h"
 
 /* Offset I2C registers */
 #define R_I2C_ICSCR       0x00UL

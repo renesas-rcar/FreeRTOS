@@ -18,6 +18,7 @@
 #include "stdint.h"
 #include "dmac/rtdmac_ctrl.h"
 #include "state-manager/r_reset_domain_id.h"
+#include "interrupt_id.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,6 +37,14 @@ extern "C" {
 
 #define I2C_CH_NUM          4 
 
+typedef enum {
+    R_I2C_IF0 = 0,  /**< channel 0 */
+    R_I2C_IF1,      /**< channel 1 */
+    R_I2C_IF2,      /**< channel 2 */
+    R_I2C_IF3,      /**< channel 3 */
+    R_I2C_LAST      /**< delimiter */
+} r_i2c_Unit_t;
+
 static const uint32_t i2c_base[I2C_CH_NUM] =
 {
     R_I2C_IF0_BASE,
@@ -50,6 +59,14 @@ static const uint32_t i2c_reset_domain_id[] =
     AIACC_RESET_DOMAIN_ID_I2C1,
     AIACC_RESET_DOMAIN_ID_I2C2,
     AIACC_RESET_DOMAIN_ID_I2C3,
+};
+
+static const uint32_t i2c_int_id[] =
+{
+    INTID_I2C_IF0,
+    INTID_I2C_IF1,
+    INTID_I2C_IF2,
+    INTID_I2C_IF3
 };
 
 #ifdef __cplusplus

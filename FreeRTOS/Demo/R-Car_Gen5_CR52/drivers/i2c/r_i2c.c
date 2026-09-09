@@ -859,7 +859,7 @@ static uint32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read)
         MID_RID_I2C6_MST_TX, MID_RID_I2C7_MST_TX, MID_RID_I2C8_MST_TX
     }; 
     
-    if (Unit >= R_I2C_IF1 && Unit <= R_I2C_IF8) 
+    if (Unit >= R_I2C_IF1 && Unit < R_I2C_LAST)
     {
         return is_read ? rx_ids[Unit] : tx_ids[Unit];
     }
@@ -1109,39 +1109,15 @@ static int R_I2C_SetInterruptCallback(r_i2c_Unit_t Unit, IrqHandlerFn handler, v
 {
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint32_t int_id;
-    switch (Unit) {
-	case R_I2C_IF0:
-	    int_id = INTID_I2C_IF0;
-	    break;
-	case R_I2C_IF1:
-	    int_id = INTID_I2C_IF1;
-	    break;
-	case R_I2C_IF2:
-	    int_id = INTID_I2C_IF2;
-	    break;
-	case R_I2C_IF3:
-	    int_id = INTID_I2C_IF3;
-	    break;
-	case R_I2C_IF4:
-	    int_id = INTID_I2C_IF4;
-	    break;
-	case R_I2C_IF5:
-	    int_id = INTID_I2C_IF5;
-	    break;
-	case R_I2C_IF6:
-	    int_id = INTID_I2C_IF6;
-	    break;
-	case R_I2C_IF7:
-	    int_id = INTID_I2C_IF7;
-	    break;
-	case R_I2C_IF8:
-	    int_id = INTID_I2C_IF8;
-	    break;
-	default:
-	    int_id = INTID_NO_EXIST;
-	    LogDebug(("ERROR: IRQ FAILED - no INTID exist!\n"));
+
+    if ((uint32_t)Unit >= R_I2C_LAST)
+    {
+        LogDebug(("Wrong I2C Unit %d\r\n", Unit));
         return -1;
-	}
+    }
+
+    int_id = i2c_int_id[Unit];
+
     /* Set Handler for Irq */
     Irq_SetupEntry(int_id, handler, ctx);
 
@@ -1158,39 +1134,14 @@ static int RCar_I2C_DisableGICInterrupt(r_i2c_Unit_t Unit)
 {
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint32_t int_id;
-    switch (Unit) {
-	case R_I2C_IF0:
-	    int_id = INTID_I2C_IF0;
-	    break;
-	case R_I2C_IF1:
-	    int_id = INTID_I2C_IF1;
-	    break;
-	case R_I2C_IF2:
-	    int_id = INTID_I2C_IF2;
-	    break;
-	case R_I2C_IF3:
-	    int_id = INTID_I2C_IF3;
-	    break;
-	case R_I2C_IF4:
-	    int_id = INTID_I2C_IF4;
-	    break;
-	case R_I2C_IF5:
-	    int_id = INTID_I2C_IF5;
-	    break;
-	case R_I2C_IF6:
-	    int_id = INTID_I2C_IF6;
-	    break;
-	case R_I2C_IF7:
-	    int_id = INTID_I2C_IF7;
-	    break;
-	case R_I2C_IF8:
-	    int_id = INTID_I2C_IF8;
-	    break;
-	default:
-	    int_id = INTID_NO_EXIST;
-	    LogDebug(("ERROR: IRQ FAILED - no INTID exist!\n"));
+
+    if ((uint32_t)Unit >= R_I2C_LAST)
+    {
+        LogDebug(("Wrong I2C Unit %d\r\n", Unit));
         return -1;
-	}
+    }
+
+    int_id = i2c_int_id[Unit];
 
     /* Disable Irq */
     Irq_Disable(int_id);

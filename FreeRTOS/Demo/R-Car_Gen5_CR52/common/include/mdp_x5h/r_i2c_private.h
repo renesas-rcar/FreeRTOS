@@ -18,6 +18,7 @@
 #include "stdint.h"
 #include "dmac/sysdmac_ctrl.h"
 #include "state-manager/r_reset_domain_id.h"
+#include "interrupt_id.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +41,19 @@ extern "C" {
 #define R_I2C_IF8_BASE      0xc06f8000
 
 #define I2C_CH_NUM          9
+
+typedef enum {
+    R_I2C_IF0 = 0,  /**< channel 0 */
+    R_I2C_IF1,      /**< channel 1 */
+    R_I2C_IF2,      /**< channel 2 */
+    R_I2C_IF3,      /**< channel 3 */
+    R_I2C_IF4,      /**< channel 4 */
+    R_I2C_IF5,      /**< channel 5 */
+    R_I2C_IF6,      /**< channel 6 */
+    R_I2C_IF7,      /**< channel 7 */
+    R_I2C_IF8,      /**< channel 8 */
+    R_I2C_LAST      /**< delimiter */
+} r_i2c_Unit_t;
 
 static const uint32_t i2c_base[I2C_CH_NUM] =
 {
@@ -65,6 +79,19 @@ static const uint32_t i2c_reset_domain_id[] =
     X5H_RESET_DOMAIN_ID_I2C6,
     X5H_RESET_DOMAIN_ID_I2C7,
     X5H_RESET_DOMAIN_ID_I2C8
+};
+
+static const uint32_t i2c_int_id[] =
+{
+    INTID_I2C_IF0,
+    INTID_I2C_IF1,
+    INTID_I2C_IF2,
+    INTID_I2C_IF3,
+    INTID_I2C_IF4,
+    INTID_I2C_IF5,
+    INTID_I2C_IF6,
+    INTID_I2C_IF7,
+    INTID_I2C_IF8
 };
 
 #ifdef __cplusplus
