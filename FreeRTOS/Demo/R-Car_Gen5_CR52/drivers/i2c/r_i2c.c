@@ -241,6 +241,13 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint8_t ret;
 
+    ret = rcar_i2c_reset_unit(Unit);
+
+    if (ret != 0U)
+    {
+        return ret;
+    }
+
     if ((uint32_t)Unit >= R_I2C_LAST)
     {
         LogDebug(("Wrong I2C Unit %d\r\n", Unit));
@@ -485,13 +492,7 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
     uint32_t val;
     int r;
     uint8_t ret;
-
-    ret = rcar_i2c_reset_unit(Unit);
-
-    if (ret != 0U)
-    {
-        return ret;
-    }
+    uint64_t start = R_UTILS_GetTimerCounter();
 
     /* Clear Master Status register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
@@ -504,6 +505,14 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
 
     /* Load the first byte into the shift register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICTXD, Bytes[0]);
+
+    do {
+        val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
+        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_COUNT)
+        {
+            return -1;
+        }
+    } while ((val & R_I2C_FSDA_BIT) != (uint32_t)0);
 
     if (p_instance_ctrl->p_cfg->dma_single == true) 
     {
@@ -625,13 +634,7 @@ static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint3
     uint32_t val;
     int r;
     uint8_t ret;
-
-    ret = rcar_i2c_reset_unit(Unit);
-
-    if (ret != 0U)
-    {
-        return ret;
-    }
+    uint64_t start = R_UTILS_GetTimerCounter();
 
     /* Clear Master Status register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
@@ -645,6 +648,14 @@ static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint3
 
     /* Load the slave register address into the shift register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICTXD, SlaveReg);
+
+    do {
+        val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
+        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_COUNT)
+        {
+            return -1;
+        }
+    } while ((val & R_I2C_FSDA_BIT) != (uint32_t)0);
     
     if (p_instance_ctrl->p_cfg->dma_single == true) 
     {
@@ -706,13 +717,7 @@ static uint32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *By
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint32_t val;
     uint8_t ret;
-
-    ret = rcar_i2c_reset_unit(Unit);
-
-    if (ret != 0U)
-    {
-        return ret;
-    }
+    uint64_t start = R_UTILS_GetTimerCounter();
 
     /* Clear Master Status register */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
@@ -725,6 +730,14 @@ static uint32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *By
 
     /* Set Master Control register (MDBS=1, MIE=1, ESG=1) */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x89);
+
+    do {
+        val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
+        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_COUNT)
+        {
+            return -1;
+        }
+    } while ((val & R_I2C_FSDA_BIT) != (uint32_t)0);
 
     return loc_ReadCommon(Unit, SlaveAddr, Bytes, NumBytes);
 }
