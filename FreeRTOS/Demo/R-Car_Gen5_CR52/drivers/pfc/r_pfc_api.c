@@ -271,97 +271,6 @@ static int pfcSetModeSel(rcar_pfc_group_t grp, rcar_pfc_pin_t pin,
     return ret;
 }
 
-static int pfcSetDrvControlReg(rcar_pfc_group_t grp, rcar_pfc_pin_t pin,
-                              drive_strength_t  drv_str_cfg)
-{
-    uint32_t reg_addr, reg_val;
-    uint32_t bit_val, bit_pos = pin;
-    uint8_t i;
-
-    if (grp < RCAR_PFC_GROUP_00 ||
-        grp > (RCAR_PFC_GROUP_MAX - 1))
-    {
-        printf("%s: Invalid group %d\n", __func__, pin);
-        return -1;
-    }
-
-    if (pin < RCAR_PFC_PIN_00 ||
-        pin > RCAR_PFC_PIN_31)
-    {
-        printf("%s: Invalid pin %d\n", __func__, pin);
-        return -1;
-    }
-
-    if (drv_str_cfg <= INVALID_DRIVE_STRENGTH_18 ||
-        drv_str_cfg >= INVALID_DRIVE_STRENGTH_LAST)
-    {
-        printf("%s: Invalid drive stregth!\n", __func__);
-        return -1;
-    }
-
-    for (i = 0; i < NUM_GP_DRVCTRL; ++i)
-    {
-        reg_addr   = getPfcRegister(grp, GP_DRVCTRL(i));
-        reg_val    = readl(reg_addr);
-        bit_val    = bitfield_extract(drv_str_cfg, i, 1);
-
-        reg_val &= ~(1U << bit_pos);
-        reg_val |= (bit_val << bit_pos);
-        LogDebug(("BF: reg <0x%x>: 0x%x", reg_addr, readl(reg_addr)));
-        pfcWrite(grp, reg_addr, reg_val);
-        LogDebug(("bit_pos: %d, bit_val: %d", bit_pos, bit_val));
-        LogDebug(("AF: reg <0x%x>: 0x%x\n", reg_addr, readl(reg_addr)));
-
-    }
-
-    return 0;
-}
-
-static int pfcSetTdselControlReg(rcar_pfc_group_t grp, rcar_pfc_pin_t pin,
-                                tdsel_control_t tdsel_cfg)
-{
-    uint32_t reg_addr, reg_val;
-    uint32_t bit_val, bit_pos = pin;
-    uint8_t i;
-
-    if (grp < RCAR_PFC_GROUP_00 ||
-        grp > (RCAR_PFC_GROUP_MAX - 1))
-    {
-        printf("%s: Invalid group %d\n", __func__, pin);
-        return -1;
-    }
-
-    if (pin < RCAR_PFC_PIN_00 ||
-        pin > RCAR_PFC_PIN_31)
-    {
-        printf("%s: Invalid pin %d\n", __func__, pin);
-        return -1;
-    }
-
-    if (tdsel_cfg >= INVALID_DELAY) 
-    {
-        printf("%s: Invalid TDSEL config!\n", __func__);
-        return -1;
-    }
-
-    for (i = 0; i < NUM_GP_TDSEL; ++i)
-    {
-        reg_addr   = getPfcRegister(grp, GP_TDSEL(i));
-        reg_val    = readl(reg_addr);
-        bit_val    = bitfield_extract(tdsel_cfg, i, 1);
-
-        reg_val &= ~(1U << bit_pos);
-        reg_val |= (bit_val << bit_pos);
-        LogDebug(("BF: reg <0x%x>: 0x%x", reg_addr, readl(reg_addr)));
-        pfcWrite(grp, reg_addr, reg_val);
-        LogDebug(("bit_pos: %d, bit_val: %d", bit_pos, bit_val));
-        LogDebug(("AF: reg <0x%x>: 0x%x\n", reg_addr, readl(reg_addr)));
-
-    }
-
-    return 0;
-}
-
 static const int* findGroupByModule(st_module_config_t module) {
     for (int indx = 0; indx < sizeof(all_drv_groups)/sizeof(all_drv_groups[0]);indx++) {
         if (all_drv_groups[indx].module_id == module.module_id) {
@@ -370,6 +279,7 @@ static const int* findGroupByModule(st_module_config_t module) {
     }
     return NULL;
 }
+
 int pfcInitModule(st_module_config_t module)
 {
     int ret = 0;
@@ -402,12 +312,6 @@ int pfcInitModule(st_module_config_t module)
         switch(reg) {
         case REG_ALTSEL:
             ret = pfcInitPeripheralFunction(grp, pin, (rcar_pfc_func_id_t)fid);
-            break;
-        case REG_DRVCTRL:
-            ret = pfcSetDrvControlReg(grp, pin, (drive_strength_t)fid);
-            break;
-        case REG_TDSEL:
-            ret = pfcSetTdselControlReg(grp, pin, (tdsel_control_t)fid);
             break;
         case REG_MODSEL:
             ret = pfcSetModeSel(grp, pin, (modsel_func_t)fid);
