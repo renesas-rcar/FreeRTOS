@@ -108,6 +108,8 @@ static void writel(const uint32_t value, const uintptr_t address);
 
 static uint32_t readl(const uintptr_t Address);
 
+static int validate_pfc_data(rcar_pfc_group_t grp, rcar_pfc_pin_t pin);
+
 static void writel(const uint32_t value, const uintptr_t address)
 {
     *((volatile unsigned int*) address)  = value;
@@ -120,36 +122,21 @@ static uint32_t readl(const uintptr_t address)
 
 static uint32_t getPfcRegister(rcar_pfc_group_t grp, uint32_t offset)
 {
-
-    if ((uint32_t)grp >= (sizeof(pfc_gr_base) / sizeof(pfc_gr_base[0])))
-    {
-        printf("PFC group %d not exist!\n", grp);
-        return PFC_INVALID_ADDR;
-    }
-
     return pfc_gr_base[grp] + offset;
 }
 
 static void pfcWrite(rcar_pfc_group_t grp, uint32_t addr, uint32_t val)
 {
-    writel(~val, getPfcRegister(grp, GP_PMMR));
+    uint32_t reg_addr = 0;
+
+    reg_addr = getPfcRegister(grp, GP_PMMR);
+
+    writel(~val, reg_addr);
     writel(val, addr);
 }
 
 static uint32_t bitfield_extract(uint32_t value, uint8_t offset, uint8_t width)
 {
-    if (width == 0 || width > 32)
-    {
-        printf("%s: Invalid width %d\n", __func__, width);
-        return 0;
-    }
-
-    if ((offset + width) > 32)
-    {
-        printf("%s: Invalid offset + width %d\n", __func__, (offset + width));
-        return 0;
-    }
-
     return (value >> offset) & ((1U << width) - 1);
 }
 
@@ -158,6 +145,7 @@ static void pfcSetGPSR(uint8_t gpio, rcar_pfc_group_t grp, rcar_pfc_pin_t pin)
     uint32_t val, reg_addr;
 
     reg_addr = getPfcRegister(grp, GP_GPSR);
+
     val = readl(reg_addr);
     val = gpio ? val & ~BIT(pin) : val | BIT(pin);
     pfcWrite(grp, reg_addr, val);
@@ -165,6 +153,11 @@ static void pfcSetGPSR(uint8_t gpio, rcar_pfc_group_t grp, rcar_pfc_pin_t pin)
 
 int pfcSetGPIO(rcar_pfc_group_t grp, rcar_pfc_pin_t pin)
 {
+    if(validate_pfc_data(grp, pin) != 0)
+    {
+        return -1;
+    }
+
     pfcSetGPSR(PFC_GPIO, grp, pin);
     return 0;
 }
@@ -182,29 +175,10 @@ static int pfcSetFunction(rcar_pfc_group_t grp, rcar_pfc_pin_t pin,
     uint32_t bit_val, bit_pos = pin;
     uint8_t i;
 
-    if (grp < RCAR_PFC_GROUP_00 ||
-        grp > (RCAR_PFC_GROUP_MAX - 1))
-    {
-        printf("%s: Invalid group %d\n", __func__, pin);
-        return -1;
-    }
-
-    if (pin < RCAR_PFC_PIN_00 ||
-        pin > RCAR_PFC_PIN_31)
-    {
-        printf("%s: Invalid pin %d\n", __func__, pin);
-        return -1;
-    }
-
-    if (f_id >= INVALID_RCAR_PFC_FUNC)
-    {
-        printf("%s: Invalid function id %d\n", __func__, f_id);
-        return -1;
-    }
-
     for (i = 0; i < NUM_GP_ALTSEL; ++i)
     {
         reg_addr   = getPfcRegister(grp, GP_ALTSEL(i));
+
         reg_val    = readl(reg_addr);
         bit_val    = bitfield_extract(f_id, i, 1);
 
@@ -236,27 +210,8 @@ static int pfcSetModeSel(rcar_pfc_group_t grp, rcar_pfc_pin_t pin,
     uint32_t bit_val, bit_pos;
     int ret = 0;
 
-    if (grp < RCAR_PFC_GROUP_00 ||
-        grp > (RCAR_PFC_GROUP_MAX - 1))
-    {
-        printf("%s: Invalid group %d\n", __func__, pin);
-        return -1;
-    }
-
-    if (pin < RCAR_PFC_PIN_00 ||
-        pin > RCAR_PFC_PIN_31)
-    {
-        printf("%s: Invalid pin %d\n", __func__, pin);
-        return -1;
-    }
-
-    if (modsel_cfg >= INVALID_MODSEL)
-    {
-        printf("%s: Invalid modsel %d\n", __func__, modsel_cfg);
-        return -1;
-    }
-
     reg_addr = getPfcRegister(grp, GP_MODSEL);
+
     reg_val  = readl(reg_addr);
     bit_val  = modsel_cfg;
     bit_pos  = pin;
@@ -288,7 +243,7 @@ int pfcInitModule(st_module_config_t module)
     const int * p_drv_grp = findGroupByModule(module);
 
     if (p_drv_grp == NULL) {
-        printf("%s: no group found for module_id=%d\n", __func__, module.module_id);
+        LogError(("%s: no group found for module_id=%d\n", __func__, module.module_id));
         return -1;
     }
 
@@ -309,6 +264,11 @@ int pfcInitModule(st_module_config_t module)
         LogDebug(("pin: %d", pin));
         LogDebug(("fid: %d", fid));
 
+        if(validate_pfc_data(grp, pin) != 0)
+        {
+            return -1;
+        }
+
         switch(reg) {
         case REG_ALTSEL:
             ret = pfcInitPeripheralFunction(grp, pin, (rcar_pfc_func_id_t)fid);
@@ -317,17 +277,13 @@ int pfcInitModule(st_module_config_t module)
             ret = pfcSetModeSel(grp, pin, (modsel_func_t)fid);
             break;
         default:
-            printf("%s: Invalid register!");
+            LogError(("%s: Invalid register!\n", __func__));
             return -1;
         }
 
-        if (ret != 0) {
-            printf("%s: FAILED\n", __func__);
-            return -1;
-        }
     }
 
-    return 0;
+    return ret;
 }
 
 int pfcInitModules(st_module_config_t* module_list)
@@ -348,8 +304,8 @@ int pfcInitModules(st_module_config_t* module_list)
         ret |= pfcInitModule(module);
         if (ret != 0)
         {
-            printf("%s: module index %d FAILED\n", __func__, module_indx);
-            return -1;
+            LogError(("%s: module index %d FAILED\n", __func__, module_indx));
+            continue;
         }
     }
 
@@ -361,6 +317,7 @@ static void pfcPullMode(uint8_t enable, rcar_pfc_group_t grp, rcar_pfc_pin_t pin
     uint32_t val, reg_addr;
 
     reg_addr = getPfcRegister(grp, GP_PULLEN);
+
     val = readl(reg_addr);
     if (enable == PFC_ENABLE_PULL) {
         val |= BIT(pin);
@@ -376,6 +333,7 @@ static void pfcSetPullType(uint8_t option, rcar_pfc_group_t grp, rcar_pfc_pin_t 
     uint32_t val, reg_addr;
 
     reg_addr = getPfcRegister(grp, GP_PUDSEL);
+
     val = readl(reg_addr);
     if (option == RCAR_PFC_PULL_UP) {
         val |= BIT(pin);
@@ -386,8 +344,32 @@ static void pfcSetPullType(uint8_t option, rcar_pfc_group_t grp, rcar_pfc_pin_t 
     pfcWrite(grp, reg_addr, val);
 }
 
+static int validate_pfc_data(rcar_pfc_group_t grp, rcar_pfc_pin_t pin)
+{
+    if (grp < RCAR_PFC_GROUP_00 ||
+        grp > (RCAR_PFC_GROUP_MAX - 1))
+    {
+        LogError(("%s: Invalid group %d\n", __func__, grp));
+        return -1;
+    }
+
+    if (pin < RCAR_PFC_PIN_00 ||
+        pin > RCAR_PFC_PIN_31)
+    {
+        LogError(("%s: Invalid pin %d\n", __func__, pin));
+        return -1;
+    }
+
+    return 0;
+}
+
 int pfcSetPullDown(rcar_pfc_group_t grp, rcar_pfc_pin_t pin)
 {
+    if(validate_pfc_data(grp, pin) != 0)
+    {
+        return -1;
+    }
+
     pfcSetPullType(RCAR_PFC_PULL_DOWN, grp, pin);
     pfcPullMode(PFC_ENABLE_PULL, grp, pin);
     return 0;
@@ -395,6 +377,11 @@ int pfcSetPullDown(rcar_pfc_group_t grp, rcar_pfc_pin_t pin)
 
 int pfcSetPullUp(rcar_pfc_group_t grp, rcar_pfc_pin_t pin)
 {
+    if(validate_pfc_data(grp, pin) != 0)
+    {
+        return -1;
+    }
+
     pfcSetPullType(RCAR_PFC_PULL_UP, grp, pin);
     pfcPullMode(PFC_ENABLE_PULL, grp, pin);
     return 0;
@@ -402,6 +389,11 @@ int pfcSetPullUp(rcar_pfc_group_t grp, rcar_pfc_pin_t pin)
 
 int pfcSetNoPull(rcar_pfc_group_t grp, rcar_pfc_pin_t pin)
 {
+    if(validate_pfc_data(grp, pin) != 0)
+    {
+        return -1;
+    }
+
     pfcPullMode(PFC_DISABLE_PULL, grp, pin);
     return 0;
 }
