@@ -10,6 +10,10 @@
 #include "r_gpio_private.h"
 #include "r_gpio_api.h"
 
+#define LIBRARY_LOG_LEVEL 0
+/* Logging Function include. */
+#include "logging_stack.h"
+
 #define PINS_EACH_GROUP 32U
 
 #define GPIO_BASE_ADDR_ERR           0xABCD
@@ -56,8 +60,6 @@ static uint32_t readl(const uintptr_t Address);
 
 static void setbit_l(uint32_t addr, uint32_t pos);
 
-static uint32_t getbit_l(uint32_t addr, uint32_t pos);
-
 static void clearbit_l(uint32_t addr, uint32_t pos);
 
 static uint32_t getGpioRegister(rcar_gpio_group_t grp, uint32_t offset);
@@ -66,9 +68,33 @@ static void gpioSetGeneralOutputMode(rcar_gpio_group_t grp, rcar_pin_t pin);
 
 static void gpioSetGeneralInputMode(rcar_gpio_group_t grp, rcar_pin_t pin);
 
+static int validate_gpio_data(rcar_gpio_group_t grp, rcar_pin_t pin)
+{
+    if (grp < RCAR_GPIO_GROUP_00 ||
+        grp > RCAR_GPIO_GROUP_10)
+    {
+        LogError(("%s: Invalid group %d\n", __func__, grp));
+        return -1;
+    }
+
+    if (pin < RCAR_PIN_00 ||
+        pin > RCAR_PIN_31)
+    {
+        LogError(("%s: Invalid pin %d\n", __func__, pin));
+        return -1;
+    }
+
+    return 0;
+}
+
 int R_GPIO_PinWriteOutput(rcar_gpio_group_t grp, rcar_pin_t pin, bool lvl)
 {
     uint32_t reg_addr;
+
+    if(validate_gpio_data(grp, pin) != 0)
+    {
+        return -1;
+    }
 
     reg_addr = getGpioRegister(grp, GP_OUTDT);
     if (lvl) {
@@ -87,6 +113,10 @@ int R_GPIO_GroupWriteOutput(rcar_gpio_group_t grp, uint32_t group_level,
     bool pin_level;
 
     for (pin_num = 0U; pin_num < PINS_EACH_GROUP; pin_num++) {
+        if(validate_gpio_data(grp, pin_num) != 0)
+        {
+            continue;
+        }
         mask_pos = ((uint32_t)1 << pin_num);
         if ((mask_pins & mask_pos) != 0U) {
             pin_level = !!((group_level & mask_pos) >> pin_num);
@@ -102,6 +132,11 @@ bool R_GPIO_PinReadInput(rcar_gpio_group_t grp, rcar_pin_t pin)
     uint32_t bit = BIT(pin);
     bool pin_val;
 
+    if(validate_gpio_data(grp, pin) != 0)
+    {
+        return -1;
+    }
+
     if ((readl(getGpioRegister(grp, GP_INOUTSEL)) & bit) != 0U) {
             pin_val = !!(readl(getGpioRegister(grp, GP_OUTDT)) & bit);
     } else {
@@ -115,6 +150,11 @@ uint32_t R_GPIO_GroupRead(rcar_gpio_group_t grp)
 {
     uint32_t pin_val;
 
+    if(validate_gpio_data(grp, RCAR_PIN_01) != 0)
+    {
+        return -1;
+    }
+
     pin_val = readl(getGpioRegister(grp, GP_OUTDT));
     pin_val |= readl(getGpioRegister(grp, GP_INDT));
 
@@ -124,6 +164,11 @@ uint32_t R_GPIO_GroupRead(rcar_gpio_group_t grp)
 int R_GPIO_PinConfigMode(rcar_gpio_group_t grp, rcar_pin_t pin,
               rcar_io_direction_t option)
 {
+    if(validate_gpio_data(grp, pin) != 0)
+    {
+        return -1;
+    }
+
     switch (option) {
     case RCAR_IO_DIRECTION_OUTPUT:
         gpioSetGeneralOutputMode(grp, pin);
@@ -131,8 +176,6 @@ int R_GPIO_PinConfigMode(rcar_gpio_group_t grp, rcar_pin_t pin,
     case RCAR_IO_DIRECTION_INPUT:
         gpioSetGeneralInputMode(grp, pin);
         break;
-    default:
-        return -1;
     }
 
     return 0;
@@ -141,6 +184,11 @@ int R_GPIO_PinConfigMode(rcar_gpio_group_t grp, rcar_pin_t pin,
 int R_GPIO_PinRequestPinFunction(rcar_gpio_group_t grp, rcar_pin_t pin,
                                 rcar_req_pfc_functions_t option)
 {
+    if(validate_gpio_data(grp, pin) != 0)
+    {
+        return -1;
+    }
+
     switch (option) {
     case RCAR_IO_REQ_PFC_PULL_DOWN:
         pfcSetPullDown(grp, pin);
@@ -151,8 +199,6 @@ int R_GPIO_PinRequestPinFunction(rcar_gpio_group_t grp, rcar_pin_t pin,
     case RCAR_IO_REQ_PFC_NO_PULL:
         pfcSetNoPull(grp, pin);
         break;
-    default:
-        return -1;
     }
 
     return 0;
@@ -165,6 +211,10 @@ int R_GPIO_GroupConfigMode(rcar_gpio_group_t grp, uint32_t mask_directions,
     rcar_io_direction_t pin_option;
 
     for (pin_num = 0U; pin_num < PINS_EACH_GROUP; pin_num++) {
+        if(validate_gpio_data(grp, pin_num) != 0)
+        {
+            continue;
+        }
         mask_pos = ((uint32_t)1 << pin_num);
         if ((mask_pins & mask_pos) != 0U) {
             pin_option = (mask_directions & mask_pos) >> pin_num;
@@ -178,6 +228,11 @@ int R_GPIO_GroupConfigMode(rcar_gpio_group_t grp, uint32_t mask_directions,
 int R_GPIO_PinConfigInterruptMode(rcar_gpio_group_t grp, rcar_pin_t pin,
                                  rcar_interrupt_input_t trigger_mode)
 {
+    if(validate_gpio_data(grp, pin) != 0)
+    {
+        return -1;
+    }
+
     /* Set Peripheral Function to GPIO */
     (void)pfcSetGPIO(grp, pin);
 
@@ -285,7 +340,7 @@ int R_GPIO_SetInterruptCallback(rcar_gpio_group_t grp, IrqHandlerFn handler, voi
     return 0;
 
 setup_irq_fail:
-    printf("IRQ FAILED: group no exist!\n");
+    LogError(("IRQ FAILED: group no exist!\n"));
     return -1;
 }
 
@@ -306,11 +361,6 @@ static void setbit_l(uint32_t addr, uint32_t pos)
     writel(val |= BIT(pos), addr);
 }
 
-static uint32_t getbit_l(uint32_t addr, uint32_t pos)
-{
-    return !!(readl(addr) & BIT(pos));
-}
-
 static void clearbit_l(uint32_t addr, uint32_t pos)
 {
     uint32_t val = readl(addr);
@@ -318,18 +368,10 @@ static void clearbit_l(uint32_t addr, uint32_t pos)
     writel(val &= ~BIT(pos), addr);
 }
 
-
 static uint32_t getGpioRegister(rcar_gpio_group_t grp, uint32_t offset)
 {
-    if ((uint32_t)grp >= (sizeof(gpio_gr_base) / sizeof(gpio_gr_base[0])))
-    {
-        (void)printf("GPIO group %d not exist!\n", grp);
-        return GPIO_BASE_ADDR_ERR;
-    }
-
     return gpio_gr_base[grp] + offset;
 }
-
 
 static void gpioSetGeneralOutputMode(rcar_gpio_group_t grp, rcar_pin_t pin)
 {
