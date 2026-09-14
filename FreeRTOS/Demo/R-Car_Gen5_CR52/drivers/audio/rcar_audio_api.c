@@ -9,7 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "rcar_audio_api.h"
-#include "board.h"
+#include "r_audio_private.h"
+
+/* Logging Function include. */
+#define LIBRARY_LOG_LEVEL 0
+#include "logging_stack.h"
 
 audio_ssi_conf_t *audio_ssi_conf;
 adg_conf_t *audio_adg_conf;
@@ -292,77 +296,40 @@ int r_ak4619_init(st_audio_cfg_t const * const p_cfg)
 
 int r_audio_clock_on(void)
 {
-	int res;
+	int res = 0;
 
-#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
-	int clock_id = X5H_CLOCK_ID_MDLC_ADG0;
-	res = R_StateManager_ClockOn(clock_id);
-    if (res != 0)
+    for (size_t i = 0U; i < AUDIO_CLOCK_ID_COUNT; i++)
     {
-        printf("Error: Failed to set clock id %d ON.\r\n",
-                clock_id);
-    }
-	clock_id = X5H_CLOCK_ID_MDLC_SSI0;
-	res = R_StateManager_ClockOn(clock_id);
-    if (res != 0)
-    {
-        printf("Error: Failed to set clock id %d ON.\r\n",
-                clock_id);
+        res = R_StateManager_ClockOn(audio_clock_domain_id[i]);
+
+        if (res != 0)
+        {
+            LogDebug(("Error: Failed to set clock id %d ON.\r\n",
+                   audio_clock_domain_id[i]));
+            break;
+        }
     }
 
-	clock_id = X5H_CLOCK_ID_MDLC_SSI05;
-	res = R_StateManager_ClockOn(clock_id);
-    if (res != 0)
-    {
-        printf("Error: Failed to set clock id %d ON.\r\n",
-                clock_id);
-    }
-#endif
-  
-	return res;
+    return res;
 }
 
 int r_audio_clock_off(void)
 {
-	int res;
-#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
-	int clock_id = X5H_CLOCK_ID_MDLC_ADG0;
-	res = R_StateManager_ClockOff(clock_id);
-    if (res != 0)
+    int res = 0;
+
+    for (size_t i = 0U; i < AUDIO_CLOCK_ID_COUNT; i++)
     {
-        printf("Error: Failed to set clock id %d ON.\r\n",
-                clock_id);
-    }
-    else
-    {
-        printf("Set clock id %d OFF OK!\r\n", clock_id);
+        res = R_StateManager_ClockOff(audio_clock_domain_id[i]);
+
+        if (res != 0)
+        {
+            LogDebug(("Error: Failed to set clock id %d OFF.\r\n",
+                   audio_clock_domain_id[i]));
+            break;
+        }
     }
 
-	clock_id = X5H_CLOCK_ID_MDLC_SSI0;
-	res = R_StateManager_ClockOff(clock_id);
-    if (res != 0)
-    {
-        printf("Error: Failed to set clock id %d ON.\r\n",
-                clock_id);
-    }
-    else
-    {
-        printf("Set clock id %d OFF OK!\r\n", clock_id);
-    }
-	clock_id = X5H_CLOCK_ID_MDLC_SSI05;
-	res = R_StateManager_ClockOff(clock_id);
-    if (res != 0)
-    {
-        printf("Error: Failed to set clock id %d ON.\r\n",
-                clock_id);
-    }
-    else
-    {
-        printf("Set clock id %d OFF OK!\r\n", clock_id);
-    }
-#endif
-
-	return res;
+    return res;
 }
 
 int r_deinit(void)
