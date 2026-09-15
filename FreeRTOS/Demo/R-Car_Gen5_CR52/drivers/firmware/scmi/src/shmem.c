@@ -11,7 +11,8 @@
 #include "scmi/inc/shmem.h"
 #include "scmi/inc/util.h"
 #include "scmi/inc/common.h"
-#include "scmi/rcar_scmi_common.h"
+#include "scmi/inc/rcar_scmi_common.h"
+#include "scmi/rcar_scmi_private.h"
 #include "board.h"
 
 struct scmi_shmem_config {

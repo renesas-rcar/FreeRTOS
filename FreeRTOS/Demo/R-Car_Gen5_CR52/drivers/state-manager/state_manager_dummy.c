@@ -8,7 +8,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
-#include "scmi/rcar_scmi_common.h"
+#include "scmi/inc/rcar_scmi_common.h"
+#include "scmi/rcar_scmi_private.h"
 #include "scmi/inc/common.h"
 #include "scmi/inc/base.h"
 #include "scmi/inc/power.h"

@@ -13,7 +13,8 @@
 #include "scmi/inc/util.h"
 #include "scmi/inc/sensor.h"
 #include "scmi/inc/common.h"
-#include "scmi/rcar_scmi_common.h"
+#include "scmi/inc/rcar_scmi_common.h"
+#include "scmi/rcar_scmi_private.h"
 #include "FreeRTOS.h"
 
 SCMI_PROTOCOL_DEFINE_NODEV(SCMI_PROTOCOL_SENSOR, NULL);

@@ -17,7 +17,8 @@
 
 #include "cmsis_rcar_gen5.h"
 #include "interrupts.h"
-#include "scmi/rcar_scmi_common.h"
+#include "scmi/inc/rcar_scmi_common.h"
+#include "scmi/rcar_scmi_private.h"
 #include "scmi/inc/mbox.h"
 #include "board.h"
 
