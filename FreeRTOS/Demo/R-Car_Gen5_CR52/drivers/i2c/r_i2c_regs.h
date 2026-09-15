@@ -48,13 +48,13 @@ typedef enum {
 
 #define R_I2C_MNR_BIT   (1UL << 6)
 #define R_I2C_MAL_BIT   (1UL << 5)
-#define R_I2C_MST_BIT   (1UL << 4)
-#define R_I2C_MDE_BIT   (1UL << 3)
+#define R_I2C_MST_BIT   (uint32_t)(1UL << 4)
+#define R_I2C_MDE_BIT   (uint32_t)(1U << 3)
 #define R_I2C_MDT_BIT   (1UL << 2)
-#define R_I2C_MDR_BIT   (1UL << 1)
-#define R_I2C_MAT_BIT   (1UL << 0)
+#define R_I2C_MDR_BIT   (uint32_t)(1UL << 1)
+#define R_I2C_MAT_BIT   (uint32_t)(1UL << 0)
 
-#define R_I2C_ESG_BIT   (1UL << 0)
+#define R_I2C_ESG_BIT   (uint32_t)(1UL << 0)
 
 #define R_I2C_GCAR      (1UL << 6)
 #define R_I2C_STM       (1UL << 5)

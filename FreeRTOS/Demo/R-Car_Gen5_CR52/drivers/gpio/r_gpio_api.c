@@ -89,7 +89,7 @@ int R_GPIO_GroupWriteOutput(rcar_gpio_group_t grp, uint32_t group_level,
     for (pin_num = 0U; pin_num < PINS_EACH_GROUP; pin_num++) {
         mask_pos = ((uint32_t)1 << pin_num);
         if ((mask_pins & mask_pos) != 0U) {
-            pin_level = (group_level & mask_pos) >> pin_num;
+            pin_level = !!((group_level & mask_pos) >> pin_num);
             R_GPIO_PinWriteOutput(grp, pin_num, pin_level);
         }
     }

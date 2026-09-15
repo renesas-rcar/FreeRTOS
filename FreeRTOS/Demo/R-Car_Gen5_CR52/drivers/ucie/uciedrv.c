@@ -865,7 +865,7 @@ void Ucie_Start_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode, e_ucie_linkspeed_t sp
     //;  axi0 addres OFF
     mem_write32( ucie_apb_base + (uintptr_t)UCIE_APB_UCIEDBIADR_OFFSET, 0x00000000 );
 
-    uint32_t dvsecLinkControl = ((speed & LINKSPEED_MASK) << LINKSPEED_OFFSET) | 0x00004000;
+    uint32_t dvsecLinkControl = ((((uint32_t)speed) & LINKSPEED_MASK) << LINKSPEED_OFFSET) | 0x00004000U;
     mem_write32( ucie_axi_base + DVSEC_UNIT_DSP_DVSEC_UCIE_LINK_CONTROL_ADD, dvsecLinkControl);
 
     if(mode == UCIE_MODE_RC){

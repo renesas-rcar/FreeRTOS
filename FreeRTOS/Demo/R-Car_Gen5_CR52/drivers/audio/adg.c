@@ -39,8 +39,8 @@ bool adg_set_clock(adg_conf_t *adg, bool use_brgb){
 			
 			for(uint32_t cks = 0; cks <= 3; cks++){
 			uint32_t divider_base = ((uint32_t)1 << (cks * 2U)); //2^(CKS*2)
-			float N = input_freq / req_clk;
-			float brr_float = (N / (2*divider_base) ) - 1;
+			float N = (float)input_freq / (float)req_clk;
+			float brr_float = (N / (2.0F * (float)divider_base)) - 1.0F;
 			uint32_t brr = (uint32_t)(brr_float + 0.5);
 			
 			if(brr > 255) {

@@ -228,7 +228,7 @@ int ak4619_configure_audio_format(e_ak4619_interface_format_t format)
 
     if (format == STEREO_I2S_COMPATIBLE)
     {
-        reg_value_fm_1 &= ~0b11110000; // Clear 4 MSB bit (TDM, DCF[2:0] bit) to set mode Stereo I2S, bit 2 3 is DSL set Slot Length default 11 (32bit)
+        reg_value_fm_1 &= ~0b11110000U; // Clear 4 MSB bit (TDM, DCF[2:0] bit) to set mode Stereo I2S, bit 2 3 is DSL set Slot Length default 11 (32bit)
         reg_value_fm_2 &= ~(1U << 4); // Clear bit 4 (Slot bit) to set mode Stereo I2S
         if ((write_i2c_reg(REG_AUDIO_IF_FORMAT_ADDRESS_1, reg_value_fm_1) != 0) || (write_i2c_reg(REG_AUDIO_IF_FORMAT_ADDRESS_2, reg_value_fm_2) != 0))
         {
@@ -291,8 +291,8 @@ int ak4619_configure_input_dac(e_ak4619_dac_source_t dac_1)
         return -1;
     } 
 
-    reg_value_dac_input &= ~0b00000011; // Clear 2 LSB bit
-    reg_value_dac_input |= dac_1; // dac_1 set 2 LSB bit
+    reg_value_dac_input &= ~0b00000011U; // Clear 2 LSB bit
+    reg_value_dac_input |= (uint8_t)dac_1; // dac_1 set 2 LSB bit
     if (write_i2c_reg(REG_DAC_INPUT_SELECT_ADDRESS, reg_value_dac_input) != 0)
     {
         printf("Can not configure SDIN1 input for DAC1");

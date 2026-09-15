@@ -464,7 +464,7 @@ int Irq_SetIntType(unsigned int id, r_irq_type type)
 static uint8_t Irq_GetCpuId(void)
 {
         uint32_t mpidr = __get_MPIDR();
-        uint8_t cpu_id = mpidr & 0xFF;
+        uint8_t cpu_id = (uint8_t)(mpidr & 0xFFU);
         return cpu_id;
 }
 

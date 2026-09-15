@@ -156,11 +156,11 @@ void R_PCIE_Outbound_ATU(uint16_t channel, uint64_t base_addr, uint64_t target_a
     uint32_t lower_base, upper_base;
     uint32_t lower_target, upper_target;
 
-    lower_base = base_addr & 0xFFFFFFFF;
-    upper_base = (base_addr >> 32) & 0xFFFFFFFF;
+    lower_base = (uint32_t)(base_addr & 0xFFFFFFFFU);
+    upper_base = (uint32_t)((base_addr >> 32U) & 0xFFFFFFFFU);
 
-    lower_target = target_addr & 0xFFFFFFFF;
-    upper_target = (target_addr >> 32) & 0xFFFFFFFF;
+    lower_target = (uint32_t)(target_addr & 0xFFFFFFFFULL);
+    upper_target = (uint32_t)((target_addr >> 32U) & 0xFFFFFFFFU);
 
     /* Outbound ATU configuration */
     R_UCIE_RegWrite32(channel, UCIE_OB_ATU_LOWER_BASE, lower_base);

@@ -12,12 +12,12 @@
 
 #define BIT(nr)                 (1UL << (nr))
 
-#define TCM_ENABLEEL10          (BIT(0))                    // Bit field to enable TCM at EL1 and EL0.
-#define TCM_ENABLEEL2           (BIT(1))                    // Bit field to enable TCM at EL2.
+#define TCM_ENABLEEL10          (uint32_t)(BIT(0))                    // Bit field to enable TCM at EL1 and EL0.
+#define TCM_ENABLEEL2           (uint32_t)(BIT(1))                    // Bit field to enable TCM at EL2.
 
-#define TCM_SIZE_8KB            (BIT(4))                    // Bit field to set TCM size 8KB.
-#define TCM_SIZE_16KB           (BIT(4) | BIT(2))           // Bit field to set TCM size 16KB.
-#define TCM_SIZE_32KB           (BIT(4) | BIT(3))           // Bit field to set TCM size 32KB.
+#define TCM_SIZE_8KB            (uint32_t)(BIT(4))                    // Bit field to set TCM size 8KB.
+#define TCM_SIZE_16KB           (uint32_t)(BIT(4) | BIT(2))           // Bit field to set TCM size 16KB.
+#define TCM_SIZE_32KB           (uint32_t)(BIT(4) | BIT(3))           // Bit field to set TCM size 32KB.
 
 #define IS_8KB_ALIGNED(addr)    (((addr) & 0x1FFFu) == 0)
 

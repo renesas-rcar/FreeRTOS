@@ -881,7 +881,7 @@ static void rcar_i2c_irq_recv(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
     {
         /* Clear ESG */
         uint32_t val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR) & 0xff;
-        val &= ~R_I2C_ESG_BIT;   
+        val &= ~R_I2C_ESG_BIT;
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, val);
 
         /* Enable DMA transmit mode */
@@ -889,8 +889,8 @@ static void rcar_i2c_irq_recv(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
         
         /* Clear MAT and MDR */
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & 0x7f;
-        val &= ~R_I2C_MAT_BIT;  
-        val &= ~R_I2C_MDR_BIT;  
+        val &= ~R_I2C_MAT_BIT;
+        val &= ~R_I2C_MDR_BIT;
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         /* Enable DMAC for receive mode */
@@ -908,7 +908,7 @@ static void rcar_i2c_irq_recv(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
 
         /* Clear MDR */
         uint32_t val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & 0x7f;
-        val &= ~R_I2C_MDR_BIT;  
+        val &= ~R_I2C_MDR_BIT;
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         /* Next time interrupt will be the last byte for reading */
@@ -923,12 +923,12 @@ static void rcar_i2c_irq_recv(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
         
         /* Clear MDR */
         uint32_t val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & 0x7f;
-        val &= ~R_I2C_MDR_BIT;   
+        val &= ~R_I2C_MDR_BIT;
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         /* Enable MST interrupt for getting ICMSR.MST = 1 event */
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMIER) & 0x7f;
-        val |= R_I2C_MST_BIT;   
+        val |= R_I2C_MST_BIT;
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, val);
 
         p_instance_ctrl->dma_read_done = true;
@@ -942,7 +942,7 @@ static void rcar_i2c_irq_recv(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
         
         /* Clear MST */
         uint32_t val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & 0x7f;
-        val &= ~R_I2C_MST_BIT; 
+        val &= ~R_I2C_MST_BIT;
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         if (p_instance_ctrl->p_callback != NULL) 
@@ -975,7 +975,7 @@ static void rcar_i2c_irq_send(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
         /* Clear MAT, MDE */
         uint32_t val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & 0x7f;
         val &= ~R_I2C_MAT_BIT;
-        val &= ~R_I2C_MDE_BIT; 
+        val &= ~R_I2C_MDE_BIT;
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
         return; 
     }
@@ -1018,7 +1018,7 @@ static void rcar_i2c_irq_send(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
             /* Clear MDE */
             R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, (uint32_t)0x8A);
             uint32_t val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & 0x7f;
-            val &= ~R_I2C_MDE_BIT; 
+            val &= ~R_I2C_MDE_BIT;
             R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
             p_instance_ctrl->dma_write_done = true;

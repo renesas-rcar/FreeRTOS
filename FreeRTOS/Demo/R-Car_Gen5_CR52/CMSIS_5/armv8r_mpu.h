@@ -62,7 +62,7 @@
 
 /* ARM_MPU Control bit fields */
 #define ARM_MPU_ENABLE_Pos                     	 0U                                            /*!< ARM_MPU enable bit Position */
-#define ARM_MPU_ENABLE_Msk                      (1UL /*<< ARM_MPU_ENABLE_Pos*/)                    /*!< ARM_MPU enable bit Enable Mask */
+#define ARM_MPU_ENABLE_Msk                      (1U /*<< ARM_MPU_ENABLE_Pos*/)                    /*!< ARM_MPU enable bit Enable Mask */
 
 /* ARM_MPU Background Region bit fields */
 #define ARM_MPU_BR_Pos                     	 	 17U                                            /*!< ARM_MPU Background Region enable bit Position */

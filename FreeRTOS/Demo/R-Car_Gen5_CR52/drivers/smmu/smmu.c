@@ -95,7 +95,7 @@ static const uintptr_t smmu_base_addresses[] = {
 #define STRTAB_SPLIT            8
 #define STRTAB_FMT_2LV          1
 #define L1STE_MASK              0xFFF00
-#define L2STE_MASK              0xFF
+#define L2STE_MASK              0xFFU
 
 #define TIME_OUT    1000000
 
@@ -262,7 +262,7 @@ void R_SMMU_Detach(st_smmu_streamid_instance_ctrl_t *p_ctrl) {
     split = smmu_strtab_cfg->SPLIT;
     log2size = smmu_strtab_cfg->LOG2SIZE;
     l1ste_idx = (stream_id & L1STE_MASK) >> STRTAB_SPLIT;
-    l2ste_idx = stream_id & L2STE_MASK;
+    l2ste_idx = (uint16_t)(stream_id & L2STE_MASK);
 
     l1ste_tbl = (smmu_l1ste_tbl_t*)(uintptr_t)(smmu_strtab->ADDR << 6);
     l2ste_tbl = (st_smmu_ste_t*)(uintptr_t)((l1ste_tbl + l1ste_idx)->l2tbl_base << 6);
@@ -309,7 +309,7 @@ e_smmu_map_fault_code_t R_SMMU_Map(st_smmu_streamid_instance_ctrl_t *p_ctrl,
     split = smmu_strtab_cfg->SPLIT;
     log2size = smmu_strtab_cfg->LOG2SIZE;
     l1ste_idx = (stream_id & L1STE_MASK) >> STRTAB_SPLIT;
-    l2ste_idx = stream_id & L2STE_MASK;
+    l2ste_idx = (uint16_t)(stream_id & L2STE_MASK);
 
     l1ste_tbl = (smmu_l1ste_tbl_t*)(uintptr_t)(smmu_strtab->ADDR << 6);
     l2ste_tbl = (st_smmu_ste_t*)(uintptr_t)((l1ste_tbl + l1ste_idx)->l2tbl_base << 6);
@@ -358,7 +358,7 @@ void R_SMMU_Unmap(st_smmu_streamid_instance_ctrl_t *p_ctrl, uint64_t va, uint64_
     split = smmu_strtab_cfg->SPLIT;
     log2size = smmu_strtab_cfg->LOG2SIZE;
     l1ste_idx = (stream_id & L1STE_MASK) >> STRTAB_SPLIT;
-    l2ste_idx = stream_id & L2STE_MASK;
+    l2ste_idx = (uint16_t)(stream_id & L2STE_MASK);
 
     l1ste_tbl = (smmu_l1ste_tbl_t*)(uintptr_t)(smmu_strtab->ADDR << 6);
     l2ste_tbl = (st_smmu_ste_t*)(uintptr_t)((l1ste_tbl + l1ste_idx)->l2tbl_base << 6);
@@ -583,7 +583,7 @@ static st_smmu_ste_t* smmu_init_ste(st_smmu_streamid_instance_ctrl_t *p_ctrl){
     }
 
     l1ste_idx = (stream_id & L1STE_MASK) >> STRTAB_SPLIT;
-    l2ste_idx = stream_id & L2STE_MASK;
+    l2ste_idx = (uint16_t)(stream_id & L2STE_MASK);
 
     l1ste_base = smmu_strtab->ADDR << 6;
     l1ste_tbl = (smmu_l1ste_tbl_t*)l1ste_base;
@@ -751,7 +751,7 @@ static int smmu_write_cmd(st_smmu_cmdq_t * cmdq, st_smmu_cmd_t *cmd) {
 
     // Get pointer to queue entry
     uint8_t *entry_addr = (uint8_t *)(uintptr_t)(cmdq->base_reg->ADDR << 5);
-    entry_addr += 16 * q_index; // go to next entry
+    entry_addr += 16U * (uint8_t)q_index; // go to next entry
 
     // Write the command to queue
     cmdq_write(entry_addr, cmd);

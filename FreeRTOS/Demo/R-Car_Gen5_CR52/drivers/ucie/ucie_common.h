@@ -20,8 +20,8 @@
 #define MSI_WATERMARK_BASE      (0x7FFF0400U)
 #define MSI_DATA                (0xA5A5A5A5U)
 
-#define LINKSPEED_MASK               (0xFUL)
-#define LINKSPEED_OFFSET             (0x6UL)
+#define LINKSPEED_MASK               (0xFU)
+#define LINKSPEED_OFFSET             (0x6U)
 
 /* UCIE APB power management control registers*/
 #define UCIE_APB0_UCIEPWRMNGCTRL    (0xDCE00070)

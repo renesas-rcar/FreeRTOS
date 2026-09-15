@@ -20,7 +20,7 @@
 #define drv_OK                                (0U)    /* API completed without any error. */
 #define drv_FAIL                              (1U)    /* Failed. */
 
-#define DMACP(X)    ((X) + 4)
+#define DMACP(X)    ((uint8_t)(X) + 4U)
 
 extern int printf_delay(const char *format, ...);
 

@@ -216,7 +216,7 @@ int R_GIC_SetAddr(void* dist, void* rdist) {
       index++;
     }
 
-    gic_max_rd = index;
+    gic_max_rd = (uint8_t)index;
     return 0;
 }
 

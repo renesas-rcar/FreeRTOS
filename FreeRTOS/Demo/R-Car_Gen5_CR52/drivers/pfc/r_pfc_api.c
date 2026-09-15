@@ -17,7 +17,7 @@
 /* Logging Function include. */
 #include "logging_stack.h"
 
-#define BIT(nr)             (1UL << (nr))
+#define BIT(nr)             (1U << (nr))
 
 #define PFC_INVALID_ADDR           0x0
 

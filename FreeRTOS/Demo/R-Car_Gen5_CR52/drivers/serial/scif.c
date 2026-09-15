@@ -145,9 +145,9 @@ static void uart_rcar_set_baudrate(uint32_t port, uint32_t baud_rate)
         wait(0x2000U);
     } else {
         if (port <= 4) {
-            reg_val = ((clock_rate_s0d12 + 16 * baud_rate) / (32 * baud_rate) - 1);
+            reg_val = (uint16_t)(((clock_rate_s0d12 + (16U * baud_rate)) / (32U * baud_rate)) - 1U);
         } else {
-	        reg_val = (clock_rate_sga_syncd4 / baud_rate / 8 / 2 - 1);
+	        reg_val = (uint16_t)((clock_rate_sga_syncd4 / baud_rate / 8U / 2U) - 1U);
         }
 	    uart_rcar_write_8(SCBRR, reg_val);
     }

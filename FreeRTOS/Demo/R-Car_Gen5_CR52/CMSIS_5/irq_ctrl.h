@@ -47,11 +47,11 @@ typedef int32_t IRQn_ID_t;
 
 /* Interrupt mode bit-masks */
 #define IRQ_MODE_TRIG_Pos           (0U)
-#define IRQ_MODE_TRIG_Msk           (0x07UL /*<< IRQ_MODE_TRIG_Pos*/)
-#define IRQ_MODE_TRIG_LEVEL         (0x00UL /*<< IRQ_MODE_TRIG_Pos*/) ///< Trigger: level triggered interrupt
+#define IRQ_MODE_TRIG_Msk           (0x07U /*<< IRQ_MODE_TRIG_Pos*/)
+#define IRQ_MODE_TRIG_LEVEL         (0x00U /*<< IRQ_MODE_TRIG_Pos*/) ///< Trigger: level triggered interrupt
 #define IRQ_MODE_TRIG_LEVEL_LOW     (0x01UL /*<< IRQ_MODE_TRIG_Pos*/) ///< Trigger: low level triggered interrupt
 #define IRQ_MODE_TRIG_LEVEL_HIGH    (0x02UL /*<< IRQ_MODE_TRIG_Pos*/) ///< Trigger: high level triggered interrupt
-#define IRQ_MODE_TRIG_EDGE          (0x04UL /*<< IRQ_MODE_TRIG_Pos*/) ///< Trigger: edge triggered interrupt
+#define IRQ_MODE_TRIG_EDGE          (0x04U /*<< IRQ_MODE_TRIG_Pos*/) ///< Trigger: edge triggered interrupt
 #define IRQ_MODE_TRIG_EDGE_RISING   (0x05UL /*<< IRQ_MODE_TRIG_Pos*/) ///< Trigger: rising edge triggered interrupt
 #define IRQ_MODE_TRIG_EDGE_FALLING  (0x06UL /*<< IRQ_MODE_TRIG_Pos*/) ///< Trigger: falling edge triggered interrupt
 #define IRQ_MODE_TRIG_EDGE_BOTH     (0x07UL /*<< IRQ_MODE_TRIG_Pos*/) ///< Trigger: rising and falling edge triggered interrupt
@@ -84,11 +84,11 @@ typedef int32_t IRQn_ID_t;
 #define IRQ_MODE_MODEL_NN           (0x0UL << IRQ_MODE_MODEL_Pos)     ///< Corresponding interrupt is handled using the N-N model
 #define IRQ_MODE_MODEL_1N           (0x1UL << IRQ_MODE_MODEL_Pos)     ///< Corresponding interrupt is handled using the 1-N model
 
-#define IRQ_MODE_ERROR              (0x80000000UL)                    ///< Bit indicating mode value error
+#define IRQ_MODE_ERROR              (0x80000000U)                    ///< Bit indicating mode value error
 
 /* Interrupt priority bit-masks */
 #define IRQ_PRIORITY_Msk            (0x0000FFFFUL)                    ///< Interrupt priority value bit-mask
-#define IRQ_PRIORITY_ERROR          (0x80000000UL)                    ///< Bit indicating priority value error
+#define IRQ_PRIORITY_ERROR          (0x80000000U)                    ///< Bit indicating priority value error
 
 /// Initialize interrupt controller.
 /// \return 0 on success, -1 on error.
