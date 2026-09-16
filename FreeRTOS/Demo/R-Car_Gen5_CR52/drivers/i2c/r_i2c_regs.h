@@ -13,7 +13,6 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "r_i2c_private.h"
 
 /* Offset I2C registers */
 #define R_I2C_ICSCR       0x00UL
@@ -70,7 +69,6 @@ extern "C" {
 
 void        R_I2C_PRV_RegWrite32(uintptr_t Addr, uint32_t Data);
 uint32_t    R_I2C_PRV_RegRead32(uintptr_t Addr);
-uintptr_t   R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit);
 
 #ifdef __cplusplus
 }

@@ -18,7 +18,6 @@
 #include "i2c/r_i2c.h"
 #include "r_i2c_regs.h"
 #include "r_i2c_private.h"
-#include "board.h"
 #include "arm_generic_timer.h"
 #include "rcar_utils.h"
 
@@ -36,6 +35,7 @@
 #define ICMSR_MASK                              ((uint32_t)0x7F)
 #define ICMCR_CLEAR                             ((uint32_t)0x80)
 #define R_I2C_TIMEOUT_COUNT                     (GENERIC_TIMER_CLK/1000U) ///< 1ms
+#define I2C_INVALID_ADDR                        0x0
 
 /* ==================== STATIC VARIABLES ==================== */
 static int clock_id;
@@ -47,6 +47,7 @@ static int32_t  loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask);
 static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes);
 static uint32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read);
 static uint32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit);
+static uintptr_t R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit);
 
 /* DMA functions */
 static void rcar_i2c_dma_callback(void *p_context);
@@ -1187,4 +1188,15 @@ static uint32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit)
     }
 
     return 0;
+}
+
+static uintptr_t R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit)
+{
+    if ((uint32_t)I2cUnit >= (sizeof(i2c_base) / sizeof(i2c_base[0])))
+    {
+        LogDebug(("I2C channel %d not exist!\n", I2cUnit));
+        return I2C_INVALID_ADDR;
+    }
+
+    return i2c_base[I2cUnit];
 }
