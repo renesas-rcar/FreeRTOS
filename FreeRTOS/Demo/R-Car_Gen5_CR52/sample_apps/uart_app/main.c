@@ -50,6 +50,7 @@
         SCIF1,
         SCIF0,
         SCIF3,
+        SCIF4,
         HSCIF0,
         HSCIF1,
         HSCIF2,
@@ -129,14 +130,11 @@ static void uartIDtoString(uint8_t uartID, unsigned char *uartName)
     memset(uartName,0,strlen(uartName));
 
     switch(uartID) {
-            case SCIF1:
-                strcpy(uartName, "SCIF1");
-                break;
             case SCIF0:
                 strcpy(uartName, "SCIF0");
                 break;
-            case HSCIF0:
-                strcpy(uartName, "HSCIF0");
+            case SCIF1:
+                strcpy(uartName, "SCIF1");
                 break;
             case SCIF2_UNSUPPORTED:
                 strcpy(uartName, "SCIF2");
@@ -146,6 +144,9 @@ static void uartIDtoString(uint8_t uartID, unsigned char *uartName)
                 break;
             case SCIF4:
                 strcpy(uartName, "SCIF4");
+                break;
+            case HSCIF0:
+                strcpy(uartName, "HSCIF0");
                 break;
             case HSCIF1:
                 strcpy(uartName, "HSCIF1");
@@ -218,11 +219,7 @@ static void uartAppExample(uint8_t *channelArr, uint8_t arrLength)
         printf("\n=== Please manually switch to %s and update Terminal to 115200 baudrate on NEW COM ===\n", uartNameBuf);
         vTaskDelay(500);
 
-        #if (BOARD == X5H_RFS2)
-        if (flag == 0 || allChannel[setIndex] == SCIF3)
-        #else
         if (flag == 0)
-        #endif
         {
             /* NA TC*/
             R_SERIAL_ReConfigure(serialChannelArr[0]);
