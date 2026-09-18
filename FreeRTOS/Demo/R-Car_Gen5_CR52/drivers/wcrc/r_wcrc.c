@@ -409,31 +409,35 @@ static int wcrc_get_clock_ids(wcrc_unit_t unit, uint32_t *wcrc_id, uint32_t *crc
         default:
             return -1;
     }
+#elif (BOARD == MDP_AIACC_HIL)
+    switch (unit)
+    {
+        case WCRC_00:
+            *wcrc_id = AIACC_CLOCK_ID_WCRC0;
+            *crc_id  = AIACC_CLOCK_ID_CRC0;
+            *kcrc_id = AIACC_CLOCK_ID_KCRC0;
+            break;
+            
+        case WCRC_01:
+            *wcrc_id = AIACC_CLOCK_ID_WCRC1;
+            *crc_id  = AIACC_CLOCK_ID_CRC1;
+            *kcrc_id = AIACC_CLOCK_ID_KCRC1;
+            break;
+
+        case WCRC_02:
+            *wcrc_id = AIACC_CLOCK_ID_WCRC2;
+            *crc_id  = AIACC_CLOCK_ID_CRC2;
+            *kcrc_id = AIACC_CLOCK_ID_KCRC2;
+            break;
+
+        default:
+            return -1;
+    }
+#else
+    /* Do nothing */
 #endif
     return 0;
 }
-
-#if (BOARD == MDP_AIACC_HIL)
-static void WcrcRequestClockOn()
-{
-    uint32_t module_num = MODULE_NUM_RT;
-
-    //WCRC
-    mdlc_ms_module_run_bit_f(module_num, 12, 26);
-    mdlc_ms_module_run_bit_f(module_num, 12, 28);
-    mdlc_ms_module_run_bit_f(module_num, 12, 30);
-
-    //CRC
-    mdlc_ms_module_run_bit_f(module_num, 13, 16);
-    mdlc_ms_module_run_bit_f(module_num, 13, 18);
-    mdlc_ms_module_run_bit_f(module_num, 13, 20);
-
-    //KCRC
-    mdlc_ms_module_run_bit_f(module_num, 14, 6);
-    mdlc_ms_module_run_bit_f(module_num, 14, 8);
-    mdlc_ms_module_run_bit_f(module_num, 14, 10);
-}
-#endif
 
 static int wcrc_enable_clock(wcrc_cfg_t const * const p_cfg)
 {
@@ -444,10 +448,6 @@ static int wcrc_enable_clock(wcrc_cfg_t const * const p_cfg)
     {
         return -1;
     }
-
-#if (BOARD == MDP_AIACC_HIL)
-    WcrcRequestClockOn();
-#endif
 
     ret = wcrc_get_clock_ids(p_cfg->unit, &wcrc_id, &crc_id, &kcrc_id);
     if (ret != 0) {

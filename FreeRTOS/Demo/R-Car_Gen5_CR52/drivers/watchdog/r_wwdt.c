@@ -56,15 +56,6 @@ static void r_wdt_wait_cycles(uint8_t cycles)
     vTaskDelay(delay);
 }
 
-#if (BOARD == MDP_AIACC_HIL)
-static void WwdtRequestClockOn()
-{
-    uint32_t module_num = MODULE_NUM_RT;
-
-    mdlc_ms_module_run_bit_f(module_num, 10, 2);
-}
-#endif
-
 void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bool irq_75p, wwdt_erm_t err_mode)
 {
     uint8_t val;
@@ -76,11 +67,6 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
         return;
     }
 
-#if (BOARD == MDP_AIACC_HIL)
-    WwdtRequestClockOn();
-#endif
-
-#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
     clock_id = WWDT_CLK_ID;
     ret = R_StateManager_ClockOn(clock_id);
     if (ret != 0) {
@@ -109,7 +95,6 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
     if (ret != 0) {
         (void)printf("Error: Failed to DeassertReset clock id %d.\r\n", clock_id_1);
     }
-#endif
 
     clk_rate = (wwdt_base_addr == 0xC1380000) ? CLK_LSIOSC : RCLK;
     val = r_wwdt_read8(wwdt_base_addr + WDTA0MD);

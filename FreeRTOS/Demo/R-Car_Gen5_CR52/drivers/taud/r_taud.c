@@ -181,8 +181,11 @@ static uint8_t r_taud_setup_clk_src(void)
 #if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
     R_StateManager_ClockOn(X5H_CLOCK_ID_MDLC_TAUD0);
     R_StateManager_ClockOn(X5H_CLOCK_ID_MDLC_TAUD1);
-
     R_StateManager_GetClock(X5H_CLOCK_ID_CLK_BUSD8_SCP_MAIN, &rate);
+#elif (BOARD == MDP_AIACC_HIL)
+    R_StateManager_GetClock(AIACC_CLOCK_ID_SCPBUSD8_SCP, &rate);
+#else
+    /* Do nothing */
 #endif
     taud_set_src_clk_main(rate);
     set_one_time = true;

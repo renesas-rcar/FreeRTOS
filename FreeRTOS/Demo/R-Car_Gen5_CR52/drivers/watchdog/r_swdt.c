@@ -43,25 +43,11 @@ static void r_swdt_wait_cycles(uint8_t cycles) {
     vTaskDelay(delay);
 }
 
-#if (BOARD == MDP_AIACC_HIL)
-static void SwdtRequestClockOn()
-{
-    uint32_t module_num = MODULE_NUM_RT;
-
-    mdlc_ms_module_run_bit_f(module_num, 10, 2);
-}
-#endif
-
 uint8_t R_SWDT_Init(uint8_t timeout_sec) {
     uint16_t clks_per_sec;
     uint8_t ret;
     int clock_id, reset_id_0, reset_id_1;
 
-#if (BOARD == MDP_AIACC_HIL)
-    SwdtRequestClockOn();
-#endif
-
-#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
     clock_id = SWDT_CLK_ID;
     ret = R_StateManager_ClockOn(clock_id);
     if (ret != 0U) {
@@ -79,7 +65,6 @@ uint8_t R_SWDT_Init(uint8_t timeout_sec) {
     if (ret != 0U) {
         (void)printf("Error: Failed to reset id %d ON.\r\n", reset_id_1);
     }
-#endif
 
     /* for SWDT */
     r_swdt_write(SWDT_BASE + SWTCSRA, (0xA5A5A5U << 8) | (r_swdt_read(SWDT_BASE + SWTCSRA) & ~SWTCSRA_TME));

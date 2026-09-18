@@ -21,11 +21,7 @@
 #include "state-manager/r_power_domain_id.h"
 #include "state-manager/r_reset_domain_id.h"
 #include "state-manager/r_state_manager.h"
-
-#define NOT_SCP_SUPPORT 1 // SCP firmware not support.
-#if (NOT_SCP_SUPPORT == 1)
-#include "clock_controller/clock_controller.h"
-#endif
+#include "board.h"
 
 static bool ucie_is_setup[UCIE_CH_MAX] = {
     [UCIE_CH0] = false,
@@ -1363,160 +1359,183 @@ static void set_pll9_1(uint32_t f_Speed)
     *(volatile uint32_t *)HSCS_APB_UCI1CORECKCR = 0x00000000;
 }
 
-#if (NOT_SCP_SUPPORT == 1)
 void Ucie_PowerOn(e_ucie_ch_t ucie_ch)
 {
-    uint32_t ucixcoreclkcr;
-    uint32_t pll_num;
-    uint32_t ucie_ms_core_bit;
-    uint32_t ucie_ms_peri_bit;
     uint32_t ucie_pwrmng_addr;
     volatile uintptr_t uciepwrmngctrl;
     uint32_t ucie_apb_base;
     uint32_t val;
+    int ret;
+#if ((BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL))
+    e_x5h_clock_id_t ucie_peri_clk_id;
+    e_x5h_clock_id_t ucie_core_clk_id;
+    e_x5h_reset_domain_id_t ucie_peri_reset_id;
+    e_x5h_reset_domain_id_t ucie_core_reset_id;
+#elif (BOARD == MDP_AIACC_HIL)
+    e_aiacc_clock_id_t ucie_peri_clk_id;
+    e_aiacc_clock_id_t ucie_core_clk_id;
+    e_aiacc_reset_domain_id_t ucie_peri_reset_id;
+    e_aiacc_reset_domain_id_t ucie_core_reset_id;
+#else
+    /* Do nothing */
+#endif
+
     if (ucie_ch == UCIE_CH0){
-        ucixcoreclkcr = 0xDE201080U;
-        pll_num = 19;
-        ucie_ms_peri_bit=2;
-        ucie_ms_core_bit=0;
-        ucie_apb_base=0xDC000000U;
+        ucie_apb_base = (uint32_t)UCIE_APB0_UCIEPWRMNGCTRL;
+#if ((BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL))
+        ucie_peri_clk_id = X5H_CLOCK_ID_MDLC_UCIE02;
+        ucie_core_clk_id = X5H_CLOCK_ID_MDLC_UCIE01;
+        ucie_peri_reset_id = X5H_RESET_DOMAIN_ID_UCIE02;
+        ucie_core_reset_id = X5H_RESET_DOMAIN_ID_UCIE01;
+#elif (BOARD == MDP_AIACC_HIL)
+        ucie_peri_clk_id = AIACC_CLOCK_ID_UCIE02;
+        ucie_core_clk_id = AIACC_CLOCK_ID_UCIE01;
+        ucie_peri_reset_id = AIACC_RESET_DOMAIN_ID_UCIE02;
+        ucie_core_reset_id = AIACC_RESET_DOMAIN_ID_UCIE01;
+#else
+    /* Do nothing */
+#endif
     } else {
-        ucixcoreclkcr = 0xDE201084U;
-        pll_num = 20;
-        ucie_ms_peri_bit=6;
-        ucie_ms_core_bit=4;
-        ucie_apb_base=0xDD000000U;
+        ucie_apb_base = (uint32_t)UCIE_APB1_UCIEPWRMNGCTRL;
+#if ((BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL))
+        ucie_peri_clk_id = X5H_CLOCK_ID_MDLC_UCIE12;
+        ucie_core_clk_id = X5H_CLOCK_ID_MDLC_UCIE11;
+        ucie_peri_reset_id = X5H_RESET_DOMAIN_ID_UCIE12;
+        ucie_core_reset_id = X5H_RESET_DOMAIN_ID_UCIE11;
+#elif (BOARD == MDP_AIACC_HIL)
+        ucie_peri_clk_id = AIACC_CLOCK_ID_UCIE12;
+        ucie_core_clk_id = AIACC_CLOCK_ID_UCIE11;
+        ucie_peri_reset_id = AIACC_RESET_DOMAIN_ID_UCIE12;
+        ucie_core_reset_id = AIACC_RESET_DOMAIN_ID_UCIE11;
+#else
+    /* Do nothing */
+#endif
     }
 
-    /* ms ucie core reset*/
-    mdlc_transition_ms(16, 2, ucie_ms_core_bit, 0x1);
-    mdlc_check_ms_status(16, 2, ucie_ms_core_bit);
+#if ((BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL))
+    ret = R_StateManager_PowerOn(X5H_POWER_DOMAIN_ID_UCI);
+    if (ret != 0)
+    {
+        (void)printf("Error: Failed to set power domain id %d ON.\r\n",
+                X5H_POWER_DOMAIN_ID_UCI);
+    }
+#endif
 
-    /* ms ucie peri reset */
-    mdlc_transition_ms(16, 2, ucie_ms_peri_bit, 0x1);
-    mdlc_check_ms_status(16, 2, ucie_ms_peri_bit);
-    /* ms ucie peri run */
-    mdlc_transition_ms(16, 2, ucie_ms_peri_bit, 0x3);
-    mdlc_check_ms_status(16, 2, ucie_ms_peri_bit);
+#if ((BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL) || (BOARD == MDP_AIACC_HIL))
+    ret = R_StateManager_ClockOn(ucie_peri_clk_id);
+    if (ret != 0)
+    {
+        (void)printf("Error: Failed to set clock id %d ON.\r\n",
+                ucie_peri_clk_id);
+    }
+    ret = R_StateManager_Reset(ucie_peri_reset_id);
+    if (ret != 0)
+    {
+        (void)printf("Error: Failed to reset domain id %d.\r\n",
+                ucie_peri_reset_id);
+    }
+#endif
 
-    ucie_pwrmng_addr = ucie_apb_base+0x00E00070U;
+    ucie_pwrmng_addr = ucie_apb_base;
     uciepwrmngctrl= (uintptr_t)(ucie_pwrmng_addr);
     val = mem_read32(uciepwrmngctrl);
     val &= ~(1U<<4);                 // Clear sys_aux_pwr_det bit (bit 4 )
     val |=  (uint32_t)(1U<<6);                 // Set app_ready_entr_l23 bit (bit 6)
     mem_write32(uciepwrmngctrl, val);
 
-    (void)switch_clock_source_pll(pll_num);
-
-    /* ms ucie core run */
-    mdlc_transition_ms(16, 2, ucie_ms_core_bit, 0x3);
-    mdlc_check_ms_status(16, 2, ucie_ms_core_bit);
-}
-#else
-void Ucie_PowerOn(e_ucie_ch_t ch)
-{
-    e_x5h_clock_id_t ucie_peri_clk_id;
-    e_x5h_clock_id_t ucie_core_clk_id;
-    e_x5h_reset_domain_id_t ucie_peri_reset_id;
-    e_x5h_reset_domain_id_t ucie_core_reset_id;
-
-    if(ch == UCIE_CH0) {
-        ucie_peri_clk_id = X5H_CLOCK_ID_MDLC_UCIE02;
-        ucie_core_clk_id = X5H_CLOCK_ID_MDLC_UCIE01;
-        ucie_peri_reset_id = X5H_RESET_DOMAIN_ID_UCIE02;
-        ucie_core_reset_id = X5H_RESET_DOMAIN_ID_UCIE01;
+#if ((BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL) || (BOARD == MDP_AIACC_HIL))
+    ret = R_StateManager_ClockOn(ucie_core_clk_id);
+    if (ret != 0)
+    {
+        (void)printf("Error: Failed to set clock id %d ON.\r\n",
+                ucie_core_clk_id);
     }
-    else if (ch == UCIE_CH1) {
-        ucie_peri_clk_id = X5H_CLOCK_ID_MDLC_UCIE12;
-        ucie_core_clk_id = X5H_CLOCK_ID_MDLC_UCIE11;
-        ucie_peri_reset_id = X5H_RESET_DOMAIN_ID_UCIE12;
-        ucie_core_reset_id = X5H_RESET_DOMAIN_ID_UCIE11;
+    ret = R_StateManager_Reset(ucie_core_reset_id);
+    if (ret != 0)
+    {
+        (void)printf("Error: Failed to reset domain id %d.\r\n",
+                ucie_core_reset_id);
     }
-    
-    R_StateManager_PowerOn(X5H_POWER_DOMAIN_ID_UCI);
-    
-    R_StateManager_ClockOn(ucie_peri_clk_id);
-    R_StateManager_ResetAssert(ucie_peri_reset_id);
-    R_StateManager_ResetDeassert(ucie_peri_reset_id);
-    
-    if (ch == UCIE_CH0) {
-        *(volatile uint32_t *)(UCIE_APB0_UCIEPWRMNGCTRL) = 0x00000040;
-    }
-    else if (ch == UCIE_CH1) {
-        *(volatile uint32_t *)(UCIE_APB1_UCIEPWRMNGCTRL) = 0x00000040;
-    }
-
-    if (ch == UCIE_CH0) {
-        set_pll9_0(LINKSPEED_4GTPS);
-    }
-    else if (ch == UCIE_CH1) {
-        set_pll9_1(LINKSPEED_4GTPS);
-    }
-
-    R_StateManager_ClockOn(ucie_core_clk_id);
-    R_StateManager_ResetAssert(ucie_core_reset_id);
-    R_StateManager_ResetDeassert(ucie_core_reset_id);
-}
 #endif
+}
 
-#if (NOT_SCP_SUPPORT == 1)
 void Ucie_PowerOFF(e_ucie_ch_t ch)
 {
-    uint32_t ucixcoreclkcr;
-    uint32_t pll_num;
-    uint32_t ucie_ms_core_bit;
-    uint32_t ucie_ms_peri_bit;
     volatile uintptr_t uciepwrmngctrl;
     uint32_t ucie_apb_base;
     uint32_t val;
-
-    if (ch == UCIE_CH0){
-        ucixcoreclkcr = 0xDE201080U;
-        pll_num = 19;
-        ucie_ms_peri_bit=2;
-        ucie_ms_core_bit=0;
-        ucie_apb_base=0xDC000000U;
-    } else {
-        ucixcoreclkcr = 0xDE201084U;
-        pll_num = 20;
-        ucie_ms_peri_bit=6;
-        ucie_ms_core_bit=4;
-        ucie_apb_base=0xDD000000U;
-    }
-
-    mdlc_transition_ms(16, 2, ucie_ms_core_bit, 0x1);
-    mdlc_transition_ms(16, 2, ucie_ms_peri_bit, 0x1);
-    mdlc_transition_ms(16, 2, ucie_ms_core_bit, 0x0);
-    mdlc_transition_ms(16, 2, ucie_ms_peri_bit, 0x0);
-}
-#else
-void Ucie_PowerOFF(e_ucie_ch_t ch)
-{
+    int ret;
+#if ((BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL))
     e_x5h_clock_id_t ucie_peri_clk_id;
     e_x5h_clock_id_t ucie_core_clk_id;
     e_x5h_reset_domain_id_t ucie_peri_reset_id;
     e_x5h_reset_domain_id_t ucie_core_reset_id;
+#elif (BOARD == MDP_AIACC_HIL)
+    e_aiacc_clock_id_t ucie_peri_clk_id;
+    e_aiacc_clock_id_t ucie_core_clk_id;
+    e_aiacc_reset_domain_id_t ucie_peri_reset_id;
+    e_aiacc_reset_domain_id_t ucie_core_reset_id;
+#else
+    /* Do nothing */
+#endif
 
-    if(ch == UCIE_CH0) {
+    if (ch == UCIE_CH0){
+        ucie_apb_base = (uint32_t)UCIE_APB0_UCIEPWRMNGCTRL;
+#if ((BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL))
         ucie_peri_clk_id = X5H_CLOCK_ID_MDLC_UCIE02;
         ucie_core_clk_id = X5H_CLOCK_ID_MDLC_UCIE01;
         ucie_peri_reset_id = X5H_RESET_DOMAIN_ID_UCIE02;
         ucie_core_reset_id = X5H_RESET_DOMAIN_ID_UCIE01;
-    }
-    else if (ch == UCIE_CH1) {
+#elif (BOARD == MDP_AIACC_HIL)
+        ucie_peri_clk_id = AIACC_CLOCK_ID_UCIE02;
+        ucie_core_clk_id = AIACC_CLOCK_ID_UCIE01;
+        ucie_peri_reset_id = AIACC_RESET_DOMAIN_ID_UCIE02;
+        ucie_core_reset_id = AIACC_RESET_DOMAIN_ID_UCIE01;
+#else
+    /* Do nothing */
+#endif
+    } else {
+        ucie_apb_base = (uint32_t)UCIE_APB1_UCIEPWRMNGCTRL;
+#if ((BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL))
         ucie_peri_clk_id = X5H_CLOCK_ID_MDLC_UCIE12;
         ucie_core_clk_id = X5H_CLOCK_ID_MDLC_UCIE11;
         ucie_peri_reset_id = X5H_RESET_DOMAIN_ID_UCIE12;
         ucie_core_reset_id = X5H_RESET_DOMAIN_ID_UCIE11;
-    }
-    
-    R_StateManager_ResetAssert(ucie_core_reset_id);
-    R_StateManager_ClockOff(ucie_core_clk_id);
-
-    R_StateManager_ResetAssert(ucie_peri_reset_id);
-    R_StateManager_ClockOff(ucie_peri_clk_id);
-}
+#elif (BOARD == MDP_AIACC_HIL)
+        ucie_peri_clk_id = AIACC_CLOCK_ID_UCIE12;
+        ucie_core_clk_id = AIACC_CLOCK_ID_UCIE11;
+        ucie_peri_reset_id = AIACC_RESET_DOMAIN_ID_UCIE12;
+        ucie_core_reset_id = AIACC_RESET_DOMAIN_ID_UCIE11;
+#else
+    /* Do nothing */
 #endif
+    }
+
+    ret = R_StateManager_Reset(ucie_core_reset_id);
+    if (ret != 0)
+    {
+        (void)printf("Error: Failed to reset domain id %d.\r\n",
+                ucie_core_reset_id);
+    }
+    ret = R_StateManager_ClockOff(ucie_core_clk_id);
+    if (ret != 0)
+    {
+        (void)printf("Error: Failed to set clock id %d OFF.\r\n",
+                ucie_core_clk_id);
+    }
+    ret = R_StateManager_Reset(ucie_peri_reset_id);
+    if (ret != 0)
+    {
+        (void)printf("Error: Failed to reset domain id %d.\r\n",
+                ucie_peri_reset_id);
+    }
+    ret = R_StateManager_ClockOff(ucie_peri_clk_id);
+    if (ret != 0)
+    {
+        (void)printf("Error: Failed to set clock id %d OFF.\r\n",
+                ucie_peri_clk_id);
+    }
+}
 
 uint32_t R_UCIE_Config(e_ucie_ch_t ch, e_ucie_mode_t mode,
                        e_ucie_linkspeed_t speed, bool init_with_system)

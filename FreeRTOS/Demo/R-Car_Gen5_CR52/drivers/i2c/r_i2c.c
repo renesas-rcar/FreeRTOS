@@ -265,6 +265,32 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
     {
         printf("Error: Failed to set clock id %d ON.\r\n", clock_id);
     }
+#elif (BOARD == MDP_AIACC_HIL)
+    switch (Unit) {
+        case R_I2C_IF0:
+            clock_id = AIACC_CLOCK_ID_I2C0;
+            break;
+        case R_I2C_IF1:
+            clock_id = AIACC_CLOCK_ID_I2C1;
+            break;
+        case R_I2C_IF2:
+            clock_id = AIACC_CLOCK_ID_I2C2;
+            break;
+        case R_I2C_IF3:
+            clock_id = AIACC_CLOCK_ID_I2C3;
+            break;
+        default:
+            printf("[R_I2C_PRV_GetClockId] : Wrong I2C Unit %d\r\n", Unit);
+            return -1;
+    }
+
+    ret = R_StateManager_ClockOn(clock_id);
+    if (ret != 0U)
+    {
+        printf("Error: Failed to set clock id %d ON.\r\n", clock_id);
+    }
+#else
+    /* Do nothing */
 #endif
     uint32_t I2C_ClockRate = p_instance_ctrl->p_cfg->rate;
     switch (I2C_ClockRate)
