@@ -64,6 +64,15 @@ extern "C" {
 #define R_I2C_RMDMAE         (1UL << 1)
 #define R_I2C_TMDMAE         (1UL << 0)
 
+#define R_I2C_ICCCR_100KHz              (0xAEU)
+#define R_I2C_ICCCR_400KHz              (0x1EU)
+#define R_I2C_ICCCR_1MHz                (0x06U)
+#define R_I2C_ICCCR2_INITIAL_VAL        (0x00000000U)
+#define R_I2C_ICCCR2_1MHz               (0X87U)
+#define R_I2C_ICMPR_1MHz                (0x10U)
+#define R_I2C_ICHPR_1MHz                (0x1DU)
+#define R_I2C_ICLPR_1MHz                (0x28U)
+
 
 #define R_I2C_FSDA_BIT (1UL << 5)
 

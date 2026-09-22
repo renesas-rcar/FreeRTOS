@@ -278,26 +278,28 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
     uint32_t I2C_ClockRate = p_instance_ctrl->p_cfg->rate;
     switch (I2C_ClockRate)
     {
-        case 100000:
-            /* Set Clock Control register */
-            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR, 0x1e);
+        /* 100KHz and 400KHz use normal mode */
+        case I2C_MASTER_RATE_STANDARD:
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR2, R_I2C_ICCCR2_INITIAL_VAL);
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR, R_I2C_ICCCR_100KHz);
             break;
-        case 400000:
-	    /* Set Clock Control register */
-	    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR, 0xae);
+        case I2C_MASTER_RATE_FAST:
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR2, R_I2C_ICCCR2_INITIAL_VAL);
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR, R_I2C_ICCCR_400KHz);
             break;
-        case 1000000:
-	    /* Set SCL Mask Control regiters (Variable Duty ratio only) */
-	    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMPR, 0x13);
+        /* 1MHz use Duty variable mode */    
+        case I2C_MASTER_RATE_FASTPLUS:
+            /* Set SCL Mask Control regiters (Variable Duty ratio only) */
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMPR, R_I2C_ICMPR_1MHz);
 
-	    /* Set SCL High Control regiters (Variable Duty ratio only) */
-	    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICHPR, 0x15);
+            /* Set SCL High Control regiters (Variable Duty ratio only) */
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICHPR, R_I2C_ICHPR_1MHz);
 
-	    /* Set SCL Low Control regiters (Variable Duty ratio only) */
-	    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICLPR, 0x15);
+            /* Set SCL Low Control regiters (Variable Duty ratio only) */
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICLPR, R_I2C_ICLPR_1MHz);
 
-	    /* Set Clock Control register 2 */
-	    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR2, 0x87);
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR2, R_I2C_ICCCR2_1MHz);
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR, R_I2C_ICCCR_1MHz);
             break;
         default:
             LogDebug(("Invalid I2C ClockRate\n"));
