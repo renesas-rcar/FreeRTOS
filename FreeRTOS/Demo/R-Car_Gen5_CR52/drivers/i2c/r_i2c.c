@@ -360,6 +360,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
 
         vPortFree(p_usr_context);
     }
+    return 0;
 }
 
 static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
