@@ -127,6 +127,9 @@ else()
 endif()
 message(STATUS "TCM option: ${TCM_ENABLE}")
 
+set(LIBRARY_LOG_LEVEL 0 CACHE STRING "Library log level")
+message(STATUS "LIBRARY_LOG_LEVEL is defined as: ${LIBRARY_LOG_LEVEL}")
+
 set(CMAKE_ASM_FLAGS "--specs=nosys.specs -mfloat-abi=hard")
 set(CMAKE_C_FLAGS "-std=c99")
 add_compile_options(
@@ -136,6 +139,7 @@ add_compile_options(
     -DTCM_ENABLE=${TCM_ENABLE}
     ${global_definition}
     -D${UCIE_VER}=2 -D${UCIE_CONW}=1
+    -DLIBRARY_LOG_LEVEL=${LIBRARY_LOG_LEVEL}
     -ffile-prefix-map=${FREERTOS_DIR}/=
 )
 

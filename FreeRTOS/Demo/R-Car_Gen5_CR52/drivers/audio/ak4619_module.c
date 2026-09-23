@@ -12,8 +12,6 @@
 #include "gpio/r_gpio.h"
 #include "i2c/r_i2c.h"
 #include <stdio.h>
-/* Logging Function include. */
-#include "logging_stack.h"
 
 /* Logging Function include. */
 #include "logging_stack.h"
