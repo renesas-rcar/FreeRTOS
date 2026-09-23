@@ -173,7 +173,7 @@ int scmi_reset_domain_attributes(uint32_t domain_id, uint32_t *attributes,
 
 	*attributes = (uint32_t)reply_buffer.attributes;
 	*latency = (uint32_t)reply_buffer.latency;
-	strncpy(name, reply_buffer.name, SCMI_SHORT_NAME_MAX_SIZE);
+	(void)strncpy(name, reply_buffer.name, SCMI_SHORT_NAME_MAX_SIZE);
 
 	return 0;
 }

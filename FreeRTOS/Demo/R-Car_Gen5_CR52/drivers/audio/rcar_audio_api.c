@@ -12,7 +12,6 @@
 #include "r_audio_private.h"
 
 /* Logging Function include. */
-#define LIBRARY_LOG_LEVEL 0
 #include "logging_stack.h"
 
 audio_ssi_conf_t *audio_ssi_conf;
@@ -24,7 +23,7 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 
 	if((audio_ssi_conf != NULL))
 	{
-		printf("SSI has already been initialized!\n");
+		LogDebug(("SSI has already been initialized!\n"));
 		return -1;
 	}
 
@@ -34,17 +33,17 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 		
 		if(audio_ssi_conf == NULL)
 		{
-			printf("Can't allocate audio_ssi_conf!\n");
+			LogDebug(("Can't allocate audio_ssi_conf!\n"));
 			return -1;
 		}
 		ssi_conf_t *ssi_conf = (ssi_conf_t *)malloc(sizeof(ssi_conf_t));
 		if(ssi_conf == NULL)
 		{
-			printf("Can't allocate ssi_conf!\n");
+			LogDebug(("Can't allocate ssi_conf!\n"));
 			free(audio_ssi_conf);
 			return -1;
 		}
-		memset(ssi_conf, 0, sizeof(ssi_conf_t));
+		(void)memset(ssi_conf, 0, sizeof(ssi_conf_t));
 
 		/* Master mode channel 5*/
 		ssi_conf->cr_role &= ~(SCKD | SWSD);
@@ -60,7 +59,7 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 		}
 		else
 		{
-			printf("Invalid number of channels!\n");
+			LogDebug(("Invalid number of channels!\n"));
 			free(ssi_conf);
 			free(audio_ssi_conf);
 			return -1;
@@ -101,7 +100,7 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 	}
 	else
 	{
-		printf("Unsupported mode!\n");
+		LogDebug(("Unsupported mode!\n"));
 	}
 
 	return 0;
@@ -115,7 +114,7 @@ int r_ssi_config(st_audio_cfg_t const * const p_cfg)
 		ssi_conf_t *ssi_conf = audio_ssi_conf->playback != NULL ? audio_ssi_conf->playback : audio_ssi_conf->capture;
 		if(ssi_conf == NULL)
 		{
-			printf("Can't find playback / capture config!\n");
+			LogDebug(("Can't find playback / capture config!\n"));
 			return -1;
 		}
 
@@ -133,7 +132,7 @@ int r_ssi_config(st_audio_cfg_t const * const p_cfg)
 		}
 		else
 		{
-			printf("Invalid number of channels!\n");
+			LogDebug(("Invalid number of channels!\n"));
 			return -1;
 		}
 
@@ -161,7 +160,7 @@ int r_ssi_config(st_audio_cfg_t const * const p_cfg)
 	}
 	else
 	{
-		printf("Unsupported mode!\n");
+		LogDebug(("Unsupported mode!\n"));
 	}
 
 	return 0;
@@ -171,13 +170,13 @@ int r_adg_init(st_audio_cfg_t const * const p_cfg)
 {
 	if((audio_adg_conf != NULL))
 	{
-		printf("ADG has already been initialized!\n");
+		LogDebug(("ADG has already been initialized!\n"));
 		return -1;
 	}
 	audio_adg_conf = (adg_conf_t *)malloc(sizeof(adg_conf_t));
 	if(audio_adg_conf == NULL)
 	{
-		printf("Can't allocate audio_adg_conf!\n");
+		LogDebug(("Can't allocate audio_adg_conf!\n"));
 		return -1;
 	}
 	audio_adg_conf->word_size = p_cfg->bit_depth;
@@ -189,7 +188,7 @@ int r_adg_init(st_audio_cfg_t const * const p_cfg)
 	}	
 	else
 	{
-		printf("This sample rate is currently not supported!\n");
+		LogDebug(("This sample rate is currently not supported!\n"));
 		return -1;
 	}
 	
@@ -201,7 +200,7 @@ int r_ssi_start(st_audio_cfg_t const * const p_cfg)
 {
 	if(audio_ssi_conf == NULL)
 	{
-		printf("SSI module hasn't been initialized!\n");
+		LogDebug(("SSI module hasn't been initialized!\n"));
 		return -1;
 	}
 	if(p_cfg->mode <= CAPTURE_MODE)
@@ -211,7 +210,7 @@ int r_ssi_start(st_audio_cfg_t const * const p_cfg)
 	}
 	else
 	{
-		printf("Unknow format!\n");
+		LogDebug(("Unknow format!\n"));
 		return -1;
 	}
 	return 0;
@@ -221,7 +220,7 @@ int r_ssi_trans(uint32_t data)
 {
 	if(audio_ssi_conf == NULL)
 	{
-		printf("SSI module hasn't been initialized!\n");
+		LogDebug(("SSI module hasn't been initialized!\n"));
 		return -1;
 	}
 	ssi_conf_t *ssi_conf = audio_ssi_conf->playback;
@@ -233,7 +232,7 @@ int r_ssi_stop(st_audio_cfg_t const * const p_cfg)
 {
 	if(audio_ssi_conf == NULL)
 	{
-		printf("SSI module hasn't been initialized!\n");
+		LogDebug(("SSI module hasn't been initialized!\n"));
 		return -1;
 	}
 	if(p_cfg->mode <= CAPTURE_MODE)
@@ -243,7 +242,7 @@ int r_ssi_stop(st_audio_cfg_t const * const p_cfg)
 	}
 	else
 	{
-		printf("Unknow format!\n");
+		LogDebug(("Unknow format!\n"));
 		return -1;
 	}
 	return 0;
@@ -263,7 +262,7 @@ int r_ak4619_init(st_audio_cfg_t const * const p_cfg)
 	}
 	else
 	{
-		printf("Unsupported this sample rate\n");
+		LogDebug(("Unsupported this sample rate\n"));
 		return -1;
 	}
 
@@ -271,7 +270,7 @@ int r_ak4619_init(st_audio_cfg_t const * const p_cfg)
 	res = ak4619_power_on();
     if (res != 0)
     {
-        printf("Can not setup AK4619\n");
+        LogDebug(("Can not setup AK4619\n"));
     }
     vTaskDelay(pdMS_TO_TICKS(10)); // delay 10ms
     // After this, PMDA1 bit = RSTN bit = 0, at reset state -> let config register after this state
@@ -288,7 +287,7 @@ int r_ak4619_init(st_audio_cfg_t const * const p_cfg)
     res = ak4619_module_init(&instance_set, 2, 16);
     if (res != 0)
     {
-        printf("Can not setup AK4619 module\n");
+        LogDebug(("Can not setup AK4619 module\n"));
     }
  
 	return res;

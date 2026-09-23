@@ -18,6 +18,9 @@
 #include "FreeRTOS.h"
 #include "rcar_utils.h"
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 /**
  * @brief Array storing base addresses for each SMMU domain.
  */
@@ -493,11 +496,11 @@ static smmu_l1ste_tbl_t* smmu_alloc_l1ste(e_smmu_domain_t smmu_domain, bool is_s
     l1ste_size = num_l1_entry*sizeof(smmu_l1ste_tbl_t);
     l1ste_tbl = aligned_malloc(1U << (log2size - split + 3U), l1ste_size);
     if (l1ste_tbl == NULL)  {
-        printf("Allocate l1ste fail\n");
+        LogDebug(("Allocate l1ste fail\n"));
         return NULL;
     }
 
-    memset(l1ste_tbl, 0, l1ste_size);
+    (void)memset(l1ste_tbl, 0, l1ste_size);
 
     smmu_strtab->ADDR = (uintptr_t)l1ste_tbl >> 6;
     __DSB();
@@ -535,11 +538,11 @@ static st_smmu_ste_t* smmu_alloc_l2ste(e_smmu_domain_t smmu_domain, bool is_secu
     l2_tbl_size = (1U << split)*sizeof(st_smmu_ste_t);
     l2ste_tbl = aligned_malloc(1U << (6U + split), l2_tbl_size);
     if (l2ste_tbl == NULL) {
-        printf("Allocate l2ste fail\n");
+        LogDebug(("Allocate l2ste fail\n"));
         return NULL;
     }
     
-    memset(l2ste_tbl, 0, l2_tbl_size);
+    (void)memset(l2ste_tbl, 0, l2_tbl_size);
 
     (l1ste_tbl + l1ste_idx)->l2tbl_base = (uintptr_t)l2ste_tbl >> 6;
     (l1ste_tbl + l1ste_idx)->span = split + 1;
@@ -578,7 +581,7 @@ static st_smmu_ste_t* smmu_init_ste(st_smmu_streamid_instance_ctrl_t *p_ctrl){
     stream_id_bits = MAX_L1STE_BITS + split;
     stream_id_bits = log2size < stream_id_bits ? log2size : stream_id_bits;
     if (stream_id > (((uint32_t)1 << stream_id_bits) - 1U)) {
-        printf("Fail to init stream table entry. Stream id is too large\n");
+        LogDebug(("Fail to init stream table entry. Stream id is too large\n"));
         return NULL;
     }
 
@@ -626,11 +629,11 @@ static st_smmu_cd_t* smmu_init_cd_table(st_smmu_streamid_instance_ctrl_t *p_ctrl
 
     cd_tbl = aligned_malloc(1U << 6, sizeof(st_smmu_cd_t));
     if (cd_tbl == NULL) {
-        printf("Allocate cd table fail\n");
+        LogDebug(("Allocate cd table fail\n"));
         return NULL;
     }
     
-    memset(cd_tbl, 0, sizeof(st_smmu_cd_t));
+    (void)memset(cd_tbl, 0, sizeof(st_smmu_cd_t));
 
     cd_tbl->t0sz = 16;
     cd_tbl->ir0 = CTXDESC_CD_IR_RAWAWB;

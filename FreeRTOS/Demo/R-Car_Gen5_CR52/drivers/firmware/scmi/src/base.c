@@ -180,7 +180,7 @@ int scmi_base_vendorid_get(bool sub_vendor, char *vendor_id)
 		return scmi_status_to_errno(reply_buffer.status);
 	}
 	
-	strncpy(vendor_id, reply_buffer.vendor_id, SCMI_SHORT_NAME_MAX_SIZE);
+	(void)strncpy(vendor_id, reply_buffer.vendor_id, SCMI_SHORT_NAME_MAX_SIZE);
 
 	return 0;
 }
@@ -332,7 +332,7 @@ int scmi_base_discover_agent_get(uint32_t request_agent_id,
 	}
 	
 	*agent_id = reply_buffer.agent_id;
-	strncpy(name, reply_buffer.name, SCMI_SHORT_NAME_MAX_SIZE);
+	(void)strncpy(name, reply_buffer.name, SCMI_SHORT_NAME_MAX_SIZE);
 
 	return 0;
 }

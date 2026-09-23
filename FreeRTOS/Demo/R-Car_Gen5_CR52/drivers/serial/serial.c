@@ -57,7 +57,10 @@ int32_t R_SERIAL_PortInit(e_serial_devices_t device)
 
     if (log_sync)
     {
-        R_MFIS_LockRelease(mfis_lock_id);
+        if (R_MFIS_LockRelease(mfis_lock_id) != MFIS_LOCK_SUCCESS)
+        {
+            return -1;
+        }
     }
 
 	return ret;
@@ -120,7 +123,10 @@ int32_t R_SERIAL_PutString(const unsigned char *buffer, unsigned short length)
 
     if (log_sync)
     {
-        R_MFIS_LockRelease(mfis_lock_id);
+        if (R_MFIS_LockRelease(mfis_lock_id) != MFIS_LOCK_SUCCESS)
+        {
+            return -1;
+        }
     }
 
 	return 0;
@@ -148,7 +154,10 @@ int32_t R_SERIAL_PutChar(unsigned char send_char)
 
     if (log_sync)
     {
-        R_MFIS_LockRelease(mfis_lock_id);
+        if (R_MFIS_LockRelease(mfis_lock_id) != MFIS_LOCK_SUCCESS)
+        {
+            return -1;
+        }
     }
 
     return 0;
@@ -191,7 +200,10 @@ int _write(int file, char *ptr, int len)
 
     if (log_sync)
     {
-        R_MFIS_LockRelease(mfis_lock_id);
+        if (R_MFIS_LockRelease(mfis_lock_id) != MFIS_LOCK_SUCCESS)
+        {
+            return -1;
+        }
     }
 
     return len;

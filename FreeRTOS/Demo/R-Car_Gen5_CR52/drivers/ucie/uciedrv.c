@@ -23,6 +23,9 @@
 #include "state-manager/r_state_manager.h"
 #include "board.h"
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 static bool ucie_is_setup[UCIE_CH_MAX] = {
     [UCIE_CH0] = false,
     [UCIE_CH1] = false
@@ -60,17 +63,17 @@ uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
     e_ucie_hdma_mode_t rw = cfg->rw;
     
     if (ucieCh != UCIE_CH0 && ucieCh != UCIE_CH1) {
-        printf("ERROR: Invalid UCIe channel\n");
+        LogDebug(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (dmaCh < HDMA_CH0 || dmaCh > HDMA_CH31) {
-        printf("ERROR: Invalid HDMA channel\n");
+        LogDebug(("ERROR: Invalid HDMA channel\n"));
         return 1;
     }
 
     if (rw != HDMA_WRITE && rw != HDMA_READ) {
-        printf("ERROR: Invalid HDMA transfer mode\n");
+        LogDebug(("ERROR: Invalid HDMA transfer mode\n"));
         return 1;
     }
 
@@ -78,7 +81,7 @@ uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
                             (dmaCh * HDMA_CH_BLOCK_SIZE) + (rw * HDMA_RW_BLOCK_SIZE);
 
     if (mem_read32(base + (uintptr_t)HDMA_STATUS_OFF) == HDMA_STATUS_RUNNING) {
-        printf("ERROR: Channel is running\n");
+        LogDebug(("ERROR: Channel is running\n"));
         return 1;
     }
 
@@ -129,17 +132,17 @@ uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
     e_ucie_hdma_mode_t rw = cfg->rw;
     
     if (ucieCh != UCIE_CH0 && ucieCh != UCIE_CH1) {
-        (void)printf("ERROR: Invalid UCIe channel\n");
+        LogDebug(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (dmaCh < HDMA_CH0 || dmaCh > HDMA_CH31) {
-        (void)printf("ERROR: Invalid HDMA channel\n");
+        LogDebug(("ERROR: Invalid HDMA channel\n"));
         return 1;
     }
 
     if (rw != HDMA_WRITE && rw != HDMA_READ) {
-        (void)printf("ERROR: Invalid HDMA transfer mode\n");
+        LogDebug(("ERROR: Invalid HDMA transfer mode\n"));
         return 1;
     }
 
@@ -147,7 +150,7 @@ uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
                             ((uint32_t)dmaCh * HDMA_CH_BLOCK_SIZE) + ((uint32_t)rw * HDMA_RW_BLOCK_SIZE);
 
     if (mem_read32(base + (uintptr_t)HDMA_STATUS_OFF) == HDMA_STATUS_RUNNING) {
-        (void)printf("ERROR: Channel is running\n");
+        LogDebug(("ERROR: Channel is running\n"));
         return 1;
     }
 
@@ -168,17 +171,17 @@ uint32_t R_UCIE_HDMA_WaitStop(st_ucie_hdma_cfg_t *cfg)
     uint32_t timeout;
 
     if (ucieCh != UCIE_CH0 && ucieCh != UCIE_CH1) {
-        printf("ERROR: Invalid UCIe channel\n");
+        LogDebug(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (dmaCh < HDMA_CH0 || dmaCh > HDMA_CH31) {
-        printf("ERROR: Invalid HDMA channel\n");
+        LogDebug(("ERROR: Invalid HDMA channel\n"));
         return 1;
     }
 
     if (rw != HDMA_WRITE && rw != HDMA_READ) {
-        printf("ERROR: Invalid HDMA transfer mode\n");
+        LogDebug(("ERROR: Invalid HDMA transfer mode\n"));
         return 1;
     }
 
@@ -209,17 +212,17 @@ uint32_t R_UCIE_HDMA_Stop(st_ucie_hdma_cfg_t *cfg)
     e_ucie_hdma_mode_t rw = cfg->rw;
 
     if (ucieCh != UCIE_CH0 && ucieCh != UCIE_CH1) {
-        printf("ERROR: Invalid UCIe channel\n");
+        LogDebug(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (dmaCh < HDMA_CH0 || dmaCh > HDMA_CH31) {
-        printf("ERROR: Invalid HDMA channel\n");
+        LogDebug(("ERROR: Invalid HDMA channel\n"));
         return 1;
     }
 
     if (rw != HDMA_WRITE && rw != HDMA_READ) {
-        printf("ERROR: Invalid HDMA transfer mode\n");
+        LogDebug(("ERROR: Invalid HDMA transfer mode\n"));
         return 1;
     }
 
@@ -1072,7 +1075,7 @@ uint32_t Ucie_Setup_PCIE_Wait_LinkUp(e_ucie_ch_t ch)
     uint32_t mask, expect;
 
     if (ch != UCIE_CH0 && ch != UCIE_CH1) {
-        printf("ERROR: Invalid UCIe channel\n");
+        LogDebug(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
@@ -1552,17 +1555,17 @@ e_ucie_linkup_status_t R_UCIE_Setup(e_ucie_ch_t ch, e_ucie_mode_t mode,
     e_ucie_linkup_status_t ret;
 
     if (ch != UCIE_CH0 && ch != UCIE_CH1) {
-        printf("ERROR: Invalid UCIe channel\n");
+        LogDebug(("ERROR: Invalid UCIe channel\n"));
         return LINKUP_ERROR;
     }
 
     if (mode != UCIE_MODE_EP && mode != UCIE_MODE_RC) {
-        printf("ERROR: Invalid UCIe mode\n");
+        LogDebug(("ERROR: Invalid UCIe mode\n"));
         return LINKUP_ERROR;
     }
 
     if (speed < LINKSPEED_4GTPS || speed > LINKSPEED_16GTPS){
-        printf("ERROR: Invalid UCIe link speed\n");
+        LogDebug(("ERROR: Invalid UCIe link speed\n"));
         return LINKUP_ERROR;
     }
 
@@ -1657,23 +1660,23 @@ uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg)
     uint32_t base;
 
     if (ucie_ch != UCIE_CH0 && ucie_ch != UCIE_CH1) {
-        printf("ERROR: Invalid UCIe channel\n");
+        LogDebug(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (rgn < IATU_RGN0 || rgn > IATU_RGN31) {
-        printf("ERROR: Invalid iATU region\n");
+        LogDebug(("ERROR: Invalid iATU region\n"));
         return 1;
     }
 
     if (type != IATU_OUTBOUND && type != IATU_INBOUND) {
-        printf("ERROR: Invalid iATU type\n");
+        LogDebug(("ERROR: Invalid iATU type\n"));
         return 1;
     }
 
     if ((mSrcAddr & IATU_ADDR_MASK) || (mDestAddr & IATU_ADDR_MASK) || 
                                                     (size & IATU_ADDR_MASK)) {
-        printf("ERROR: Src addr, dest addr and size must be aligned with 4KB\n");
+        LogDebug(("ERROR: Src addr, dest addr and size must be aligned with 4KB\n"));
         return 1;
     }
     
@@ -1700,17 +1703,17 @@ uint32_t R_UCIE_IATU_UnsetRegion(st_ucie_iatu_cfg_t *cfg)
     uint32_t base;
 
     if (ucie_ch != UCIE_CH0 && ucie_ch != UCIE_CH1) {
-        printf("ERROR: Invalid UCIe channel\n");
+        LogDebug(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (rgn < IATU_RGN0 || rgn > IATU_RGN31) {
-        printf("ERROR: Invalid iATU region\n");
+        LogDebug(("ERROR: Invalid iATU region\n"));
         return 1;
     }
 
     if (type != IATU_OUTBOUND && type != IATU_INBOUND) {
-        printf("ERROR: Invalid iATU type\n");
+        LogDebug(("ERROR: Invalid iATU type\n"));
         return 1;
     }
 

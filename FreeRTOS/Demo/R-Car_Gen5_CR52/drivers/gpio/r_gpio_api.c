@@ -10,13 +10,12 @@
 #include "r_gpio_private.h"
 #include "r_gpio_api.h"
 
-#define LIBRARY_LOG_LEVEL 0
 /* Logging Function include. */
 #include "logging_stack.h"
 
 #define PINS_EACH_GROUP 32U
 
-#define GPIO_BASE_ADDR_ERR           0xABCD
+#define GPIO_BASE_ADDR_ERR           0xABCDU
 
 #define BIT(nr)             ((uint32_t)1 << (nr))
 
@@ -97,6 +96,7 @@ int R_GPIO_PinWriteOutput(rcar_gpio_group_t grp, rcar_pin_t pin, bool lvl)
     }
 
     reg_addr = getGpioRegister(grp, GP_OUTDT);
+
     if (lvl) {
         setbit_l(reg_addr, pin);
     } else {
@@ -120,7 +120,10 @@ int R_GPIO_GroupWriteOutput(rcar_gpio_group_t grp, uint32_t group_level,
         mask_pos = ((uint32_t)1 << pin_num);
         if ((mask_pins & mask_pos) != 0U) {
             pin_level = !!((group_level & mask_pos) >> pin_num);
-            R_GPIO_PinWriteOutput(grp, pin_num, pin_level);
+            if (R_GPIO_PinWriteOutput(grp, pin_num, pin_level) != 0)
+            {
+                return -1;
+            }
         }
     }
 
@@ -191,13 +194,13 @@ int R_GPIO_PinRequestPinFunction(rcar_gpio_group_t grp, rcar_pin_t pin,
 
     switch (option) {
     case RCAR_IO_REQ_PFC_PULL_DOWN:
-        pfcSetPullDown(grp, pin);
+        (void)pfcSetPullDown(grp, pin);
         break;
     case RCAR_IO_REQ_PFC_PULL_UP:
-        pfcSetPullUp(grp, pin);
+        (void)pfcSetPullUp(grp, pin);
         break;
     case RCAR_IO_REQ_PFC_NO_PULL:
-        pfcSetNoPull(grp, pin);
+        (void)pfcSetNoPull(grp, pin);
         break;
     }
 
@@ -380,10 +383,10 @@ static void gpioSetGeneralOutputMode(rcar_gpio_group_t grp, rcar_pin_t pin)
     /* Set Peripheral Function to GPIO */
     (void)pfcSetGPIO(grp, pin);
 
-    /* (1) Set the initial values of the output ports in OUTDT.  
-     *     Set the positive or negative logic in POSNEG.
-     */
-    R_GPIO_PinWriteOutput(grp, pin, lvl);
+    /* (1) Set the initial values of the output ports in OUTDT */
+    (void)R_GPIO_PinWriteOutput(grp, pin, lvl);
+
+    /* Set the positive or negative logic in POSNEG */
     clearbit_l(getGpioRegister(grp, GP_POSNEG), pin);
 
     /* Select "Input Disable" in INEN */

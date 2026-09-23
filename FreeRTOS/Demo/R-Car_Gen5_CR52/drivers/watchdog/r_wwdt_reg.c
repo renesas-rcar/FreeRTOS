@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include "r_wwdt_reg.h"
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 void r_wwdt_write(uintptr_t Addr, uint32_t val)
 {
     *((volatile uint32_t *)Addr) = val;
@@ -36,7 +39,7 @@ extern uintptr_t R_WWDT_PRV_GetRegbase(wwdt_unit_t unit)
     if ((uint32_t)unit < WWDT_CH_NUM) {
         ret = wwdt_base_tbl[(uint32_t)unit];
     } else {
-        printf("[R_WWDT_PRV_GetRegbase] : Wrong WWDT Unit %d\r\n", unit);
+        LogDebug(("[R_WWDT_PRV_GetRegbase] : Wrong WWDT Unit %d\r\n", unit));
     }
 
     return ret;

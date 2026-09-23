@@ -15,6 +15,10 @@
 #include "state-manager/r_state_manager.h"
 #include "state-manager/r_clock_domain_id.h"
 #include <stdio.h>
+
+/* Logging Function include. */
+#include "logging_stack.h"
+
 #include "board.h"
 
 #include "board.h"
@@ -51,7 +55,7 @@ int R_CRC_Open(wcrc_ctrl_t * const p_ctrl, wcrc_cfg_t const * const p_cfg)
     /* Request WCRC driver to set mode */
     ret = wcrcSetMode(p_instance_ctrl);
     if (ret != 0) {
-        printf("wcrcSetMode: FAILED\n");
+        LogDebug(("wcrcSetMode: FAILED\n"));
         return ret;
     }
 
@@ -68,7 +72,7 @@ int R_CRC_Set_Callback(wcrc_sub_module_t module, wcrc_ctrl_t * const p_ctrl,
     if (module != CRC_SUB_MODULE &&
         module != KCRC_SUB_MODULE) {
         ret = -1;
-        printf("%s: Invalid module\n", __func__);
+        LogDebug(("%s: Invalid module\n", __func__));
     }
 
     ret = wcrc_set_callback(module, p_instance_ctrl,
@@ -88,7 +92,7 @@ int R_CRC_Calculate(wcrc_ctrl_t * const p_ctrl)
     /* Start WCRC */
     ret = wcrcStart(p_instance_ctrl);
     if (ret != 0) {
-        printf("wcrcStart: FAILED\n");
+        LogDebug(("wcrcStart: FAILED\n"));
         return ret;
     }
 
@@ -145,13 +149,13 @@ int R_CRC_Wait_Operation(wcrc_ctrl_t * p_ctrl, uint32_t timeout)
         ret |= is_done(KCRC_SUB_MODULE, p_ctrl, timeout);
         break;
     default:
-        printf("%s: Invalid module\n", __func__);
+        LogDebug(("%s: Invalid module\n", __func__));
         ret = -1;
         break;
     };
 
     if (ret != 0) {
-        printf("%s: Waiting timeout\n", __func__);
+        LogDebug(("%s: Waiting timeout\n", __func__));
     }
 
     return ret;
@@ -164,7 +168,7 @@ static int get_crc_data(crc_output_t const * const p_crc_data)
     uint32_t * p_data;
 
     if (p_crc_data->is_done == false) {
-        printf("%s: crc is running\n", __func__);
+        LogDebug(("%s: crc is running\n", __func__));
         return -1;
     }
 
@@ -174,7 +178,7 @@ static int get_crc_data(crc_output_t const * const p_crc_data)
     R_UTILS_InvalidateDCache((uint32_t)p_crc_data->p_output_buffer, num_data*sizeof(uint32_t));
 
     for (index = 0; index < num_data; index++) {
-        printf(" 0x%x\n", (*p_data));
+        LogDebug((" 0x%x\n", (*p_data)));
         p_data++;
     }
 
@@ -188,7 +192,7 @@ static int get_kcrc_data(crc_output_t const * const p_kcrc_data)
     uint32_t * p_data;
 
     if (p_kcrc_data->is_done == false) {
-        printf("%s: kcrc is running\n", __func__);
+        LogDebug(("%s: kcrc is running\n", __func__));
         return -1;
     }
 
@@ -198,7 +202,7 @@ static int get_kcrc_data(crc_output_t const * const p_kcrc_data)
     R_UTILS_InvalidateDCache((uint32_t)p_kcrc_data->p_output_buffer, num_data*sizeof(uint32_t));
 
     for (index = 0; index < num_data; index++) {
-        printf(" 0x%x\n", (*p_data));
+        LogDebug((" 0x%x\n", (*p_data)));
         p_data++;
     }
 
@@ -215,22 +219,22 @@ int R_CRC_Get_Generated_Value(wcrc_ctrl_t const * const p_ctrl)
 
     switch (p_cfg->sub_module) {
     case CRC_SUB_MODULE:
-        printf("**** CRC data ****\n");
+        LogDebug(("**** CRC data ****\n"));
         ret = get_crc_data(p_crc_data);
         break;
     case KCRC_SUB_MODULE:
-        printf("**** KCRC data ****\n");
+        LogDebug(("**** KCRC data ****\n"));
         ret = get_kcrc_data(p_kcrc_data);
         break;
     case CRC_KCRC_SUB_MODULE:
-        printf("**** CRC data ****\n");
+        LogDebug(("**** CRC data ****\n"));
         ret = get_crc_data(p_crc_data);
 
-        printf("**** KCRC data ****\n");
+        LogDebug(("**** KCRC data ****\n"));
         ret |= get_kcrc_data(p_kcrc_data);
         break;
     default:
-        printf("%s: Invalid module\n", __func__);
+        LogDebug(("%s: Invalid module\n", __func__));
         ret = -1;
         break;
     }
@@ -249,7 +253,7 @@ static int get_crc_input(wcrc_cfg_t const * const p_cfg)
     p_input_buffer = (uint32_t *)input_cfg->p_input_buffer;
 
     for (index = 0; index < num_data; index++) {
-        printf(" 0x%x\n", (*p_input_buffer));
+        LogDebug((" 0x%x\n", (*p_input_buffer)));
         p_input_buffer++;
     }
 
@@ -267,7 +271,7 @@ static int get_kcrc_input(wcrc_cfg_t const * const p_cfg)
     p_input_buffer = (uint32_t *)input_cfg->p_input_buffer;
 
     for (index = 0; index < num_data; index++) {
-        printf(" 0x%x\n", (*p_input_buffer));
+        LogDebug((" 0x%x\n", (*p_input_buffer)));
         p_input_buffer++;
     }
 
@@ -282,22 +286,22 @@ int R_CRC_Get_Input_Data(wcrc_ctrl_t const * const p_ctrl)
 
     switch (p_cfg->sub_module) {
     case CRC_SUB_MODULE:
-        printf("**** CRC input ****\n");
+        LogDebug(("**** CRC input ****\n"));
         ret = get_crc_input(p_cfg);
         break;
     case KCRC_SUB_MODULE:
-        printf("**** KCRC input ****\n");
+        LogDebug(("**** KCRC input ****\n"));
         ret = get_kcrc_input(p_cfg);
         break;
     case CRC_KCRC_SUB_MODULE:
-        printf("**** CRC input ****\n");
+        LogDebug(("**** CRC input ****\n"));
         ret = get_crc_input(p_cfg);
 
-        printf("**** KCRC input ****\n");
+        LogDebug(("**** KCRC input ****\n"));
         ret |= get_kcrc_input(p_cfg);
         break;
     default:
-        printf("%s: Invalid module\n", __func__);
+        LogDebug(("%s: Invalid module\n", __func__));
         ret = -1;
         break;
     }
@@ -324,7 +328,7 @@ uint32_t R_CRC_Get_BufferSize(wcrc_sub_module_t module, wcrc_ctrl_t * const p_ct
 
     if (module != CRC_SUB_MODULE && module != KCRC_SUB_MODULE) {
         ret = -1;
-        printf("%s: Invalid module\n", __func__);
+        LogDebug(("%s: Invalid module\n", __func__));
     }
 
     ret = wcrcGetCrcSize(module, p_instance_ctrl, buf_size);

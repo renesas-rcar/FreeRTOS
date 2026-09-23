@@ -43,7 +43,11 @@ uint16_t R_DMAC_RcarCallBackSet(dmac_ctrl_t *const p_ctrl, void ( *p_callback)(v
 
 	/* Get channel */
     uint16_t irq_ch = args->irq_channel;
-    R_DMAC_SetInterruptCallback(irq_ch, (void *)R_DMAC_RcarInterruptHandler, p_context);
+
+    if (R_DMAC_SetInterruptCallback(irq_ch, (void *)R_DMAC_RcarInterruptHandler, p_context) != 0)
+    {
+        return drv_FAIL;
+    }
 
     return drv_OK;
 }
@@ -175,7 +179,7 @@ uint16_t R_DMAC_RcarDmacExec(DMAC_t dev, uint8_t ch, rDmacCfg_t *cfg, rDmacDescC
         Value = R_RTDMAC_Get_RDMCHCR(dev, ch);
         if (0 != (Value & DRV_RTDMAC_REG_RDMCHCR_DE))
         {
-	        printf_delay("-----CH_BUSY-----\n");
+	        (void)printf_delay("-----CH_BUSY-----\n");
             ret = drv_FAIL;
         }
         else

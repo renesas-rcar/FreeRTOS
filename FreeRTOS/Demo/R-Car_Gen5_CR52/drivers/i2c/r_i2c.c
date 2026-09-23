@@ -22,7 +22,6 @@
 #include "rcar_utils.h"
 
 /* Logging Function include. */
-#define LIBRARY_LOG_LEVEL 0
 #include "logging_stack.h"
 
 /* ==================== DEFINES ==================== */
@@ -106,15 +105,22 @@ int R_I2C_Close(i2c_master_ctrl_t * const p_ctrl)
     i2c_instance_ctrl_t * p_instance_ctrl = (i2c_instance_ctrl_t *) p_ctrl;
 
     /* Abort an in-progress transfer with this device only */
-    i2c_abort_seq_master(p_instance_ctrl);
+    if (i2c_abort_seq_master(p_instance_ctrl) != 0)
+    {
+        return -1;
+    }
 
     /* The device is now considered closed */
-    p_instance_ctrl->open = 0U;
-
     if (p_instance_ctrl->p_cfg != NULL) 
     {
-        RCar_I2C_Close(p_instance_ctrl);
+        if (RCar_I2C_Close(p_instance_ctrl) != 0)
+        {
+            return -1;
+        }
     }
+
+    /* Mark the device as closed */
+    p_instance_ctrl->open = 0U;
 
     return 0;
 }
@@ -305,7 +311,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
                 LogDebug(("ERROR: Malloc failed for I2C DMAC handle\n"));
                 return -1;
             }       
-            memset(p_instance_ctrl->p_dmac_handle_irq, 0, sizeof(rDmacIrqCfg_t));
+            (void)memset(p_instance_ctrl->p_dmac_handle_irq, 0, sizeof(rDmacIrqCfg_t));
         }
 
         if (p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg == NULL) 
@@ -316,7 +322,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
                 LogDebug(("ERROR: Malloc failed for I2C DMAC config\n"));
                 return -1;
             }
-            memset(p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg, 0, sizeof(rDmacCfg_t));
+            (void)memset(p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg, 0, sizeof(rDmacCfg_t));
         }
 
         ret = RCAR_DMAC_CTRL_INIT(p_instance_ctrl->p_cfg->dmac_unit, DRV_RTDMAC_PRIO_FIX);
@@ -360,7 +366,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
     /* Wait for the slave address to be transmitted*/
     r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT);
     if (r < 0) {
-	LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
+        LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
         return 0;
     }
 
@@ -377,7 +383,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         /* Wait for transfer to complete */
         r = loc_WaitMsrEvent(Unit, (uint32_t)R_I2C_MDR_BIT);
         if (r < 0) {
-	    LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transfer to complete) Failed(0)\r\n",r));
+            LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transfer to complete) Failed(0)\r\n",r));
             return -1;
         }
 
@@ -417,7 +423,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         /* Wait for Data Empty event */
         r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
         if (r < 0) {
-	    LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 1) Failed(0)\r\n",r));
+            LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 1) Failed(0)\r\n",r));
             return -1;
         }
 
@@ -434,7 +440,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
             /* Wait for Data Empty event */
             r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
             if (r < 0) {
-		LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,i));
+                LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,i));
                 return i;
             }
 
@@ -453,7 +459,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         /* Wait for transmission to complete */
         r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
         if (r < 0) {
-	    LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,i));
+            LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,i));
             return i;
         }
 
@@ -555,7 +561,7 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
             /* Wait for transmission to complete */
             r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
             if (r < 0) {
-            LogDebug(("[R_I2C_Write] loc_WaitMsrEvent :Return value(r) is %d.(Wait for transmission to complete) Failed(0)\r\n",r));
+                LogDebug(("[R_I2C_Write] loc_WaitMsrEvent :Return value(r) is %d.(Wait for transmission to complete) Failed(0)\r\n",r));
                 return -1;
             } else {
                 val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
@@ -578,7 +584,7 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
             /* Wait for Data Empty event */
             r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT);
             if (r < 0) {
-            LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 1) Failed(0)\r\n",r));
+                LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 1) Failed(0)\r\n",r));
                 return -1;
             }
 
@@ -595,7 +601,7 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
                 /* Wait for Data Empty event */
                 r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT);
                 if (r < 0) {
-            LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,--i));
+                    LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,--i));
                     return --i;
                 }
             }
@@ -611,7 +617,7 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
             /* Wait for transmission to complete */
             r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
             if (r < 0) {
-            LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,--i));
+                LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,--i));
                 return --i;
             } else {
                 val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
@@ -678,7 +684,7 @@ static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint3
         /* Wait for the slave address to be transmitted */
         r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT);
         if (r < 0) {
-        LogDebug(("[R_I2C_ReadRegMap] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
+            LogDebug(("[R_I2C_ReadRegMap] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
             return -1;
         }
         /* Clear ESG bit in ICMCR reg */
@@ -691,7 +697,7 @@ static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint3
         /* Wait for the slave register address to be transmitted */
         r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT);
         if (r < 0) {
-        LogDebug(("[R_I2C_ReadRegMap] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave register address to be transmitted) Failed(0)\r\n",r));
+            LogDebug(("[R_I2C_ReadRegMap] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave register address to be transmitted) Failed(0)\r\n",r));
             return -1;
         }
         /* Change from Write mode to Read mode */
@@ -777,7 +783,10 @@ static int RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl)
         }
 
         /* Disable GIC interrupt */
-        RCar_I2C_DisableGICInterrupt(Unit);
+        if (RCar_I2C_DisableGICInterrupt(Unit) != 0)
+        {
+            return -1;
+        }
     }
 
     return 0;
@@ -1165,7 +1174,7 @@ static void r_i2c_isr_handler(void * const p_context)
     i2c_instance_ctrl_t * p_instance_ctrl = (i2c_instance_ctrl_t *) p_context;
 
     // Call to HAL driver to process data.
-    R_I2C_Irq_handler(p_instance_ctrl);
+    (void)R_I2C_Irq_handler(p_instance_ctrl);
 
     // if (p_instance_ctrl->p_callback != NULL) {
     //     p_instance_ctrl->p_callback(p_context);

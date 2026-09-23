@@ -10,6 +10,9 @@
 /* Logging Function include. */
 #include "logging_stack.h"
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 int R_Audio_Init(st_audio_instance_ctrl_t * const p_instance_ctrl, st_audio_cfg_t const * const p_cfg)
 {
 	int ret;

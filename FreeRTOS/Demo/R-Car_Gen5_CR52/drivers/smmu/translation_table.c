@@ -14,6 +14,9 @@
 #include "rcar_utils.h"
 #include <string.h>
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 #define MAX_TABLE_SIZE      512U
 #define ENTRY_TABLE_MASK    MAX_TABLE_SIZE - 1
 #define ENTRY_ADDR_MASK     0xFFFFFFFFFU << 12
@@ -47,14 +50,14 @@ static uint64_t *Find_Entry_Table(uint64_t *ttb, uint64_t virt_addr, int tbl_lev
 
         if (get_entry_type(table) != ENTRY_TYPE_TABLE)
         {
-            printf("Can't find Entry.\n");
+            LogDebug(("Can't find Entry.\n"));
             return NULL;
         }
 
         table = (uint64_t *)(uintptr_t)(*table & ENTRY_ADDR_MASK);
     }
 
-    printf("[%s][%d] Can't reach this line.\n", __func__, __LINE__);
+    LogDebug(("[%s][%d] Can't reach this line.\n", __func__, __LINE__));
     return NULL;
 }
 
@@ -62,7 +65,7 @@ static uint64_t *Allocate_Table(void)
 {
     uint64_t *new_table = aligned_malloc(((uint32_t)1 << 12), MAX_TABLE_SIZE * sizeof(uint64_t));
     if (new_table != NULL) {
-        memset(new_table, 0, MAX_TABLE_SIZE * sizeof(uint64_t));
+        (void)memset(new_table, 0, MAX_TABLE_SIZE * sizeof(uint64_t));
     }
 
     return new_table;
@@ -214,7 +217,7 @@ void freeMemoryRegion(uint64_t *ttb, uint64_t va, uint64_t pa, uint64_t size)
             entry = Find_Entry_Table(ttb, va, level);
             if (!entry)
             {
-                printf("[%s] PTE not found for va: 0x%llx\n", __func__, va);
+                LogDebug(("[%s] PTE not found for va: 0x%llx\n", __func__, va));
                 return;
             }
 

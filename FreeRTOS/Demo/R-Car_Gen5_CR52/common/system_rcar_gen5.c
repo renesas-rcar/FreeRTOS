@@ -24,6 +24,9 @@
 #include "ucie_common.h"
 #include "rcar_utils.h"
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 #define CNTCR_ADDR   ((volatile uint32_t *)0x1C000000) // Counter Control Register
 #define SILENT_CONSOLE_ON (1U)
 
@@ -140,14 +143,14 @@ static void Init_MPU(void)
 
             default:
 #if RAM_CONSOLE_ENABLE
-                snprintf(ram_console + strlen(ram_console), sizeof(ram_console) - strlen(ram_console), "Set MPU region index %d FAIL. Memory attribute isn't supported;", i + 1);
+                (void)snprintf(ram_console + strlen(ram_console), sizeof(ram_console) - strlen(ram_console), "Set MPU region index %d FAIL. Memory attribute isn't supported;", i + 1);
 #endif
 			    break;
         }
 
         if (ret != 0U) {
 #if RAM_CONSOLE_ENABLE
-            snprintf(ram_console + strlen(ram_console), sizeof(ram_console) - strlen(ram_console), "Set MPU region index %d FAIL. Exceeded number of MPU regions supported;", i + 1);
+            (void)snprintf(ram_console + strlen(ram_console), sizeof(ram_console) - strlen(ram_console), "Set MPU region index %d FAIL. Exceeded number of MPU regions supported;", i + 1);
 #endif
         } 
     } 
@@ -360,7 +363,7 @@ void SystemInit(void)
 
     Irq_Setup();
     if (R_StateManager_Init() != 0) {
-        printf("Error: Failed to init State Manager.\r\n");
+        LogDebug(("Error: Failed to init State Manager.\r\n"));
         return;
     }
 
@@ -374,7 +377,7 @@ void SystemInit(void)
 
 void assert_func(const char *file, int line, const char *func)
 {
-    printf("ASSERT! File \"%s\", Line \"%d\", Function \"%s\" \n", file, line, func);
+    LogDebug(("ASSERT! File \"%s\", Line \"%d\", Function \"%s\" \n", file, line, func));
     for (;;)
     {
         __BKPT(0);

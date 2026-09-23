@@ -105,7 +105,7 @@ st_virtio_instance_ctrl_t * R_VIRTIO_BE_Create(e_mfis_channel_t mfis_ch)
                 result->is_initialized = 1;
                 virtio_be_inst[mfis_ch] = result;
                 char task_name[16];
-                snprintf(task_name, sizeof(task_name), "Virtio_BE_Task%d", mfis_ch);
+                (void)snprintf(task_name, sizeof(task_name), "Virtio_BE_Task%d", mfis_ch);
                 xTaskCreate( Virtio_Task, task_name, configMINIMAL_STACK_SIZE *10, result, ( configMAX_PRIORITIES - 1), NULL);
             }
         }
@@ -163,7 +163,7 @@ st_virtio_instance_ctrl_t * R_VIRTIO_FE_Create(e_mfis_channel_t mfis_ch, st_rsc_
                 result->is_initialized = 1;
                 virtio_fe_inst[mfis_ch] = result;
                 char task_name[16];
-                snprintf(task_name, sizeof(task_name), "Virtio_FE_Task%d", mfis_ch);
+                (void)snprintf(task_name, sizeof(task_name), "Virtio_FE_Task%d", mfis_ch);
                 xTaskCreate( Virtio_Task, task_name, configMINIMAL_STACK_SIZE *10, result, ( configMAX_PRIORITIES - 1), NULL);
             }
         }
@@ -264,7 +264,7 @@ int R_VIRTIO_ResponseCb(struct rpmsg_endpoint *ept,
     if (p_context->resp_buf != NULL)
         {
             size_t copy_len = (len < sizeof(st_virtio_msg_t)) ? len : sizeof(st_virtio_msg_t);
-            memcpy(p_context->resp_buf, msg, copy_len);
+            (void)memcpy(p_context->resp_buf, msg, copy_len);
         }
         /* Unblock the SendDataSync caller */
         xSemaphoreGive(p_context->sem);

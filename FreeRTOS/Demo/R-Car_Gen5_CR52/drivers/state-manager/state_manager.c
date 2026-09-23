@@ -24,18 +24,21 @@
 #include "board.h"
 #include "FreeRTOS.h"
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 #define SM_LOG_INFO(format, ...) \
     do { \
-        (void)printf("SM: I [%s:%d] ", __func__, __LINE__); \
-        (void)printf(format "\r\n", ##__VA_ARGS__); \
+        LogDebug(("SM: I [%s:%d] ", __func__, __LINE__)); \
+        LogDebug((format "\r\n", ##__VA_ARGS__)); \
     } while(0)
 
 #define SM_LOG_ERR(format, ...) \
     do { \
-        (void)printf("SM: E [%s:%d] ", __func__, __LINE__); \
-        (void)printf(format "\r\n", ##__VA_ARGS__); \
+        LogDebug(("SM: E [%s:%d] ", __func__, __LINE__)); \
+        LogDebug((format "\r\n", ##__VA_ARGS__)); \
     } while(0)
-
+	
 #define VALIDATE_ID(id, max) \
     do { \
         if ((id) >= (max)) { \
@@ -209,7 +212,7 @@ int R_StateManager_SCMI_Info_Show(void)
 		}
 		SM_LOG_INFO("SCMI base protocol vendor id: %s", vendor_id);
 
-		memset(vendor_id, 0, 16);
+		(void)memset(vendor_id, 0, 16);
 		ret = scmi_base_vendorid_get(true, vendor_id);
 		if (ret != 0) {
 			SM_LOG_ERR("Error: Failed to get scmi base protocol sub vendor id.\r\n");
@@ -571,7 +574,7 @@ int R_StateManager_Reset_Status_Get(int domain_id, e_reset_domain_status_t *stat
     
     ret = scmi_vendor_reset_domain_status_get(&rst_cfg);
     if (ret != RET_OK) {
-        printf("Failed to get status of reset domain ID %d (%d)\r\n", domain_id, ret);
+        LogDebug(("Failed to get status of reset domain ID %d (%d)\r\n", domain_id, ret));
     } else {
         *status = (rst_cfg.reset_status == 0 ? RESET_DOMAIN_ASSERTED : RESET_DOMAIN_RELEASED);
     }

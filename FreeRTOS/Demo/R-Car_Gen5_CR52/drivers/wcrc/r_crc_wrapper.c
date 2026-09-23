@@ -15,6 +15,9 @@
 /* Logging Function include. */
 #include "logging_stack.h"
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 #ifndef BIT
 #define BIT(x) (1U << (x))
 #endif
@@ -880,7 +883,7 @@ static int wcrc_check_rtdma_config(uint8_t module, wcrc_cfg_t const * const p_cf
 
     for (i = 0; i < rtdma_require; i++) {
         if (p_rtdma_inst[i] < RTDMA0_CH0 || p_rtdma_inst[i] > RTDMA3_CH15) {
-            LogDebug(("%s: p_rtdma_inst[%d] is out of range rtdma_inst_t\n", __func__, i)); 
+            LogDebug(("%s: p_rtdma_inst[%d] is out of range rtdma_inst_t\n", __func__, i));
             return -1;
         }
     }

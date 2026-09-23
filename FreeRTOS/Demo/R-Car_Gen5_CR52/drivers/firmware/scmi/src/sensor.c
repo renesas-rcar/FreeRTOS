@@ -289,7 +289,7 @@ int scmi_sensor_description_get(uint32_t desc_index,
     if (!rx) {
         return -ENOMEM;
     }
-    memset(rx, 0, rx_len);
+    (void)memset(rx, 0, rx_len);
 
     reply.hdr = msg.hdr;
     reply.len = rx_len;
@@ -335,7 +335,7 @@ int scmi_sensor_description_get(uint32_t desc_index,
         out[i].sensor_attributes_low  = attr_low;
         out[i].sensor_attributes_high = attr_high;
 
-        memcpy(out[i].sensor_name, rx + off + 12u, SCMI_SENSOR_NAME_MAX);
+        (void)memcpy(out[i].sensor_name, rx + off + 12u, SCMI_SENSOR_NAME_MAX);
         /* ensure null-terminated of a string */
         out[i].sensor_name[SCMI_SENSOR_NAME_MAX - 1u] = '\0';
 
@@ -613,7 +613,7 @@ int scmi_sensor_reading_get(uint32_t sensor_id,
         }
 
         if (ret == RET_OK) {
-            memset(rx, 0, rx_len);
+            (void)memset(rx, 0, rx_len);
 
             reply.hdr = msg.hdr;
             reply.len = rx_len;
@@ -648,7 +648,7 @@ int scmi_sensor_reading_get(uint32_t sensor_id,
                                 n = out_cap;
                             }
 
-                            memcpy(out, rx + sizeof(*hdr),
+                            (void)memcpy(out, rx + sizeof(*hdr),
                                    n * sizeof(struct scmi_sensor_reading_desc));
                         }
                     }

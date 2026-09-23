@@ -16,6 +16,9 @@
 #include <stdio.h>
 #include "cmsis_cp15.h"
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 #define MAX_IRQ_NUMBER       1019
 #define DEFAULT_ISR_PRIORITY IPRIORITY(1)
 
@@ -438,7 +441,7 @@ int Irq_MergeSetup(unsigned int id)
     }
 
     if (timeout == 0) {
-        printf("Merge interrupt: Setup fail");
+        LogDebug(("Merge interrupt: Setup fail"));
     }
 
 	return 0;

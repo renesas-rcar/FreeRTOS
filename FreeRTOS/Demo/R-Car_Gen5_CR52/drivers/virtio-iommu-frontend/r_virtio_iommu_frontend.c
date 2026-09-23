@@ -126,7 +126,7 @@ int R_VIRTIO_IOMMU_Attach(st_smmu_streamid_instance_ctrl_t *p_ctrl)
     st_virtio_smmu_payload_req_t *smmu = (st_virtio_smmu_payload_req_t *)req.payload;
     smmu->type = VIRTIO_IOMMU_T_ATTACH;
     /* Use memcpy to copy p_ctrl because some members may be const-qualified */
-    memcpy(&smmu->p_ctrl, p_ctrl, sizeof(st_smmu_streamid_instance_ctrl_t));
+    (void)memcpy(&smmu->p_ctrl, p_ctrl, sizeof(st_smmu_streamid_instance_ctrl_t));
     
     int ret = R_VIRTIO_SendDataSync(p_virtio_fe->p_ept, &req, &resp, 0);
     return (ret == 0) ? (int)resp.hdr.status : ret;
@@ -144,7 +144,7 @@ int R_VIRTIO_IOMMU_Map(st_smmu_streamid_instance_ctrl_t *p_ctrl,
     st_virtio_smmu_payload_req_t *smmu = (st_virtio_smmu_payload_req_t *)req.payload;
     smmu->type = VIRTIO_IOMMU_T_MAP;
     /* Use memcpy to copy p_ctrl because some members may be const-qualified */
-    memcpy(&smmu->p_ctrl, p_ctrl, sizeof(st_smmu_streamid_instance_ctrl_t));
+    (void)memcpy(&smmu->p_ctrl, p_ctrl, sizeof(st_smmu_streamid_instance_ctrl_t));
     smmu->va   = va;
     smmu->pa   = pa;
     smmu->size = size;
@@ -166,7 +166,7 @@ int R_VIRTIO_IOMMU_UnMap(st_smmu_streamid_instance_ctrl_t *p_ctrl,
     st_virtio_smmu_payload_req_t *smmu = (st_virtio_smmu_payload_req_t *)req.payload;
     smmu->type = VIRTIO_IOMMU_T_UNMAP;
     /* Use memcpy to copy p_ctrl because some members may be const-qualified */
-    memcpy(&smmu->p_ctrl, p_ctrl, sizeof(st_smmu_streamid_instance_ctrl_t));
+    (void)memcpy(&smmu->p_ctrl, p_ctrl, sizeof(st_smmu_streamid_instance_ctrl_t));
     smmu->va   = va;
     smmu->pa   = pa;
     smmu->size = size;
@@ -186,7 +186,7 @@ int R_VIRTIO_IOMMU_Detach(st_smmu_streamid_instance_ctrl_t *p_ctrl)
     st_virtio_smmu_payload_req_t *smmu = (st_virtio_smmu_payload_req_t *)req.payload;
     smmu->type = VIRTIO_IOMMU_T_DETACH;
     /* Use memcpy to copy p_ctrl because some members may be const-qualified */
-    memcpy(&smmu->p_ctrl, p_ctrl, sizeof(st_smmu_streamid_instance_ctrl_t));
+    (void)memcpy(&smmu->p_ctrl, p_ctrl, sizeof(st_smmu_streamid_instance_ctrl_t));
 
     int ret = R_VIRTIO_SendDataSync(p_virtio_fe->p_ept, &req, &resp, 0);
     return (ret == 0) ? (int)resp.hdr.status : ret;

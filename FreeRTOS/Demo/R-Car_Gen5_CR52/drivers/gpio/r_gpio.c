@@ -8,7 +8,6 @@
 #include "gpio/r_gpio.h"
 #include "r_gpio_api.h"
 
-#define LIBRARY_LOG_LEVEL 0
 /* Logging Function include. */
 #include "logging_stack.h"
 
@@ -64,8 +63,8 @@ int R_GPIO_PinInterruptInput(gpio_ctrl_t * const p_ctrl, gpio_port_pin_t pin, gp
     /* Get port and pin number */
     uint32_t port_num = (GPIO_PRV_PORT_BITS & (uint32_t)pin) >> GPIO_PRV_PORT_OFFSET;
     uint32_t pin_num  = (GPIO_PRV_PIN_BITS & (uint32_t)pin);
-    R_GPIO_PinConfigInterruptMode(port_num, pin_num, option);
-    return 0;
+
+    return R_GPIO_PinConfigInterruptMode(port_num, pin_num, option);
 }
 
 int R_GPIO_CallbackSet(gpio_ctrl_t * const p_ctrl, void ( *p_callback)(void *), void * const p_context) {
@@ -98,8 +97,8 @@ int R_GPIO_PinWrite(gpio_ctrl_t * const p_ctrl, gpio_port_pin_t pin, gpio_level_
     /* Get port and pin number */
     uint32_t port_num = (GPIO_PRV_PORT_BITS & (uint32_t)pin) >> GPIO_PRV_PORT_OFFSET;
     uint32_t pin_num  = (GPIO_PRV_PIN_BITS & (uint32_t)pin);
-    R_GPIO_PinWriteOutput(port_num, pin_num, level);
-    return 0;
+
+    return R_GPIO_PinWriteOutput(port_num, pin_num, level);
 }
 
 int R_GPIO_PortDirectionSet(gpio_ctrl_t * const p_ctrl,
@@ -107,8 +106,8 @@ int R_GPIO_PortDirectionSet(gpio_ctrl_t * const p_ctrl,
                                     uint32_t            direction_values,
                                     uint32_t            mask) {
     (void)p_ctrl;
-    R_GPIO_GroupConfigMode(port, direction_values, mask);
-    return 0;
+
+    return R_GPIO_GroupConfigMode(port, direction_values, mask);
 
 }
 
@@ -120,8 +119,8 @@ int R_GPIO_PortRead(gpio_ctrl_t * const p_ctrl, gpio_port_t port, uint32_t * p_p
 
 int R_GPIO_PortWrite(gpio_ctrl_t * const p_ctrl, gpio_port_t port, uint32_t value, uint32_t mask) {
     (void)p_ctrl;
-    R_GPIO_GroupWriteOutput(port, value, mask);
-    return 0;
+
+    return R_GPIO_GroupWriteOutput(port, value, mask);
 }
 
 int R_GPIO_PinSetPull(gpio_ctrl_t * const p_ctrl, gpio_port_pin_t pin, gpio_request_pull_t option) {

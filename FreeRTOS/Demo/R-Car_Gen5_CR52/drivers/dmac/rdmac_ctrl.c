@@ -35,7 +35,7 @@ uint16_t R_RTDMAC_RcarDmacExec(DMAC_t dev, uint8_t ch, rDmacCfg_t *cfg, rDmacDes
 
     Value = R_DMAC_RcarDmacExec(dev, ch, cfg, descCfg);
     if (Value != 0U) {
-        printf_delay("RTDMAC execution failed\n");
+        (void)printf_delay("RTDMAC execution failed\n");
         return Value;
     }
 
@@ -49,7 +49,7 @@ uint16_t R_RTDMAC_RcarDmacExec(DMAC_t dev, uint8_t ch, rDmacCfg_t *cfg, rDmacDes
  
      Value = R_DMAC_RcarDmacStop(dev, ch);
      if (Value != 0U) {
-         printf_delay("RTDMAC stop failed\n");
+         (void)printf_delay("RTDMAC stop failed\n");
          return Value;
      }
      
@@ -64,7 +64,7 @@ uint16_t R_RTDMAC_RcarCallBackSet(dmac_ctrl_t * const p_ctrl, void ( *p_callback
     Value = R_DMAC_RcarCallBackSet(p_ctrl, p_callback, p_context);
 
     if (Value != 0U) {
-        printf_delay("RTDMAC IRQ callback failed\n");
+        (void)printf_delay("RTDMAC IRQ callback failed\n");
         return Value;
     }
 

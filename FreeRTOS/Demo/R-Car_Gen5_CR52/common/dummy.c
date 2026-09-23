@@ -95,17 +95,17 @@ __attribute__((weak)) void LDR_FRTOS_BSP_LOG_HANDLER(e_log_level_t log_level,
 
     va_list args;
     va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    (void)vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    fprintf(stdout, "[%s] [%s]: %s", log_str[log_level], module_name, buf);
+    (void)fprintf(stdout, "[%s] [%s]: %s", log_str[log_level], module_name, buf);
 }
 
 __attribute__((weak)) void vApplicationMallocFailedHook( void )
 {
     /* Weak function  */
     /* if want to use this function redefine this function */
-    printf("%s\n", __func__);
+    (void)printf("%s\n", __func__);
     for(;;) {}
 }
 
@@ -116,8 +116,8 @@ __attribute__((weak)) void vApplicationStackOverflowHook(TaskHandle_t xTask,
     /* Weak function  */
     /* if want to use this function redefine this function */
     ( void ) xTask;
-    printf("%s\n", __func__);
-    printf("Task name: %s\n", pcTaskName);
+    (void)printf("%s\n", __func__);
+    (void)printf("Task name: %s\n", pcTaskName);
 }
 
 __attribute__((weak)) void vApplicationAssertHook(void *arg)
