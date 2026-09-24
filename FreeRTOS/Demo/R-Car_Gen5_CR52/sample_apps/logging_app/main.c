@@ -39,10 +39,13 @@
 
 #include "device_tree.h"
 
-/* Logging Function include. */
 #ifdef LIBRARY_LOG_LEVEL
-#include "logging_stack.h"
+    #undef LIBRARY_LOG_LEVEL
 #endif
+
+#define LIBRARY_LOG_LEVEL 4
+/* Logging Function include. */
+#include "logging_stack.h"
 
 #include "board.h"
 

@@ -12,6 +12,11 @@
 
 #include "device_tree.h"
 
+#ifdef LIBRARY_LOG_LEVEL
+    #undef LIBRARY_LOG_LEVEL
+#endif
+
+#define LIBRARY_LOG_LEVEL 0
 /* Logging Function include. */
 #include "logging_stack.h"
 

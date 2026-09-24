@@ -7,8 +7,6 @@
 
 #include <audio/rcar_audio.h>
 #include "rcar_audio_api.h"
-/* Logging Function include. */
-#include "logging_stack.h"
 
 /* Logging Function include. */
 #include "logging_stack.h"

@@ -127,7 +127,7 @@ else()
 endif()
 message(STATUS "TCM option: ${TCM_ENABLE}")
 
-set(LIBRARY_LOG_LEVEL 0 CACHE STRING "Library log level")
+set(LIBRARY_LOG_LEVEL 1 CACHE STRING "Library log level")
 message(STATUS "LIBRARY_LOG_LEVEL is defined as: ${LIBRARY_LOG_LEVEL}")
 
 set(CMAKE_ASM_FLAGS "--specs=nosys.specs -mfloat-abi=hard")
