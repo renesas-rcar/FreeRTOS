@@ -228,7 +228,7 @@ static void EnablePMU(void)
     __asm__ volatile ("mcr p15, 0, %0, c9, c12, 1" :: "r"(value));
 }
 
-#if (BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
+#if defined(UCIE_HW_AVAILABLE) && (UCIE_HW_AVAILABLE == 1)
 void ucie0_setup_task( void *pvParameters )
 {
     (void)pvParameters;
@@ -367,7 +367,7 @@ void SystemInit(void)
         return;
     }
 
-#if (BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
+#if defined(UCIE_HW_AVAILABLE) && (UCIE_HW_AVAILABLE == 1)
     xTaskCreate(ucie0_setup_task, "ucie0_setup_task", configMINIMAL_STACK_SIZE,
                 NULL, configMAX_PRIORITIES - 1, NULL);
     xTaskCreate(ucie1_setup_task, "ucie1_setup_task", configMINIMAL_STACK_SIZE,

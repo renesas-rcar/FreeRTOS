@@ -111,7 +111,9 @@ else()
     set(UCIE_CONW "UCIE_CONW_NONE")
 endif()
 
-
+if(BOARD STREQUAL "mdp_x5h_hil" OR BOARD STREQUAL "mdp_aiacc_hil")
+    add_compile_definitions(UCIE_HW_AVAILABLE=1)
+endif()
 
 message(STATUS "board: ${BOARD}")
 message(STATUS "BOARD_ID: ${BOARD_ID}")
