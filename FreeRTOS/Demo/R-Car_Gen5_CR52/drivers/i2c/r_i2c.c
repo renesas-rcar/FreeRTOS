@@ -5,7 +5,6 @@
  *
  */
 
-#include "FreeRTOS.h"
 #include "interrupts.h"
 #include <stdio.h>
 #include <stdlib.h>
