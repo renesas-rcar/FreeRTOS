@@ -40,6 +40,8 @@
 #define ICMCR_CLEAR                             ((uint32_t)0x80)
 #define R_I2C_TIMEOUT_COUNT                     (GENERIC_TIMER_CLK/1000U) ///< 1ms
 #define I2C_INVALID_ADDR                        0x0
+#define I2C_DMA_MIN_READ_BYTES                  (3U)
+#define I2C_DMA_MIN_WRITE_BYTES                 (2U)
 
 /* ==================== STATIC VARIABLES ==================== */
 static int clock_id;
@@ -856,6 +858,11 @@ static int rcar_i2c_dma_init(i2c_instance_ctrl_t * p_instance_ctrl)
 
     if (is_read) 
     {
+        if (p_instance_ctrl->total < I2C_DMA_MIN_READ_BYTES)
+        {
+            LogDebug(("ERROR: Data length is too small to use DMA I2C.\n"));
+            return -1;
+        }
         /* Read mode
          * The last two bytes needs to be fetched using PIO in
          * order for the STOP phase to work.
@@ -868,14 +875,14 @@ static int rcar_i2c_dma_init(i2c_instance_ctrl_t * p_instance_ctrl)
         /* Write mode
          * First byte in message was sent using PIO.
          */
+        if (p_instance_ctrl->total < I2C_DMA_MIN_WRITE_BYTES)
+        {
+            LogDebug(("ERROR: Data length is too small to use DMA I2C.\n"));
+            return -1;
+        }
+
         buf = p_instance_ctrl->p_buff + 1;
         len = p_instance_ctrl->total - 1;
-    }
-
-    if (len <= 0)
-    {
-        LogDebug(("ERROR: Data length is too small to use DMA.\n"));
-        return -1;
     }
 
     rDmacCfg_t *cfg = p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg;
