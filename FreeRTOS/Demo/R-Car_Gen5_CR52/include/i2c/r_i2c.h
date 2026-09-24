@@ -220,7 +220,7 @@ int R_I2C_Read(i2c_master_ctrl_t * const p_ctrl,
  * @param[in]  p_ctrl     - Pointer to the I2C control structure.
  * @param[in]  slave_reg  - Register address on the slave device to start reading from.
  * @param[out] p_dest     - Pointer to the buffer where received data will be stored.
- * @param[in]  bytes      - Number of bytes to read from the slave device.
+ * @param[in]  bytes      - Number of bytes to read from the slave device. DMA mode requires at least 3 bytes.
  *
  * @retval 0 if successful.
  */
@@ -235,7 +235,7 @@ int R_I2C_ReadRegMap(i2c_master_ctrl_t * const p_ctrl,
  *
  * @param[in]  p_ctrl  - Pointer to the I2C control structure.
  * @param[in]  p_src   - Pointer to the buffer containing the data to be sent.
- * @param[in]  bytes   - Number of bytes to write to the I2C bus.
+ * @param[in]  bytes   - Number of bytes to write to the I2C bus. DMA mode requires at least 2 bytes.
  * @param[in]  restart - Flag indicating whether to issue a restart condition after the current transaction.
  *
  * @retval 0 if successful.
