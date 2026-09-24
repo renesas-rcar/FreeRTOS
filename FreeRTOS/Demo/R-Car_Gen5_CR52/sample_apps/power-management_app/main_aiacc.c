@@ -19,10 +19,11 @@
 #include "pfc/r_pfc_api.h"
 
 #define pmApp_TASK_PRIORITY ( tskIDLE_PRIORITY + 1 )
+int printf_raw(const char *format, ...);
 #define PM_LOG(format, ...) \
     {\
-        printf("PM [%s:%d] ", __func__, __LINE__);\
-        printf(format "\r\n", ##__VA_ARGS__);\
+        printf_raw("PM [%s:%d] ", __func__, __LINE__);\
+        printf_raw(format "\r\n", ##__VA_ARGS__);\
     }
 
 static void prvPmAppTask(void *pvParameters);
@@ -267,23 +268,6 @@ static int pmClockTest(int clock_id, uint32_t *rate_set)
         PM_LOG("Current clock id %d rate: %d Hz\r\n", clock_id, rate[0]);
     }
 
-#if 0
-    /* Try setting clock rate to 26MHz */
-    PM_LOG("**********TC%d %d-4: Set clock rate.**********\r\n",
-            tc_number, clock_id);
-    rate[0] = 26000000;
-    ret = R_StateManager_SetClock(clock_id, rate);
-    if (ret)
-    {
-        PM_LOG("Error: Failed to set clock id %d rate.\r\n",
-               clock_id);
-    }
-    else
-    {
-        PM_LOG("Set clock id %d to %d Hz OK\r\n", clock_id, rate[0]);
-    }
-#endif
-
     /* Set clock off  */
     PM_LOG("**********TC%d %d-5: set clock id %d OFF.**********\r\n",
             tc_number, clock_id, clock_id);
@@ -314,6 +298,38 @@ static int pmClockTest(int clock_id, uint32_t *rate_set)
     else
     {
         PM_LOG("Getting clock id %d OFF: FAILED\r\n", clock_id);
+    }
+
+    /* Set clock on */
+    PM_LOG("**********TC%d %d-7: set clock id %d ON.**********\r\n",
+            tc_number, clock_id, clock_id);
+    ret = R_StateManager_ClockOn(clock_id);
+    if (ret)
+    {
+        PM_LOG("Error: Failed to set clock id %d ON.\r\n",
+                clock_id);
+    }
+    else
+    {
+        PM_LOG("Set clock id %d ON OK!\r\n", clock_id);
+    }
+
+    /* Get clock - Expected ON */
+    PM_LOG("*****TC%d %d-8: get clock id %d (expected ON)****\r\n",
+            tc_number, clock_id, clock_id);
+    ret = R_StateManager_ClockStatusGet(clock_id, &is_clk_on);
+    if (ret)
+    {
+        PM_LOG("Error: Failed to get clock id %d status.\r\n",
+               clock_id);
+    }
+    else if (is_clk_on)
+    {
+        PM_LOG("Getting clock id %d ON: PASS\r\n", clock_id);
+    }
+    else
+    {
+        PM_LOG("Getting clock id %d ON: FAILED\r\n", clock_id);
     }
 
     return 0;
@@ -456,7 +472,13 @@ static void pmAppExample(void)
          domain_id < AIACC_CLOCK_ID_COUNT;
          ++domain_id)
     {
-        //pmClockTest(domain_id, rates);
+        if ((AIACC_CLOCK_ID_HSCIF0 == domain_id) ||
+            (AIACC_CLOCK_ID_HSCIF1 == domain_id) ||
+            (AIACC_CLOCK_ID_SCIF0 == domain_id) ||
+            (AIACC_CLOCK_ID_SCIF1 == domain_id)) {
+            continue;
+        }
+        pmClockTest(domain_id, rates);
     }
     PM_LOG("*******TC%d: SCMI Clock control end!*******\r\n\r\n",
             tc_number);
