@@ -6,9 +6,13 @@
 
 set(app_name "i2c_app")
 
-if(BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_aiacc_rfs2")
+if(BOARD STREQUAL "mdp_aiacc_hil")
     add_executable(${app_name}
         main_aiacc.c
+    )
+elseif(BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2")
+    add_executable(${app_name}
+        test_i2c_stub_rfs2.c
     )
 else()
     add_executable(${app_name}

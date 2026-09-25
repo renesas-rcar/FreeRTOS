@@ -45,7 +45,7 @@
                 "i2c_app.elf"
             ],
             "dependency": "No",
-            "status": "Skip"
+            "status": "Test"
         },
         {
             "module": "Logging",
