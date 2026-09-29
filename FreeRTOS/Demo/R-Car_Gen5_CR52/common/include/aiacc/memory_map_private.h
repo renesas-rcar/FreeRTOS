@@ -38,7 +38,7 @@ typedef struct st_memory_region {
 #define LDR_MEMORY_SIZE             0x00100000  // to 0x8E30_0000
 
 #define SHARE_CR_CA_ADDRESS         0x8E600000
-#define SHARE_CR_CA_SIZE            0x31A00000  // to 0x9E60_0000
+#define SHARE_CR_CA_SIZE            0x31A00000  // to 0xC000_0000
 
 #define PERIPHERAL_START_1          0xC0000000
 #define PERIPHERAL_SIZE_1           0x40000000  // to 0x1_0000_0000

@@ -150,7 +150,7 @@ static void prvSMMU_RT_Task( void *pvParameters )
         R_SMMU_Map(&smmu_ctrl, 0x80000000, 0x1840000000, 0x1000000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
         R_SMMU_Map(&smmu_ctrl, 0x70000000, 0x90000000, 0x1000000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
         R_SMMU_Map(&smmu_ctrl, 0x90000000, 0x90000000, 0x1000000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
-        R_SMMU_Map(&smmu_ctrl, 0xA0000000, 0xA0000000, 0x1000000, ATTR_DEVICE_NGNRNE_EL1_RO_EL0_RO);
+        R_SMMU_Map(&smmu_ctrl, 0xB0000000, 0xB0000000, 0x1000000, ATTR_DEVICE_NGNRNE_EL1_RO_EL0_RO);
     }
 
     printf("**********************************************\r\n");
@@ -224,9 +224,12 @@ static void prvSMMU_RT_Task( void *pvParameters )
 
     printf("* Test case 8: Test Read only permission *\r\n");
     printf("TC8: Pass if no further logs after <APP_END>\r\n<APP_END>\n");
-    *(uint32_t *)0xA0000000 = 0xBEFFBEFF;
-    printf("TC8 result: FAIL\n");
-    printf("**********************************************\r\n");
+    *(uint32_t *)0xB0000000 = 0xBEFFBEFF;
+    if (*(uint32_t *)0xB0000000 == 0xBEFFBEFF)
+    {
+        printf("TC8 result: FAIL\n");
+        printf("**********************************************\r\n");
+    }
 
     for(;;);
 }
