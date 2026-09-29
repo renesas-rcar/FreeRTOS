@@ -744,9 +744,6 @@ static uint32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *By
     /* Set Master Address register (slave addr + 0x01 read mode) */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMAR, ((SlaveAddr << 1) + 1) & ICMAR_MASK_READ);
 
-    /* Set Master Control register (MDBS=1, MIE=1, ESG=1) */
-    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x89);
-
     do {
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
         if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_COUNT)
@@ -754,6 +751,9 @@ static uint32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *By
             return -1;
         }
     } while ((val & R_I2C_FSDA_BIT) != (uint32_t)0);
+    
+    /* Set Master Control register (MDBS=1, MIE=1, ESG=1) */
+    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x89);
 
     return loc_ReadCommon(Unit, SlaveAddr, Bytes, NumBytes);
 }
