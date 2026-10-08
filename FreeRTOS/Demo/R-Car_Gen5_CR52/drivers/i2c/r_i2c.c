@@ -37,7 +37,8 @@
 #define ICMAR_MASK_WRITE                        ((uint32_t)0xFE)
 #define ICMSR_MASK                              ((uint32_t)0x7F)
 #define ICMCR_CLEAR                             ((uint32_t)0x80)
-#define R_I2C_TIMEOUT_COUNT                     (GENERIC_TIMER_CLK/1000U) ///< 1ms
+#define R_I2C_TIMEOUT_COUNT                     (GENERIC_TIMER_CLK / 20UL) /* 50 ms (Clock * 50 / 1000)*/
+#define R_I2C_TIMEOUT_RECOVER                   (GENERIC_TIMER_CLK / 2UL)  /* 500 ms */
 #define I2C_INVALID_ADDR                        0x0
 #define I2C_DMA_MIN_READ_BYTES                  (3U)
 #define I2C_DMA_MIN_WRITE_BYTES                 (2U)
@@ -53,6 +54,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *By
 static int32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read);
 static int32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit);
 static uintptr_t R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit);
+static int recover_bus(r_i2c_Unit_t Unit, uint64_t recovery_count);
 
 /* DMA functions */
 static void rcar_i2c_dma_callback(void *p_context);
@@ -241,6 +243,8 @@ static int32_t loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask)
         }
         if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_COUNT)
         {
+            int recovery_ret = recover_bus(Unit, R_I2C_TIMEOUT_RECOVER);
+            LogDebug(("I2C%d: Bus recovery after timeout %s (ret=%d)\r\n", Unit, (recovery_ret == 0) ? "succeeded" : "failed", recovery_ret));
             return -1;
         }
     } while (!(val & EventMask));
@@ -523,7 +527,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
 
     do {
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
-        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_COUNT)
+        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_RECOVER)
         {
             return -1;
         }
@@ -665,7 +669,7 @@ static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32
 
     do {
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
-        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_COUNT)
+        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_RECOVER)
         {
             return -1;
         }
@@ -743,7 +747,7 @@ static int32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Byt
 
     do {
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
-        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_COUNT)
+        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_RECOVER)
         {
             return -1;
         }
@@ -1222,4 +1226,41 @@ static uintptr_t R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit)
     }
 
     return i2c_base[I2cUnit];
+}
+
+/* Attempt bus recovery by requesting STOP and waiting for bus free. */
+static int recover_bus(r_i2c_Unit_t Unit, uint64_t recovery_count)
+{
+    uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
+    uint32_t mcr;
+    uint64_t start;
+
+    /* Prevent interrupt handler from consuming the status. */
+    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, 0U);
+
+    /* Clear all status */
+    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
+
+    /* Request STOP: MDBS=1, MIE=1, FSB=1, ESG=0. */
+    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x8AU);
+
+    start = R_UTILS_GetTimerCounter();
+
+    for (;;)
+    {
+        mcr = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
+
+        if ((mcr & R_I2C_FSDA_BIT) == 0U)
+        {
+            R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, ICMCR_CLEAR);
+            return 0;
+        }
+
+        if ((R_UTILS_GetTimerCounter() - start) >= recovery_count)
+        {
+            uint32_t msr = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
+            LogDebug(("I2C%d: STOP recovery timed out. Recovery bus failed, bus may still busy: ICMCR=0x%08x ICMSR=0x%08x\r\n", Unit, mcr, msr));
+            return -1;
+        }
+    }
 }
