@@ -49,9 +49,9 @@ static int reset_id;
 /* ==================== STATIC FUNCTION PROTOTYPES ==================== */
 /* Helper functions */
 static int32_t  loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask);
-static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes);
-static uint32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read);
-static uint32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit);
+static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes);
+static int32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read);
+static int32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit);
 static uintptr_t R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit);
 
 /* DMA functions */
@@ -69,9 +69,9 @@ static int  R_I2C_Irq_handler(i2c_instance_ctrl_t *p_instance_ctrl);
 /* Core I2C functions */
 static int      RCar_I2C_Init(i2c_instance_ctrl_t *p_instance_ctrl);
 static int      RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl);
-static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t *p_instance_ctrl, uint8_t *Bytes, uint32_t NumBytes);
-static uint32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes);
-static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t SlaveReg, uint8_t *Bytes, uint32_t NumBytes);
+static int32_t RCar_I2C_Write(i2c_instance_ctrl_t *p_instance_ctrl, uint8_t *Bytes, uint32_t NumBytes);
+static int32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes);
+static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t SlaveReg, uint8_t *Bytes, uint32_t NumBytes);
 
 /* Utility functions */
 static int i2c_abort_seq_master(i2c_instance_ctrl_t * const p_instance_ctrl);
@@ -252,7 +252,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
 {
     r_i2c_Unit_t Unit = p_instance_ctrl->p_cfg->channel;
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
-    uint8_t ret;
+    int ret;
 
     ret = rcar_i2c_reset_unit(Unit);
 
@@ -363,7 +363,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
     return 0;
 }
 
-static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
+static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
                                uint8_t *Bytes, uint32_t NumBytes)
 {
     (void)SlaveAddr;
@@ -376,7 +376,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
     r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT);
     if (r < 0) {
         LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
-        return 0;
+        return -1;
     }
 
     if (NumBytes == (uint32_t)1) {
@@ -450,7 +450,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
             r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
             if (r < 0) {
                 LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,i));
-                return i;
+                return -1;
             }
 
             /* Copy the next byte into the buffer */
@@ -469,7 +469,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
         if (r < 0) {
             LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,i));
-            return i;
+            return -1;
         }
 
         /* Copy the last byte into the buffer */
@@ -497,7 +497,7 @@ static uint32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
  * Note: the slave address is 7 bits long, i.e. does not include the
  * direction bit.
  */
-static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * Bytes,
+static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * Bytes,
                      uint32_t NumBytes)
 {
     r_i2c_Unit_t Unit = p_instance_ctrl->p_cfg->channel;
@@ -507,7 +507,6 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint32_t val;
     int r;
-    uint8_t ret;
     uint64_t start = R_UTILS_GetTimerCounter();
 
     /* Clear Master Status register */
@@ -611,7 +610,7 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
                 r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT);
                 if (r < 0) {
                     LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,--i));
-                    return --i;
+                    return -1;
                 }
             }
 
@@ -627,7 +626,7 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
             r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
             if (r < 0) {
                 LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,--i));
-                return --i;
+                return -1;
             } else {
                 val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
                 val &= ~(uint32_t)R_I2C_MST_BIT;
@@ -639,7 +638,7 @@ static uint32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * 
 }
 
 // Read from slave at specified register offset
-static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32_t SlaveReg,
+static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32_t SlaveReg,
                           uint8_t *Bytes, uint32_t NumBytes)
 {
     r_i2c_Unit_t Unit = p_instance_ctrl->p_cfg->channel;
@@ -649,7 +648,6 @@ static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint3
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint32_t val;
     int r;
-    uint8_t ret;
     uint64_t start = R_UTILS_GetTimerCounter();
 
     /* Clear Master Status register */
@@ -728,11 +726,10 @@ static uint32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint3
 }
 
 // Read from slave at default offset 0x00
-static uint32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes)
+static int32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes)
 {
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint32_t val;
-    uint8_t ret;
     uint64_t start = R_UTILS_GetTimerCounter();
 
     /* Clear Master Status register */
@@ -762,7 +759,7 @@ static int RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl)
 {
     r_i2c_Unit_t Unit = p_instance_ctrl->p_cfg->channel;
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
-    uint8_t ret;
+    int ret;
     
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, 0);
@@ -822,7 +819,7 @@ static void rcar_i2c_dma_callback(void *p_context)
     return;
 }
 
-static uint32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read)
+static int32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read)
 {
     /* Currently, not support channel 0 */ 
     uint32_t rx_ids[] = 
@@ -1195,7 +1192,7 @@ static void r_i2c_isr_handler(void * const p_context)
     // }
 }
 
-static uint32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit)
+static int32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit)
 {
     int ret;
 
