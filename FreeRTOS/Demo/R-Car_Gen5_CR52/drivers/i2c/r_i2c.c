@@ -58,7 +58,9 @@ static int recover_bus(r_i2c_Unit_t Unit, uint64_t recovery_count);
 
 /* DMA functions */
 static void rcar_i2c_dma_callback(void *p_context);
-static int  rcar_i2c_dma_init(i2c_instance_ctrl_t *p_instance_ctrl);
+static int  rcar_i2c_dma_setup_transfer(i2c_instance_ctrl_t *p_instance_ctrl);
+static int  rcar_i2c_dma_deinit(i2c_instance_ctrl_t * p_instance_ctrl);
+static void rcar_i2c_dma_free(i2c_instance_ctrl_t * p_instance_ctrl);
 
 /* Interrupt functions */
 static void r_i2c_isr_handler(void * const p_context);
@@ -77,6 +79,13 @@ static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t *p_instance_ctrl, uint32_
 
 /* Utility functions */
 static int i2c_abort_seq_master(i2c_instance_ctrl_t * const p_instance_ctrl);
+
+/* Driver-private DMA IRQ resources */
+typedef struct st_i2c_dma_irq 
+{
+    rDmacIrqCfg_t dmac_irq_cfg;      /* Must be the first member because its address matches the malloc struct and is used for free() */
+    Context_t     dmac_irq_context;  /* IRQ argument for DMAC InterruptHandler driver */
+} i2c_dma_irq_t;
 
 int R_I2C_Open(i2c_master_ctrl_t * const p_ctrl, i2c_master_cfg_t const * const p_cfg) 
 {
@@ -211,7 +220,7 @@ int R_I2C_CallbackSet(i2c_master_ctrl_t * const          p_ctrl,
     /* Only enable interrupt if using DMA */
     if (p_instance_ctrl->p_cfg->dma_single == true) 
     {
-        return R_I2C_SetInterruptCallback(p_instance_ctrl->p_cfg->channel, r_i2c_isr_handler, (void *)p_context);
+        return R_I2C_SetInterruptCallback(p_instance_ctrl->p_cfg->channel, r_i2c_isr_handler, p_instance_ctrl);
     }
 
     return -1;
@@ -315,54 +324,43 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
 
     if (p_instance_ctrl->p_cfg->dma_single == true)
     {
-        if (p_instance_ctrl->p_dmac_handle_irq == NULL) 
-        {            
-            p_instance_ctrl->p_dmac_handle_irq = (rDmacIrqCfg_t *)pvPortMalloc(sizeof(rDmacIrqCfg_t));
-            if (p_instance_ctrl->p_dmac_handle_irq == NULL) 
-            {
-                LogDebug(("ERROR: Malloc failed for I2C DMAC handle\n"));
-                return -1;
-            }       
-            (void)memset(p_instance_ctrl->p_dmac_handle_irq, 0, sizeof(rDmacIrqCfg_t));
-        }
-
-        if (p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg == NULL) 
-        {
-            p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg = (rDmacCfg_t *)pvPortMalloc(sizeof(rDmacCfg_t));
-            if (p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg == NULL) 
-            {
-                LogDebug(("ERROR: Malloc failed for I2C DMAC config\n"));
-                return -1;
-            }
-            (void)memset(p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg, 0, sizeof(rDmacCfg_t));
-        }
-
         ret = RCAR_DMAC_CTRL_INIT(p_instance_ctrl->p_cfg->dmac_unit, DRV_RTDMAC_PRIO_FIX);
         if (ret != 0) 
         {
             return -1;
         }
 
+        i2c_dma_irq_t *p_dma_irq = (i2c_dma_irq_t *)pvPortMalloc(sizeof(i2c_dma_irq_t));
+        if (p_dma_irq == NULL)
+        {
+            LogDebug(("ERROR: Malloc failed for I2C DMAC IRQ\n"));
+            return -1;
+        }
+        (void)memset(p_dma_irq, 0, sizeof(i2c_dma_irq_t));
+        p_instance_ctrl->p_dmac_handle_irq = &p_dma_irq->dmac_irq_cfg;
+
+        p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg = (rDmacCfg_t *)pvPortMalloc(sizeof(rDmacCfg_t));
+        if (p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg == NULL)
+        {
+            LogDebug(("ERROR: Malloc failed for I2C DMAC config\n"));
+            rcar_i2c_dma_free(p_instance_ctrl);
+            return -1;
+        }
+        (void)memset(p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg, 0, sizeof(rDmacCfg_t));
+
         p_instance_ctrl->p_dmac_handle_irq->Unit = p_instance_ctrl->p_cfg->dmac_unit;
         p_instance_ctrl->p_dmac_handle_irq->SubCh = p_instance_ctrl->p_cfg->dmac_channel;
         p_instance_ctrl->p_dmac_handle_irq->irq_channel = p_instance_ctrl->p_cfg->dmac_irq_id;
-        p_instance_ctrl->p_dmac_handle_irq->p_context = p_instance_ctrl;
+        p_instance_ctrl->p_dmac_handle_irq->p_context = p_instance_ctrl;    /* I2C instance returned to DMA callback */
 
-        // Allocate Context_t
-        Context_t *p_usr_context = (Context_t *)pvPortMalloc(sizeof(Context_t));
-        if (p_usr_context == NULL) 
+        p_dma_irq->dmac_irq_context.ctx = p_instance_ctrl->p_dmac_handle_irq; /* DMA config returned to the DMAC IRQ handler */
+        ret = RCAR_DMAC_CALLBACK_SET(p_instance_ctrl->p_dmac_handle_irq, (void *)rcar_i2c_dma_callback, &p_dma_irq->dmac_irq_context);
+        if (ret != 0) 
         {
-            LogDebug(("ERROR: Cannot malloc Context_t for DMA interrupt\n"));
-            return -1;
-        }
-        p_usr_context->ctx = p_instance_ctrl->p_dmac_handle_irq;
-
-        ret = RCAR_DMAC_CALLBACK_SET(p_instance_ctrl->p_dmac_handle_irq, (void *)rcar_i2c_dma_callback, p_usr_context);
-        if (ret != 0) {
+            rcar_i2c_dma_free(p_instance_ctrl);
             return -1;
         }
 
-        vPortFree(p_usr_context);
     }
     return 0;
 }
@@ -535,9 +533,9 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
 
     if (p_instance_ctrl->p_cfg->dma_single == true) 
     {
-        if (rcar_i2c_dma_init(p_instance_ctrl) != 0)
+        if (rcar_i2c_dma_setup_transfer(p_instance_ctrl) != 0)
         {
-            LogDebug(("ERROR: DMA write initialization failed\n"));
+            LogDebug(("ERROR: DMA write transfer setup failed\n"));
             return -1;
         }
         /* 1st byte is loaded to ICTXD register for sending to bus at next step */
@@ -677,9 +675,9 @@ static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32
     
     if (p_instance_ctrl->p_cfg->dma_single == true) 
     {
-        if (rcar_i2c_dma_init(p_instance_ctrl) != 0)
+        if (rcar_i2c_dma_setup_transfer(p_instance_ctrl) != 0)
         {
-            LogDebug(("ERROR: DMA read initialization failed\n"));
+            LogDebug(("ERROR: DMA read transfer setup failed\n"));
             return -1;
         }
         /* Set Master Control register (MDBS=1, MIE=1, ESG=1) */
@@ -763,43 +761,34 @@ static int RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl)
 {
     r_i2c_Unit_t Unit = p_instance_ctrl->p_cfg->channel;
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
-    int ret;
-    
+    int ret = 0;
+
+    if (p_instance_ctrl->p_cfg->dma_single == true)
+    {
+        if (RCar_I2C_DisableGICInterrupt(Unit) != 0)
+        {
+            LogDebug(("Error: Disable I2C interrupt failed.\r\n"));
+            ret = -1;
+        }
+
+        if (rcar_i2c_dma_deinit(p_instance_ctrl) != 0)
+        {
+            LogDebug(("Error: Deinit DMA failed.\r\n"));
+            ret = -1;
+        }
+    }
+
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, 0);
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, ICMCR_CLEAR);
 
-    ret = R_StateManager_ClockOff(clock_id);
-    if (ret != 0U)
+    if (R_StateManager_ClockOff(clock_id) != 0)
     {
         LogDebug(("Error: Failed to set clock id %d OFF.\r\n", clock_id));
-        return ret;
+        ret = -1;
     }
 
-    if (p_instance_ctrl->p_cfg->dma_single == true)
-    {
-        if (p_instance_ctrl->p_dmac_handle_irq != NULL) 
-        {
-            /* Free p_dma_cfg */ 
-            if (p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg != NULL) 
-            {
-                vPortFree(p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg);
-                p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg = NULL;
-            }
-            
-            /* Free p_dmac_handle_irq */ 
-            vPortFree(p_instance_ctrl->p_dmac_handle_irq);
-            p_instance_ctrl->p_dmac_handle_irq = NULL;
-        }
-
-        /* Disable GIC interrupt */
-        if (RCar_I2C_DisableGICInterrupt(Unit) != 0)
-        {
-            return -1;
-        }
-    }
-
-    return 0;
+    return ret;
 }
 
 static void rcar_i2c_dma_callback(void *p_context)
@@ -850,14 +839,13 @@ static int32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read)
     return -1;
 }
 
-static int rcar_i2c_dma_init(i2c_instance_ctrl_t * p_instance_ctrl)
+static int rcar_i2c_dma_setup_transfer(i2c_instance_ctrl_t * p_instance_ctrl)
 {
     volatile bool is_read = p_instance_ctrl->read;
     r_i2c_Unit_t Unit = p_instance_ctrl->p_cfg->channel;
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint8_t *buf;
     uint32_t len;
-    int ret;
 
     if (is_read) 
     {
@@ -899,13 +887,13 @@ static int rcar_i2c_dma_init(i2c_instance_ctrl_t * p_instance_ctrl)
     cfg->mResource = DRV_RTDMAC_RESOUCE_MAX;
     cfg->mLowSpeed = DRV_RTDMAC_SPEED_NORMAL;
     cfg->mPrioLevel = 0;
-    cfg->mSourceRequest = rcar_dma_request_id(Unit, is_read);
-    if (cfg->mSourceRequest == -1) 
+    int32_t request_id_dma = rcar_dma_request_id(Unit, is_read);
+    if (request_id_dma == -1) 
     {
         LogDebug(("ERROR: Failed to get DMA request ID for channel %d\n", Unit));
         return -1;
     }
-    
+    cfg->mSourceRequest = request_id_dma;
     return 0;
 }
 
@@ -989,7 +977,7 @@ static void rcar_i2c_irq_recv(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
             i2c_master_callback_args_t args = 
             {
                 .event = I2C_MASTER_EVENT_RX_COMPLETE,
-                .p_context = p_instance_ctrl->p_context /* p_context is &g_i2c_device_ctrl_x */
+                .p_context = p_instance_ctrl->p_context /* User context passed to R_I2C_CallbackSet() */
             };
             p_instance_ctrl->p_callback(&args);
         }        
@@ -1082,7 +1070,7 @@ static void rcar_i2c_irq_send(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t msr
                 i2c_master_callback_args_t args = 
                 {
                     .event = I2C_MASTER_EVENT_TX_COMPLETE,
-                    .p_context = p_instance_ctrl->p_context /* p_context is &g_i2c_device_ctrl_x */
+                    .p_context = p_instance_ctrl->p_context /* User context passed to R_I2C_CallbackSet() */
                 };
                 p_instance_ctrl->p_callback(&args);
             }
@@ -1263,4 +1251,46 @@ static int recover_bus(r_i2c_Unit_t Unit, uint64_t recovery_count)
             return -1;
         }
     }
+}
+
+static void rcar_i2c_dma_free(i2c_instance_ctrl_t * p_instance_ctrl)
+{
+    rDmacIrqCfg_t *p_irq_dma = p_instance_ctrl->p_dmac_handle_irq;
+
+    if (p_irq_dma != NULL)
+    {
+        if (p_irq_dma->p_dma_cfg != NULL)
+        {
+            vPortFree(p_irq_dma->p_dma_cfg);
+            p_irq_dma->p_dma_cfg = NULL;
+        }
+
+        vPortFree(p_irq_dma);
+        p_instance_ctrl->p_dmac_handle_irq = NULL;
+    }
+}
+
+static int rcar_i2c_dma_deinit(i2c_instance_ctrl_t * p_instance_ctrl)
+{
+    int ret = 0;
+    rDmacIrqCfg_t *p_irq_dma = p_instance_ctrl->p_dmac_handle_irq;
+    uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(p_instance_ctrl->p_cfg->channel);
+
+    if (p_irq_dma == NULL)
+    {
+        return 0;
+    }
+
+    R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICDMAER, 0U);  /* Stop I2C DMA requests */
+
+    if (RCAR_DMAC_STOP(p_irq_dma->Unit, p_irq_dma->SubCh) != 0U) /* Stop DMA channel */
+    {
+        ret = -1;
+    }
+
+    Irq_Disable(p_irq_dma->irq_channel);
+
+    rcar_i2c_dma_free(p_instance_ctrl);
+
+    return ret;
 }
