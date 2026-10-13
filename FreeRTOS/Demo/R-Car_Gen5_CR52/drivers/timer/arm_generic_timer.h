@@ -9,7 +9,6 @@
 #define arm_generic_timer_h
 
 #include "cmsis_rcar_gen5.h"
-#include "board.h"
 
 #define CNTFRQ_READ()         __get_CNTFRQ()
 #define CNTFRQ_WRITE(v)       __set_CNTFRQ(v)
@@ -18,15 +17,8 @@
 #define CNTP_CVAL_READ()      __get_CNTP_CVAL()
 #define CNTP_CVAL_WRITE(v)    __set_CNTP_CVAL(v)
 
-#if (BOARD == X5H_IRONHIDE || BOARD == MDP_AIACC_HIL || BOARD == MDP_X5H_HIL)
-#define GENERIC_TIMER_CLK     1066666666UL
-#elif (BOARD == X5H_VDK || BOARD == X5H_RFS2 || BOARD == MDP_AIACC_RFS2)
-#define GENERIC_TIMER_CLK     25000000UL
-#else
 /* The timer count up 16 counts with 66.667MHz clock.
 It means the counter operate at 1066.667MHz in equivalent */
-#define GENERIC_TIMER_CLK     1066666666    // Hz
-
-#endif
+#define GENERIC_TIMER_CLK     1066666666UL  // Hz
 
 #endif // arm_generic_timer_h
