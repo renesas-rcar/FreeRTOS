@@ -29,6 +29,7 @@ extern "C" {
 #define RCAR_DMAC_CTRL_INIT     R_SYSDMAC_RcarDmacCtrlInit
 #define RCAR_DMAC_CALLBACK_SET  R_SYSDMAC_RcarCallBackSet
 #define RCAR_DMAC_EXEC          R_SYSDMAC_RcarDmacExec
+#define RCAR_DMAC_STOP          R_SYSDMAC_RcarDmacStop
 
 /* I2C base adrress */
 #define R_I2C_IF0_BASE      0xc11d0000
