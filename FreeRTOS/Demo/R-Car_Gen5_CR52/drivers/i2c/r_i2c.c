@@ -253,7 +253,7 @@ static int32_t loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask)
         if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_COUNT)
         {
             int recovery_ret = recover_bus(Unit, R_I2C_TIMEOUT_RECOVER);
-            LogDebug(("I2C%d: Bus recovery after timeout %s (ret=%d)\r\n", Unit, (recovery_ret == 0) ? "succeeded" : "failed", recovery_ret));
+            LogError(("I2C%d: Bus recovery after timeout %s (ret=%d)\r\n", Unit, (recovery_ret == 0) ? "succeeded" : "failed", recovery_ret));
             return -1;
         }
     } while (!(val & EventMask));
@@ -276,7 +276,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
 
     if ((uint32_t)Unit >= R_I2C_LAST)
     {
-        LogDebug(("Wrong I2C Unit %d\r\n", Unit));
+        LogError(("[%s] Wrong I2C Unit %d\r\n", __func__, Unit));
         return -1;
     }
 
@@ -315,7 +315,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
             R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICCCR2, 0x87);
             break;
         default:
-            LogDebug(("Invalid I2C ClockRate\n"));
+            LogError(("Invalid I2C ClockRate\n"));
             return -1;
     }
 
@@ -333,7 +333,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
         i2c_dma_irq_t *p_dma_irq = (i2c_dma_irq_t *)pvPortMalloc(sizeof(i2c_dma_irq_t));
         if (p_dma_irq == NULL)
         {
-            LogDebug(("ERROR: Malloc failed for I2C DMAC IRQ\n"));
+            LogError(("ERROR: Malloc failed for I2C DMAC IRQ\n"));
             return -1;
         }
         (void)memset(p_dma_irq, 0, sizeof(i2c_dma_irq_t));
@@ -342,7 +342,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
         p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg = (rDmacCfg_t *)pvPortMalloc(sizeof(rDmacCfg_t));
         if (p_instance_ctrl->p_dmac_handle_irq->p_dma_cfg == NULL)
         {
-            LogDebug(("ERROR: Malloc failed for I2C DMAC config\n"));
+            LogError(("ERROR: Malloc failed for I2C DMAC config\n"));
             rcar_i2c_dma_free(p_instance_ctrl);
             return -1;
         }
@@ -377,7 +377,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
     /* Wait for the slave address to be transmitted*/
     r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT);
     if (r < 0) {
-        LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
+        LogError(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
         return -1;
     }
 
@@ -394,7 +394,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         /* Wait for transfer to complete */
         r = loc_WaitMsrEvent(Unit, (uint32_t)R_I2C_MDR_BIT);
         if (r < 0) {
-            LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transfer to complete) Failed(0)\r\n",r));
+            LogError(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transfer to complete) Failed(0)\r\n",r));
             return -1;
         }
 
@@ -434,7 +434,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         /* Wait for Data Empty event */
         r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
         if (r < 0) {
-            LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 1) Failed(0)\r\n",r));
+            LogError(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 1) Failed(0)\r\n",r));
             return -1;
         }
 
@@ -451,7 +451,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
             /* Wait for Data Empty event */
             r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
             if (r < 0) {
-                LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,i));
+                LogError(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,i));
                 return -1;
             }
 
@@ -470,7 +470,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         /* Wait for transmission to complete */
         r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
         if (r < 0) {
-            LogDebug(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,i));
+            LogError(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,i));
             return -1;
         }
 
@@ -535,7 +535,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
     {
         if (rcar_i2c_dma_setup_transfer(p_instance_ctrl) != 0)
         {
-            LogDebug(("ERROR: DMA write transfer setup failed\n"));
+            LogError(("ERROR: DMA write transfer setup failed\n"));
             return -1;
         }
         /* 1st byte is loaded to ICTXD register for sending to bus at next step */
@@ -553,7 +553,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
         /* Wait for the slave address to be transmitted*/
         r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT);
         if (r < 0) {
-            LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
+            LogError(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
             return -1;
         }
 
@@ -571,7 +571,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
             /* Wait for transmission to complete */
             r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
             if (r < 0) {
-                LogDebug(("[R_I2C_Write] loc_WaitMsrEvent :Return value(r) is %d.(Wait for transmission to complete) Failed(0)\r\n",r));
+                LogError(("[R_I2C_Write] loc_WaitMsrEvent :Return value(r) is %d.(Wait for transmission to complete) Failed(0)\r\n",r));
                 return -1;
             } else {
                 val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
@@ -594,7 +594,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
             /* Wait for Data Empty event */
             r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT);
             if (r < 0) {
-                LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 1) Failed(0)\r\n",r));
+                LogError(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 1) Failed(0)\r\n",r));
                 return -1;
             }
 
@@ -611,7 +611,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
                 /* Wait for Data Empty event */
                 r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT);
                 if (r < 0) {
-                    LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,--i));
+                    LogError(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,--i));
                     return -1;
                 }
             }
@@ -627,7 +627,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
             /* Wait for transmission to complete */
             r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
             if (r < 0) {
-                LogDebug(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,--i));
+                LogError(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,--i));
                 return -1;
             } else {
                 val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
@@ -677,7 +677,7 @@ static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32
     {
         if (rcar_i2c_dma_setup_transfer(p_instance_ctrl) != 0)
         {
-            LogDebug(("ERROR: DMA read transfer setup failed\n"));
+            LogError(("ERROR: DMA read transfer setup failed\n"));
             return -1;
         }
         /* Set Master Control register (MDBS=1, MIE=1, ESG=1) */
@@ -693,7 +693,7 @@ static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32
         /* Wait for the slave address to be transmitted */
         r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT);
         if (r < 0) {
-            LogDebug(("[R_I2C_ReadRegMap] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
+            LogError(("[R_I2C_ReadRegMap] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
             return -1;
         }
         /* Clear ESG bit in ICMCR reg */
@@ -706,7 +706,7 @@ static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32
         /* Wait for the slave register address to be transmitted */
         r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT);
         if (r < 0) {
-            LogDebug(("[R_I2C_ReadRegMap] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave register address to be transmitted) Failed(0)\r\n",r));
+            LogError(("[R_I2C_ReadRegMap] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave register address to be transmitted) Failed(0)\r\n",r));
             return -1;
         }
         /* Change from Write mode to Read mode */
@@ -767,13 +767,13 @@ static int RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl)
     {
         if (RCar_I2C_DisableGICInterrupt(Unit) != 0)
         {
-            LogDebug(("Error: Disable I2C interrupt failed.\r\n"));
+            LogError(("Error: Disable I2C interrupt failed.\r\n"));
             ret = -1;
         }
 
         if (rcar_i2c_dma_deinit(p_instance_ctrl) != 0)
         {
-            LogDebug(("Error: Deinit DMA failed.\r\n"));
+            LogError(("Error: Deinit DMA failed.\r\n"));
             ret = -1;
         }
     }
@@ -784,7 +784,7 @@ static int RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl)
 
     if (R_StateManager_ClockOff(clock_id) != 0)
     {
-        LogDebug(("Error: Failed to set clock id %d OFF.\r\n", clock_id));
+        LogError(("Error: Failed to set clock id %d OFF.\r\n", clock_id));
         ret = -1;
     }
 
@@ -794,7 +794,7 @@ static int RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl)
 static void rcar_i2c_dma_callback(void *p_context)
 {
     if (!p_context) {
-        LogDebug(("Error: Invalid context callback DMA\n"));
+        LogError(("Error: Invalid context callback DMA\n"));
         return;
     }
     
@@ -835,7 +835,7 @@ static int32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read)
         return is_read ? rx_ids[Unit] : tx_ids[Unit];
     }
     
-    LogDebug(("ERROR: I2C channel %d does not support DMA currently\n", Unit));
+    LogError(("ERROR: I2C channel %d does not support DMA currently\n", Unit));
     return -1;
 }
 
@@ -851,7 +851,7 @@ static int rcar_i2c_dma_setup_transfer(i2c_instance_ctrl_t * p_instance_ctrl)
     {
         if (p_instance_ctrl->total < I2C_DMA_MIN_READ_BYTES)
         {
-            LogDebug(("ERROR: Data length is too small to use DMA I2C.\n"));
+            LogError(("ERROR: Data length is too small to use DMA I2C.\n"));
             return -1;
         }
         /* Read mode
@@ -868,7 +868,7 @@ static int rcar_i2c_dma_setup_transfer(i2c_instance_ctrl_t * p_instance_ctrl)
          */
         if (p_instance_ctrl->total < I2C_DMA_MIN_WRITE_BYTES)
         {
-            LogDebug(("ERROR: Data length is too small to use DMA I2C.\n"));
+            LogError(("ERROR: Data length is too small to use DMA I2C.\n"));
             return -1;
         }
 
@@ -890,7 +890,7 @@ static int rcar_i2c_dma_setup_transfer(i2c_instance_ctrl_t * p_instance_ctrl)
     int32_t request_id_dma = rcar_dma_request_id(Unit, is_read);
     if (request_id_dma == -1) 
     {
-        LogDebug(("ERROR: Failed to get DMA request ID for channel %d\n", Unit));
+        LogError(("ERROR: Failed to get DMA request ID for channel %d\n", Unit));
         return -1;
     }
     cfg->mSourceRequest = request_id_dma;
@@ -1090,7 +1090,7 @@ static int R_I2C_SetInterruptCallback(r_i2c_Unit_t Unit, IrqHandlerFn handler, v
 
     if ((uint32_t)Unit >= R_I2C_LAST)
     {
-        LogDebug(("Wrong I2C Unit %d\r\n", Unit));
+        LogError(("[%s] Wrong I2C Unit %d\r\n", __func__, Unit));
         return -1;
     }
 
@@ -1115,7 +1115,7 @@ static int RCar_I2C_DisableGICInterrupt(r_i2c_Unit_t Unit)
 
     if ((uint32_t)Unit >= R_I2C_LAST)
     {
-        LogDebug(("Wrong I2C Unit %d\r\n", Unit));
+        LogError(("[%s] Wrong I2C Unit %d\r\n", __func__, Unit));
         return -1;
     }
 
@@ -1144,14 +1144,14 @@ static int R_I2C_Irq_handler(i2c_instance_ctrl_t * p_instance_ctrl)
 
     if ((msr & R_I2C_MAL_BIT) != 0) {
         /* Arbitration lost */
-        LogDebug(("ERROR: I2C arbitration lost - auto STOP\n"));
+        LogError(("ERROR: I2C arbitration lost - auto STOP\n"));
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, 0);
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
     }
 
     if ((msr & R_I2C_MNR_BIT) != 0) {
         /* HW automatically sends STOP after received NACK */
-        LogDebug(("ERROR: I2C NACK received - auto STOP\n"));
+        LogError(("ERROR: I2C NACK received - auto STOP\n"));
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, R_I2C_MST_BIT);
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMIER, 0);
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, 0);
@@ -1190,7 +1190,7 @@ static int32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit)
 
     if ((uint32_t)Unit >= R_I2C_LAST)
     {
-        LogDebug(("Wrong I2C Unit %d\r\n", Unit));
+        LogError(("[%s] Wrong I2C Unit %d\r\n", __func__, Unit));
         return -1;
     }
 
@@ -1209,7 +1209,7 @@ static uintptr_t R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit)
 {
     if ((uint32_t)I2cUnit >= (sizeof(i2c_base) / sizeof(i2c_base[0])))
     {
-        LogDebug(("I2C channel %d not exist!\n", I2cUnit));
+        LogError(("I2C channel %d not exist!\n", I2cUnit));
         return I2C_INVALID_ADDR;
     }
 
@@ -1247,7 +1247,7 @@ static int recover_bus(r_i2c_Unit_t Unit, uint64_t recovery_count)
         if ((R_UTILS_GetTimerCounter() - start) >= recovery_count)
         {
             uint32_t msr = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMSR) & ICMSR_MASK;
-            LogDebug(("I2C%d: STOP recovery timed out. Recovery bus failed, bus may still busy: ICMCR=0x%08x ICMSR=0x%08x\r\n", Unit, mcr, msr));
+            LogError(("I2C%d: STOP recovery timed out. Recovery bus failed, bus may still busy: ICMCR=0x%08x ICMSR=0x%08x\r\n", Unit, mcr, msr));
             return -1;
         }
     }
