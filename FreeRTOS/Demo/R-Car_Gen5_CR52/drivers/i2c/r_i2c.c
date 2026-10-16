@@ -37,8 +37,8 @@
 #define ICMAR_MASK_WRITE                        ((uint32_t)0xFE)
 #define ICMSR_MASK                              ((uint32_t)0x7F)
 #define ICMCR_CLEAR                             ((uint32_t)0x80)
-#define R_I2C_TIMEOUT_COUNT                     (GENERIC_TIMER_CLK / 20UL) /* 50 ms (Clock * 50 / 1000)*/
-#define R_I2C_TIMEOUT_RECOVER                   (GENERIC_TIMER_CLK / 2UL)  /* 500 ms */
+#define R_I2C_EVENT_TIMEOUT_COUNT_FOR_50MS      (GENERIC_TIMER_CLK / 20UL) /* 50 ms (Clock * 50 / 1000)*/
+#define R_I2C_RECOVER_TIMEOUT_COUNT_FOR_500MS   (GENERIC_TIMER_CLK / 2UL)  /* 500 ms */
 #define I2C_INVALID_ADDR                        0x0
 #define I2C_DMA_MIN_READ_BYTES                  (3U)
 #define I2C_DMA_MIN_WRITE_BYTES                 (2U)
@@ -49,8 +49,8 @@ static int reset_id;
 
 /* ==================== STATIC FUNCTION PROTOTYPES ==================== */
 /* Helper functions */
-static int32_t  loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask);
-static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes);
+static int32_t  loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask, uint64_t event_timeout_counts);
+static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes, uint64_t event_timeout_counts);
 static int32_t rcar_dma_request_id(r_i2c_Unit_t Unit, bool is_read);
 static int32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit);
 static uintptr_t R_I2C_PRV_GetRegbase(r_i2c_Unit_t I2cUnit);
@@ -74,7 +74,7 @@ static int  R_I2C_Irq_handler(i2c_instance_ctrl_t *p_instance_ctrl);
 static int      RCar_I2C_Init(i2c_instance_ctrl_t *p_instance_ctrl);
 static int      RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl);
 static int32_t RCar_I2C_Write(i2c_instance_ctrl_t *p_instance_ctrl, uint8_t *Bytes, uint32_t NumBytes);
-static int32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes);
+static int32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes, uint64_t event_timeout_counts);
 static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t *p_instance_ctrl, uint32_t SlaveReg, uint8_t *Bytes, uint32_t NumBytes);
 
 /* Utility functions */
@@ -110,6 +110,7 @@ int R_I2C_Open(i2c_master_ctrl_t * const p_ctrl, i2c_master_cfg_t const * const 
     p_instance_ctrl->err       = false;
     p_instance_ctrl->restarted = false;
     p_instance_ctrl->open      = I2C_OPEN;
+    p_instance_ctrl->event_timeout_counts = R_I2C_EVENT_TIMEOUT_COUNT_FOR_50MS;
     /* For DMA only */
     p_instance_ctrl->p_dmac_handle_irq = NULL;
 
@@ -150,7 +151,7 @@ int R_I2C_Read(i2c_master_ctrl_t * const p_ctrl,
     int result = -1;
     (void) restart; // unused parameter.
     i2c_instance_ctrl_t * p_instance_ctrl = (i2c_instance_ctrl_t *) p_ctrl;
-    return RCar_I2C_Read(p_instance_ctrl->p_cfg->channel, p_instance_ctrl->p_cfg->slave, p_dest, bytes);
+    return RCar_I2C_Read(p_instance_ctrl->p_cfg->channel, p_instance_ctrl->p_cfg->slave, p_dest, bytes, p_instance_ctrl->event_timeout_counts);
 }
 
 int R_I2C_ReadRegMap(i2c_master_ctrl_t * const p_ctrl,
@@ -233,7 +234,29 @@ int R_I2C_StatusGet(i2c_master_ctrl_t * const p_ctrl, i2c_master_status_t * p_st
     return 0;
 }
 
-static int32_t loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask)
+int R_I2C_TimeoutEventSet(i2c_master_ctrl_t * const p_ctrl, uint32_t timeout_ms)
+{
+    i2c_instance_ctrl_t * p_instance_ctrl = (i2c_instance_ctrl_t *) p_ctrl;
+
+    if ((p_instance_ctrl == NULL) || (p_instance_ctrl->open != I2C_OPEN))
+    {
+        return -1;
+    }
+
+    if (timeout_ms == 0U)
+    {
+        LogError(("[%s] Timeout equal 0 is not valid\n", __func__));
+        return -1;
+    }
+
+    /* Convert ms to generic timer counts. 64-bit math avoids overflow. */
+    p_instance_ctrl->event_timeout_counts = ((uint64_t)GENERIC_TIMER_CLK * (uint64_t)timeout_ms) / 1000ULL;
+    LogInfo(("[%s] Event timeout set to %lu ms (~%llu count)\n", __func__, timeout_ms, (unsigned long long)p_instance_ctrl->event_timeout_counts));
+
+    return 0;
+}
+
+static int32_t loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask, uint64_t event_timeout_counts)
 {
     uint32_t val;
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
@@ -250,10 +273,10 @@ static int32_t loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask)
 	 if ((val & R_I2C_MNR_BIT) != (uint32_t)0) {
             break;
         }
-        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_COUNT)
+        if ((R_UTILS_GetTimerCounter() - start) >= event_timeout_counts)
         {
-            int recovery_ret = recover_bus(Unit, R_I2C_TIMEOUT_RECOVER);
-            LogError(("I2C%d: Bus recovery after timeout %s (ret=%d)\r\n", Unit, (recovery_ret == 0) ? "succeeded" : "failed", recovery_ret));
+            int recovery_ret = recover_bus(Unit, R_I2C_RECOVER_TIMEOUT_COUNT_FOR_500MS);
+            LogDebug(("I2C%d: Bus recovery after timeout %s (ret=%d)\r\n", Unit, (recovery_ret == 0) ? "succeeded" : "failed", recovery_ret));
             return -1;
         }
     } while (!(val & EventMask));
@@ -366,7 +389,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
 }
 
 static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
-                               uint8_t *Bytes, uint32_t NumBytes)
+                               uint8_t *Bytes, uint32_t NumBytes, uint64_t event_timeout_counts)
 {
     (void)SlaveAddr;
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
@@ -375,7 +398,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
     int r;
 
     /* Wait for the slave address to be transmitted*/
-    r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT);
+    r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT, event_timeout_counts);
     if (r < 0) {
         LogError(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
         return -1;
@@ -392,7 +415,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         /* Wait for transfer to complete */
-        r = loc_WaitMsrEvent(Unit, (uint32_t)R_I2C_MDR_BIT);
+        r = loc_WaitMsrEvent(Unit, (uint32_t)R_I2C_MDR_BIT, event_timeout_counts);
         if (r < 0) {
             LogError(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transfer to complete) Failed(0)\r\n",r));
             return -1;
@@ -407,7 +430,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         /* Wait MST */
-        r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
+        r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT, event_timeout_counts);
         if (r < 0) 
         {
             return -1;
@@ -432,7 +455,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         /* Wait for Data Empty event */
-        r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
+        r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT, event_timeout_counts);
         if (r < 0) {
             LogError(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 1) Failed(0)\r\n",r));
             return -1;
@@ -449,7 +472,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
             R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
             /* Wait for Data Empty event */
-            r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
+            r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT, event_timeout_counts);
             if (r < 0) {
                 LogError(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,i));
                 return -1;
@@ -468,7 +491,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         /* Wait for transmission to complete */
-        r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT);
+        r = loc_WaitMsrEvent(Unit, R_I2C_MDR_BIT, event_timeout_counts);
         if (r < 0) {
             LogError(("[loc_ReadCommon] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,i));
             return -1;
@@ -482,7 +505,7 @@ static int32_t loc_ReadCommon(r_i2c_Unit_t Unit, uint32_t SlaveAddr,
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
         /* Wait for transmission to complete */
-        r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
+        r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT, event_timeout_counts);
         if (r < 0) {
             return -1;
         }
@@ -525,7 +548,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
 
     do {
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
-        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_RECOVER)
+        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_RECOVER_TIMEOUT_COUNT_FOR_500MS)
         {
             return -1;
         }
@@ -551,7 +574,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x89);
 
         /* Wait for the slave address to be transmitted*/
-        r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT);
+        r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT, p_instance_ctrl->event_timeout_counts);
         if (r < 0) {
             LogError(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
             return -1;
@@ -569,7 +592,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
             R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
             /* Wait for transmission to complete */
-            r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
+            r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT, p_instance_ctrl->event_timeout_counts);
             if (r < 0) {
                 LogError(("[R_I2C_Write] loc_WaitMsrEvent :Return value(r) is %d.(Wait for transmission to complete) Failed(0)\r\n",r));
                 return -1;
@@ -592,7 +615,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
             R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
             /* Wait for Data Empty event */
-            r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT);
+            r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT, p_instance_ctrl->event_timeout_counts);
             if (r < 0) {
                 LogError(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 1) Failed(0)\r\n",r));
                 return -1;
@@ -609,7 +632,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
                 R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
                 /* Wait for Data Empty event */
-                r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT);
+                r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT, p_instance_ctrl->event_timeout_counts);
                 if (r < 0) {
                     LogError(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for Data Empty event 2) Failed(%u)\r\n",r,--i));
                     return -1;
@@ -625,7 +648,7 @@ static int32_t RCar_I2C_Write(i2c_instance_ctrl_t * p_instance_ctrl, uint8_t * B
             R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
             /* Wait for transmission to complete */
-            r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT);
+            r = loc_WaitMsrEvent(Unit, R_I2C_MST_BIT, p_instance_ctrl->event_timeout_counts);
             if (r < 0) {
                 LogError(("[R_I2C_Write] loc_WaitMsrEvent : Return value(r) is %d.(Wait for transmission to complete) Failed(%u)\r\n",r,--i));
                 return -1;
@@ -667,7 +690,7 @@ static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32
 
     do {
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
-        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_RECOVER)
+        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_RECOVER_TIMEOUT_COUNT_FOR_500MS)
         {
             return -1;
         }
@@ -691,7 +714,7 @@ static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x89);
         
         /* Wait for the slave address to be transmitted */
-        r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT);
+        r = loc_WaitMsrEvent(Unit, R_I2C_MAT_BIT, p_instance_ctrl->event_timeout_counts);
         if (r < 0) {
             LogError(("[R_I2C_ReadRegMap] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave address to be transmitted) Failed(0)\r\n",r));
             return -1;
@@ -704,7 +727,7 @@ static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32
         val &= (uint32_t)~(R_I2C_MAT_BIT | R_I2C_MDE_BIT);
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
         /* Wait for the slave register address to be transmitted */
-        r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT);
+        r = loc_WaitMsrEvent(Unit, R_I2C_MDE_BIT, p_instance_ctrl->event_timeout_counts);
         if (r < 0) {
             LogError(("[R_I2C_ReadRegMap] loc_WaitMsrEvent : Return value(r) is %d.(Wait for the slave register address to be transmitted) Failed(0)\r\n",r));
             return -1;
@@ -723,12 +746,12 @@ static int32_t RCar_I2C_ReadRegMap(i2c_instance_ctrl_t * p_instance_ctrl, uint32
         val &= (uint32_t)~R_I2C_MDE_BIT;
         R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMSR, val);
 
-        return loc_ReadCommon(Unit, SlaveAddr, Bytes, NumBytes);
+        return loc_ReadCommon(Unit, SlaveAddr, Bytes, NumBytes, p_instance_ctrl->event_timeout_counts);
     }
 }
 
 // Read from slave at default offset 0x00
-static int32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes)
+static int32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Bytes, uint32_t NumBytes, uint64_t event_timeout_counts)
 {
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
     uint32_t val;
@@ -745,7 +768,7 @@ static int32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Byt
 
     do {
         val = R_I2C_PRV_RegRead32(i2c_base_addr + R_I2C_ICMCR);
-        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_TIMEOUT_RECOVER)
+        if ((R_UTILS_GetTimerCounter() - start) >= R_I2C_RECOVER_TIMEOUT_COUNT_FOR_500MS)
         {
             return -1;
         }
@@ -754,7 +777,7 @@ static int32_t RCar_I2C_Read(r_i2c_Unit_t Unit, uint32_t SlaveAddr, uint8_t *Byt
     /* Set Master Control register (MDBS=1, MIE=1, ESG=1) */
     R_I2C_PRV_RegWrite32(i2c_base_addr + R_I2C_ICMCR, 0x89);
 
-    return loc_ReadCommon(Unit, SlaveAddr, Bytes, NumBytes);
+    return loc_ReadCommon(Unit, SlaveAddr, Bytes, NumBytes, event_timeout_counts);
 }
 
 static int RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl)

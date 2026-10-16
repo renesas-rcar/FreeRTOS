@@ -159,6 +159,7 @@ static void prvI2CTask( void *pvParameters )
 		printf("Error: Cannot open I2C%d\n", g_i2c_device_cfg_1.channel);
 		for (;;) {};
 	}
+	R_I2C_TimeoutEventSet(&g_i2c_device_ctrl_1, 40);
 
 	R_I2C_ReadRegMap(&g_i2c_device_ctrl_1, 0x03, default_value, sizeof(default_value));
 	printf("DEFAULT VALUE: ");

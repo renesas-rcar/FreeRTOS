@@ -172,6 +172,8 @@ typedef struct st_i2c_instance_ctrl
     volatile bool dma_final_phase_read;     ///< Last byte read flag for DMA operations.
     
     rDmacIrqCfg_t *p_dmac_handle_irq;   ///< DMAC variables.
+
+    uint64_t event_timeout_counts;       ///< Per-event timeout in generic timer counts.
 } i2c_instance_ctrl_t;
 
 /***********************************************************************************************************************
@@ -292,6 +294,19 @@ int R_I2C_CallbackSet(i2c_master_ctrl_t * const          p_ctrl,
  * @retval 0 if successful.
  */
 int R_I2C_StatusGet(i2c_master_ctrl_t * const p_ctrl, i2c_master_status_t * p_status);
+
+/**
+ * @brief Set the timeout for each I2C transfer event (PIO mode only).
+ *
+ * Optional. If not called, the default timeout (50 ms) is used. Timeout will be reset to default on every R_I2C_Open().
+ * Must be called after R_I2C_Open() and while no transfer is in progress.
+ *
+ * @param[in]  p_ctrl     - Pointer to the I2C control structure.
+ * @param[in]  timeout_ms - Timeout in milliseconds, must be greater than 0.
+ *
+ * @retval 0 if successful.
+ */
+int R_I2C_TimeoutEventSet(i2c_master_ctrl_t * const p_ctrl, uint32_t timeout_ms);
 
 #ifdef __cplusplus
 }
