@@ -123,12 +123,12 @@ void rcar_ucie_reg_write32(uint32_t channel, bool phy, bool mem, uint32_t reg, u
     uint32_t phase0, phase1;
     uint64_t val;
 
-    phase0 = mem ? OPCODE_MEM_WRITE32 : OPCODE_CONF_WRITE32;
+    phase0 = (uint32_t)(mem ? OPCODE_MEM_WRITE32 : OPCODE_CONF_WRITE32);
     phase0 |= BYTE_ENABLES_32 | SRCID_PROTO_STACK0_ACCESS;
 
     R_UCIE_RegWrite32(channel, APB_BRIDGE_CTL0, phase0);
 
-    phase1 = phy ? DSTID_PHY_STACK_ACCESS : DSTID_PROTO_STACK_ACCESS;
+    phase1 = (uint32_t)(phy ? DSTID_PHY_STACK_ACCESS : DSTID_PROTO_STACK_ACCESS);
     phase1 |= reg;
 
     val = ((uint64_t)phase1 << 32) | phase0;

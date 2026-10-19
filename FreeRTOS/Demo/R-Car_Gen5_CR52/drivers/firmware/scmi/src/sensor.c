@@ -596,7 +596,7 @@ int scmi_sensor_reading_get(uint32_t sensor_id,
         } req;
 
         req.sensor_id = sensor_id;
-        req.flags = async_read ? SCMI_SENSOR_READING_GET_ASYNC_BIT : 0u;
+        req.flags = async_read ? (uint32_t)SCMI_SENSOR_READING_GET_ASYNC_BIT : 0u;
 
         msg.hdr = SCMI_MESSAGE_HDR_MAKE(SCMI_SENSOR_MSG_SENSOR_READING_GET,
                            SCMI_COMMAND, proto->id, 0x0);

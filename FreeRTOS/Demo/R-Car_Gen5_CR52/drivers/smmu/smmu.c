@@ -544,7 +544,7 @@ static st_smmu_ste_t* smmu_alloc_l2ste(e_smmu_domain_t smmu_domain, bool is_secu
     
     (void)memset(l2ste_tbl, 0, l2_tbl_size);
 
-    (l1ste_tbl + l1ste_idx)->l2tbl_base = (uintptr_t)l2ste_tbl >> 6;
+    (l1ste_tbl + l1ste_idx)->l2tbl_base = (uint64_t)l2ste_tbl >> 6;
     (l1ste_tbl + l1ste_idx)->span = split + 1;
     __DSB();
     return l2ste_tbl;
@@ -578,7 +578,7 @@ static st_smmu_ste_t* smmu_init_ste(st_smmu_streamid_instance_ctrl_t *p_ctrl){
     log2size = smmu_strtab_cfg->LOG2SIZE;
     split = smmu_strtab_cfg->SPLIT;
 
-    stream_id_bits = MAX_L1STE_BITS + split;
+    stream_id_bits = (uint32_t)MAX_L1STE_BITS + (uint32_t)split;
     stream_id_bits = log2size < stream_id_bits ? log2size : stream_id_bits;
     if (stream_id > (((uint32_t)1 << stream_id_bits) - 1U)) {
         LogError(("Fail to init stream table entry. Stream id is too large\n"));
@@ -646,7 +646,7 @@ static st_smmu_cd_t* smmu_init_cd_table(st_smmu_streamid_instance_ctrl_t *p_ctrl
     cd_tbl->had0 = CTXDESC_CD_HAD0_DIS;
     cd_tbl->mair0 = MAIR0_ATTR;
 
-    l2ste_ptr->s1cdptr = (uintptr_t)cd_tbl >> 6;
+    l2ste_ptr->s1cdptr = (uint64_t)cd_tbl >> 6;
 
     __DSB();
 
@@ -704,7 +704,7 @@ static void smmu_init_cmdq(e_smmu_domain_t smmu_domain, bool is_secure){
 
     // Initialize CMDQ_BASE
     cmdq.base_reg = (st_smmu_cmdq_base_t *)(base + SMMU_CMDQ_BASE_OFFSET);
-    cmdq_ptr = (uintptr_t)aligned_malloc(((uint32_t)1 << 12), SMMU_QUEUE_SIZE);
+    cmdq_ptr = (uint64_t)aligned_malloc(((uint32_t)1 << 12), SMMU_QUEUE_SIZE);
     cmdq.base_reg->ADDR = cmdq_ptr >> 5;
     cmdq.base_reg->LOG2SIZE = SMMU_QUEUE_LOG2SIZE;
     cmdq.base_reg->RA = 0;
@@ -731,7 +731,7 @@ static void smmu_init_evtq(e_smmu_domain_t smmu_domain, bool is_secure){
     }
     // Initialize EVTQ_BASE
     evtq.base_reg = (st_smmu_eventq_base_t *)(base + SMMU_EVTQ_BASE_OFFSET);
-    evtq_ptr = (uintptr_t)aligned_malloc(((uint32_t)1 << 12), SMMU_QUEUE_SIZE);
+    evtq_ptr = (uint64_t)aligned_malloc(((uint32_t)1 << 12), SMMU_QUEUE_SIZE);
     evtq.base_reg->ADDR = evtq_ptr >> 5;
     evtq.base_reg->LOG2SIZE = SMMU_QUEUE_LOG2SIZE;
     evtq.base_reg->WA = 0;

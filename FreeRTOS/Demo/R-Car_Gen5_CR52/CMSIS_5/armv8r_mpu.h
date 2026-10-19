@@ -324,7 +324,7 @@ static inline uint32_t ARM_MPU_Get_Number_Of_Regions(void) {
  */
 static inline void ARM_MPU_SetMAIR0Attr(uint8_t idx, uint8_t attr) {
 	const uint8_t pos = ((idx % 4U) * 8U);
-	const uint32_t mask = 0xFFU << pos;
+	const uint32_t mask = (uint32_t)0xFFU << pos;
  
 	uint32_t MAIRx_Value;
 	__get_CP(15, 0, MAIRx_Value, 10, 2, 0);
@@ -338,7 +338,7 @@ static inline void ARM_MPU_SetMAIR0Attr(uint8_t idx, uint8_t attr) {
  */
 static inline void ARM_MPU_SetMAIR1Attr(uint8_t idx, uint8_t attr) {
 	const uint8_t pos = ((idx % 4U) * 8U);
-	const uint32_t mask = 0xFFU << pos;
+	const uint32_t mask = (uint32_t)0xFFU << pos;
  
 	uint32_t MAIRx_Value;
 	__get_CP(15, 0, MAIRx_Value, 10, 2, 1);

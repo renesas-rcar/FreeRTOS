@@ -73,17 +73,17 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 		{
 			ssi_conf->cr_own &= ~(63u << 16);
 			ssi_conf->cr_own |= DWL_16;
-			reg_val = SWL_16;
+			reg_val = (uint32_t)SWL_16;
 			ssi_conf->cr_own = (p_cfg->format == STEREO_FORMAT) ? ssi_conf->cr_own | reg_val : ssi_conf->cr_own | (1u << 16);
 		}
 		else
 		{
 			ssi_conf->cr_own &= ~((uint32_t)63 << 16);
 			ssi_conf->cr_own |= DWL_32;
-			reg_val = SWL_32;
+			reg_val = (uint32_t)SWL_32;
 			ssi_conf->cr_own |= reg_val;
 		}
-		
+
 		if(p_cfg->mode == PLAYBACK_MODE)
 		{
 			audio_ssi_conf->playback = ssi_conf;
@@ -144,14 +144,14 @@ int r_ssi_config(st_audio_cfg_t const * const p_cfg)
 		{
 			ssi_conf->cr_own &= ~(63u << 16);
 			ssi_conf->cr_own |= DWL_16;
-			reg_val = SWL_16;
+			reg_val = (uint32_t)SWL_16;
 			ssi_conf->cr_own = (p_cfg->format == STEREO_FORMAT) ? ssi_conf->cr_own | reg_val : ssi_conf->cr_own | (1u << 16);
 		}
 		else
 		{
 			ssi_conf->cr_own &= ~(63u << 16);
 			ssi_conf->cr_own |= DWL_32;
-			reg_val = SWL_32;
+			reg_val = (uint32_t)SWL_32;
 			ssi_conf->cr_own |= reg_val;
 		}
 		

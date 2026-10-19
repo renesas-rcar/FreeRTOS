@@ -35,9 +35,9 @@
 /*
  * System word length
  */
-#define	SWL_16		(1u << 16)	/* R/W System Word Length */
+#define	SWL_16		(1UL << 16U)	/* R/W System Word Length */
 #define	SWL_24		(2 << 16)	/* R/W System Word Length */
-#define	SWL_32		(3u << 16)	/* R/W System Word Length */
+#define	SWL_32		(3UL << 16U)	/* R/W System Word Length */
 #define	SWL_48		(4 << 16)	/* R/W System Word Length */
 #define	SWL_64		(5 << 16)	/* R/W System Word Length */
 #define	SWL_128		(6 << 16)	/* R/W System Word Length */

@@ -15,10 +15,10 @@
 #include "logging_stack.h"
 
 #ifndef BIT
-#define BIT(x) (1U << (x))
+#define BIT(x) (1UL << (x))
 #endif
 
-#define BIT_CONVERT_TO_BYTE 8
+#define BIT_CONVERT_TO_BYTE 8U
 
 #define WCRC_MODULE 0
 #define CRC_MODULE  1
@@ -366,11 +366,11 @@ typedef enum e_wcrc_fifo_ports_use_rtdma
 #define CRC_POL_32_ETHERNET 0 //default CRC-32-IEEE 802.3
 #define CRC_POL_16_CCITT_FALSE_CRC16 BIT(0) //CCITT_FALSE_CRC16
 #define CRC_POL_8_SAE_J1850 BIT(1) //SAE_J1850
-#define CRC_POL_8_0X2F (3U << 0) // 0x2F polynomial
+#define CRC_POL_8_0X2F 3U // 0x2F polynomial
 #define CRC_POL_32_0XF4ACFB13 BIT(2) //0xF4ACFB13 polynomial
-#define CRC_POL_32_0X1EDC6F41 (5U << 0) //0x1EDC6F41 polynomial CRC-32 (Castagnoli)
-#define CRC_POL_21_0X102899 (6U << 0) //0x102899 polynomial CRC-21
-#define CRC_POL_17_0X1685B (7U << 0) //0x1685B polynomial CRC-17
+#define CRC_POL_32_0X1EDC6F41 5U //0x1EDC6F41 polynomial CRC-32 (Castagnoli)
+#define CRC_POL_21_0X102899 6U //0x102899 polynomial CRC-21
+#define CRC_POL_17_0X1685B 7U //0x1685B polynomial CRC-17
 #define CRC_POL_15_0X4599 BIT(3) //0x4599 polynomial CRC-15
 
 /* CRC[m] Control register 2 */
@@ -401,15 +401,15 @@ typedef enum e_wcrc_fifo_ports_use_rtdma
 
 /* KCRC[m] control register */
 #define KCRC_CTL 0x0090
-#define PSIZE_32 (31U << 16) //default 32-bit
-#define PSIZE_16 (15U << 16) //16-bit
-#define PSIZE_8 (7U << 16) //8-bit
+#define PSIZE_32 (31UL << 16U) //default 32-bit
+#define PSIZE_16 (15UL << 16U) //16-bit
+#define PSIZE_8 (7UL << 16U) //8-bit
 #define CMD0 BIT(8) //0: Mode N (Normal), 1: Mode R (output reflect)
 #define CMD1 BIT(5) //0: Mode N (Normal), 1: Mode R (input reflect)
 #define CMD2 BIT(4) //0: Mode M (MSB shift), 1: Mode R (LSB shift)
-#define DW_32   ((0x1FU) << 16)  //default 32-bit fix mode
-#define DW_16   ((0xFU)  << 16)  //16-bit fix mode
-#define DW_8    ((0x7U)  << 16)  //8-bit fix mode
+#define DW_32   (0x1FUL << 16U)  //default 32-bit fix mode
+#define DW_16   (0xFUL  << 16U)  //16-bit fix mode
+#define DW_8    (0x7UL  << 16U)  //8-bit fix mode
 
 /* KCRC[m] Polynomial register */
 #define KCRC_POLY 0x00A0
@@ -966,13 +966,13 @@ static int get_width_input(wcrc_sub_module_t module, wcrc_cfg_t const * const p_
     /* Get each data size in byte */
     switch(p_input_cfg->bit_width) {
     case WIDTH_8_BIT:
-        each_data_size = 8 / BIT_CONVERT_TO_BYTE;
+        each_data_size = (uint32_t)8U / BIT_CONVERT_TO_BYTE;
         break;
     case WIDTH_16_BIT:
-        each_data_size = 16 / BIT_CONVERT_TO_BYTE;
+        each_data_size = (uint32_t)16U / BIT_CONVERT_TO_BYTE;
         break;
     case WIDTH_32_BIT:
-        each_data_size = 32 / BIT_CONVERT_TO_BYTE;
+        each_data_size = (uint32_t)32U / BIT_CONVERT_TO_BYTE;
         break;
     default:
         LogError(("%s: Input bit width INVALID\n", __func__));

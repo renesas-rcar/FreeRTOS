@@ -58,7 +58,7 @@ typedef int32_t IRQn_ID_t;
 
 #define IRQ_MODE_TYPE_Pos           (3U)
 #define IRQ_MODE_TYPE_Msk           (0x01UL << IRQ_MODE_TYPE_Pos)
-#define IRQ_MODE_TYPE_IRQ           (0x00UL << IRQ_MODE_TYPE_Pos)     ///< Type: interrupt source triggers CPU IRQ line
+#define IRQ_MODE_TYPE_IRQ           (0x00UL)                          ///< Type: interrupt source triggers CPU IRQ line
 #define IRQ_MODE_TYPE_FIQ           (0x01UL << IRQ_MODE_TYPE_Pos)     ///< Type: interrupt source triggers CPU FIQ line
 
 #define IRQ_MODE_DOMAIN_Pos         (4U)
