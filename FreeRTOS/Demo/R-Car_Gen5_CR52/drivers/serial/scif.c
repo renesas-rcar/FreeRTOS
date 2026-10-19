@@ -87,14 +87,14 @@ static uint32_t scif_base;
 #define SCLSR_TO        BIT(2)  /* Timeout */
 #define SCLSR_ORER      BIT(0)  /* Overrun Error */
 
-#define HSCIF_DL_DIV1           (uint16_t)(1U << 0U)
+#define HSCIF_DL_DIV1           (uint16_t)1U
 #define HSCIF_CKS_CKS           (uint16_t)(1U << 15U)
 #define HSCIF_CKS_XIN           (uint16_t)(1U << 14U)
 #define HSCIF_CKS_SC_CLK_EXT    ~((uint16_t)(HSCIF_CKS_CKS | HSCIF_CKS_XIN))
 
 #define HSCIF_HSSRR_SRE         (uint16_t)(1U << 15U)
-#define HSCIF_HSSRR_SRCYC       (uint16_t)(0x1FU << 0U)
-#define HSCIF_HSSRR_SRCYC8      (uint16_t)(7U << 0U)    /* Sampling rate 8-1 */
+#define HSCIF_HSSRR_SRCYC       (uint16_t)0x1FU
+#define HSCIF_HSSRR_SRCYC8      (uint16_t)7U    /* Sampling rate 8-1 */
 #define HSCIF_HSSRR_VAL         (uint16_t)(HSCIF_HSSRR_SRE | HSCIF_HSSRR_SRCYC8)
 
 static uint8_t is_log_enable = SCIF_LOG_STATE_ON;

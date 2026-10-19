@@ -52,7 +52,7 @@ tau_clock_t * taud_pwm_set_clk(uint8_t unit, uint32_t freq_hz)
             clk_set = &tau_clock[ck_index];
             for (uint8_t presc = 0; presc <= TAUD_PRESCALER_MAX; presc++)
             {
-                clk_set->clk_value = scpbusd8_scp_main / (uint32_t)(1U << presc); 
+                clk_set->clk_value = scpbusd8_scp_main / ((uint32_t)1U << presc);
                 if(clk_set->clk_value / freq_hz < TAUD_COUNTER_MAX_TICKS)
                 {
                     clk_set->clk_src = ck_index;

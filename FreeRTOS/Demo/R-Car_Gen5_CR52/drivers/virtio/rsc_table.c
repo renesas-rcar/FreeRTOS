@@ -12,6 +12,7 @@
  * for use by the Linux host
  */
 
+#include <stdint.h>
 #include <openamp/open_amp.h>
 #include "rsc_table.h"
 
@@ -194,19 +195,19 @@ void init_resource_table(uint8_t src_index)
     switch (src_index )
     {
     case 0:
-        len = (size_t)(&__resource_table_end - &__resource_table_start);
+        len = (uintptr_t)&__resource_table_end - (uintptr_t)&__resource_table_start;
 
         (void)memcpy((void *)&__resource_table_start, &resources_data, len);
         break;
 
     case 1:
-        len = (size_t)(&__resource_table1_end - &__resource_table1_start);
+        len = (uintptr_t)&__resource_table1_end - (uintptr_t)&__resource_table1_start;
 
         (void)memcpy((void *)&__resource_table1_start, &resources_data, len);
         break;
 
     case 2:
-        len = (size_t)(&__resource_table2_end - &__resource_table2_start);
+        len = (uintptr_t)&__resource_table2_end - (uintptr_t)&__resource_table2_start;
 
         (void)memcpy((void *)&__resource_table2_start, &resources_data, len);
         break;
@@ -221,19 +222,19 @@ void *get_resource_table(int rsc_id, int *len)
     switch (rsc_id )
     {
     case 0:
-    *len = (int)(&__resource_table_end - &__resource_table_start);
+    *len = (uintptr_t)&__resource_table_end - (uintptr_t)&__resource_table_start;
 
     return (void *)&__resource_table_start;
         break;
 
     case 1:
-        *len = (int)(&__resource_table1_end - &__resource_table1_start);
+        *len = (uintptr_t)&__resource_table1_end - (uintptr_t)&__resource_table1_start;
 
         return (void *)&__resource_table1_start;
         break;
     
     case 2:
-        *len = (int)(&__resource_table2_end - &__resource_table2_start);
+        *len = (uintptr_t)&__resource_table2_end - (uintptr_t)&__resource_table2_start;
 
         return (void *)&__resource_table2_start;
         break;
