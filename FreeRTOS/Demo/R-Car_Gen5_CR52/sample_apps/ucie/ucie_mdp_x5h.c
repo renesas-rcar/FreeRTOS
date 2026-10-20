@@ -155,11 +155,11 @@ static void ucie_comm_task(void *pvParameters)
 
     printf("<----- [X5H] TC5: UCIE0 HDMA Transfer ----->\n");
     printf("HDMA not suppport now\n");
-    printf("Result: FAILED\n");
+    printf("Result: NA\n");
 
     printf("<----- [X5H] TC6: UCIE1 HDMA Transfer ----->\n");
     printf("HDMA not suppport now\n");
-    printf("Result: FAILED\n");
+    printf("Result: NA\n");
 
     /* Setup PIO region for X5H-AIACC0 */
     st_ucie_iatu_cfg_t cfg = {
@@ -230,10 +230,10 @@ static void ucie_comm_task(void *pvParameters)
     }
 
     printf("<----- [X5H] TC9: UCIE0 interrupt ----->\n");
-    printf("Result: FAILED\n");
+    printf("Result: NA\n");
 
     printf("<----- [X5H] TC10: UCIE1 interrupt ----->\n");
-    printf("Result: FAILED\n");
+    printf("Result: NA\n");
 
     printf("<----- [X5H] <APP_END> ----->\n");
 

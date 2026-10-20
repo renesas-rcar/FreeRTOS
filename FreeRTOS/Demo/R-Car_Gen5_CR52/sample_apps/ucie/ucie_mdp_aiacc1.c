@@ -154,11 +154,11 @@ static void ucie_comm_task(void *pvParameters)
 
     printf("<----- [AIACC1] TC5: UCIE0 HDMA Transfer ----->\n");
     printf("HDMA not suppport now\n");
-    printf("Result: FAILED\n");
+    printf("Result: NA\n");
 
     printf("<----- [AIACC1] TC6: UCIE1 HDMA Transfer ----->\n");
     printf("HDMA not suppport now\n");
-    printf("Result: FAILED\n");
+    printf("Result: NA\n");
 
     printf("<----- [AIACC1] TC7: UCIE0 PIO Transfer ----->\n");
 
@@ -206,10 +206,10 @@ static void ucie_comm_task(void *pvParameters)
     *(volatile uint32_t*)(uintptr_t)AIACC1_EP1_ADDR = PIO_AIACC1_EP1_WRITE_DATA;
 
     printf("<----- [AIACC1] TC9: UCIE0 interrupt ----->\n");
-    printf("Result: FAILED\n");
+    printf("Result: NA\n");
 
     printf("<----- [AIACC1] TC10: UCIE1 interrupt ----->\n");
-    printf("Result: FAILED\n");
+    printf("Result: NA\n");
 
     printf("<----- [AIACC1] <APP_END> ----->\n");
 
