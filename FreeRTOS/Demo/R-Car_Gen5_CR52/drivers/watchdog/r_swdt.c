@@ -54,19 +54,19 @@ uint8_t R_SWDT_Init(uint8_t timeout_sec) {
     clock_id = SWDT_CLK_ID;
     ret = R_StateManager_ClockOn(clock_id);
     if (ret != 0U) {
-        LogDebug(("Error: Failed to turn clock ID %d ON.\r\n", clock_id));
+        LogError(("Failed to turn clock ID %d ON.\r\n", clock_id));
     }
 
     reset_id_0 = SWDT0_RST_ID;
     ret = R_StateManager_Reset(reset_id_0);
     if (ret != 0U) {
-        LogDebug(("Error: Failed to reset id %d ON.\r\n", reset_id_0));
+        LogError(("Failed to reset id %d ON.\r\n", reset_id_0));
     }
 
     reset_id_1 = SWDT1_RST_ID;
     ret = R_StateManager_Reset(reset_id_1);
     if (ret != 0U) {
-        LogDebug(("Error: Failed to reset id %d ON.\r\n", reset_id_1));
+        LogError(("Failed to reset id %d ON.\r\n", reset_id_1));
     }
 
     /* for SWDT */

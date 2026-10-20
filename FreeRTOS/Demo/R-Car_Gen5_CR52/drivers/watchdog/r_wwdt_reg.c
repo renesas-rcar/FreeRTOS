@@ -38,7 +38,7 @@ extern uintptr_t R_WWDT_PRV_GetRegbase(wwdt_unit_t unit)
     if ((uint32_t)unit < WWDT_CH_NUM) {
         ret = wwdt_base_tbl[(uint32_t)unit];
     } else {
-        LogDebug(("[R_WWDT_PRV_GetRegbase] : Wrong WWDT Unit %d\r\n", unit));
+        LogError(("[R_WWDT_PRV_GetRegbase] : Wrong WWDT Unit %d\r\n", unit));
     }
 
     return ret;

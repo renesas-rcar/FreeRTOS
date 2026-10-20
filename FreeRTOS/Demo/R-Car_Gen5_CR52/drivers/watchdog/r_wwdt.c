@@ -66,14 +66,14 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
     int clock_id, clock_id_0, clock_id_1, ret;
 
     if ((uint32_t)unit >= WWDT_CH_NUM) {
-        LogDebug(("Wrong Unit for Clock ID\n"));
+        LogError(("Wrong Unit for Clock ID\n"));
         return;
     }
 
     clock_id = WWDT_CLK_ID;
     ret = R_StateManager_ClockOn(clock_id);
     if (ret != 0) {
-        LogDebug(("Error: Failed to set clock id %d ON.\r\n", clock_id));
+        LogError(("Failed to set clock id %d ON.\r\n", clock_id));
     }
 
     clock_id_0 = wwdt_clock_tbl[unit].clock_id_0;
@@ -81,22 +81,22 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
 
     ret = R_StateManager_ResetAssert(clock_id_0);
     if (ret != 0) {
-        LogDebug(("Error: Failed to reset clock id %d.\r\n", clock_id_0));
+        LogError(("Failed to reset clock id %d.\r\n", clock_id_0));
     }
 
     ret = R_StateManager_ResetAssert(clock_id_1);
     if (ret != 0) {
-        LogDebug(("Error: Failed to reset clock id %d.\r\n", clock_id_1));
+        LogError(("Failed to reset clock id %d.\r\n", clock_id_1));
     }
 
     ret = R_StateManager_ResetDeassert(clock_id_0);
     if (ret != 0) {
-        LogDebug(("Error: Failed to DeassertReset clock id %d.\r\n", clock_id_0));
+        LogError(("Failed to DeassertReset clock id %d.\r\n", clock_id_0));
     }
 
     ret = R_StateManager_ResetDeassert(clock_id_1);
     if (ret != 0) {
-        LogDebug(("Error: Failed to DeassertReset clock id %d.\r\n", clock_id_1));
+        LogError(("Failed to DeassertReset clock id %d.\r\n", clock_id_1));
     }
 
     clk_rate = (wwdt_base_addr == 0xC1380000) ? CLK_LSIOSC : RCLK;
