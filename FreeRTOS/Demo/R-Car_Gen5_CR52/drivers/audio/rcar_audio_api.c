@@ -22,7 +22,7 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 
 	if((audio_ssi_conf != NULL))
 	{
-		LogDebug(("SSI has already been initialized!\n"));
+		LogError(("SSI has already been initialized!\n"));
 		return -1;
 	}
 
@@ -32,13 +32,13 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 		
 		if(audio_ssi_conf == NULL)
 		{
-			LogDebug(("Can't allocate audio_ssi_conf!\n"));
+			LogError(("Can't allocate audio_ssi_conf!\n"));
 			return -1;
 		}
 		ssi_conf_t *ssi_conf = (ssi_conf_t *)malloc(sizeof(ssi_conf_t));
 		if(ssi_conf == NULL)
 		{
-			LogDebug(("Can't allocate ssi_conf!\n"));
+			LogError(("Can't allocate ssi_conf!\n"));
 			free(audio_ssi_conf);
 			return -1;
 		}
@@ -58,7 +58,7 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 		}
 		else
 		{
-			LogDebug(("Invalid number of channels!\n"));
+			LogError(("Invalid number of channels!\n"));
 			free(ssi_conf);
 			free(audio_ssi_conf);
 			return -1;
@@ -99,7 +99,7 @@ int r_ssi_init(st_audio_cfg_t const * const p_cfg)
 	}
 	else
 	{
-		LogDebug(("Unsupported mode!\n"));
+		LogError(("Unsupported mode!\n"));
 	}
 
 	return 0;
@@ -113,7 +113,7 @@ int r_ssi_config(st_audio_cfg_t const * const p_cfg)
 		ssi_conf_t *ssi_conf = audio_ssi_conf->playback != NULL ? audio_ssi_conf->playback : audio_ssi_conf->capture;
 		if(ssi_conf == NULL)
 		{
-			LogDebug(("Can't find playback / capture config!\n"));
+			LogError(("Can't find playback / capture config!\n"));
 			return -1;
 		}
 
@@ -131,7 +131,7 @@ int r_ssi_config(st_audio_cfg_t const * const p_cfg)
 		}
 		else
 		{
-			LogDebug(("Invalid number of channels!\n"));
+			LogError(("Invalid number of channels!\n"));
 			return -1;
 		}
 
@@ -159,7 +159,7 @@ int r_ssi_config(st_audio_cfg_t const * const p_cfg)
 	}
 	else
 	{
-		LogDebug(("Unsupported mode!\n"));
+		LogError(("Unsupported mode!\n"));
 	}
 
 	return 0;
@@ -169,13 +169,13 @@ int r_adg_init(st_audio_cfg_t const * const p_cfg)
 {
 	if((audio_adg_conf != NULL))
 	{
-		LogDebug(("ADG has already been initialized!\n"));
+		LogError(("ADG has already been initialized!\n"));
 		return -1;
 	}
 	audio_adg_conf = (adg_conf_t *)malloc(sizeof(adg_conf_t));
 	if(audio_adg_conf == NULL)
 	{
-		LogDebug(("Can't allocate audio_adg_conf!\n"));
+		LogError(("Can't allocate audio_adg_conf!\n"));
 		return -1;
 	}
 	audio_adg_conf->word_size = p_cfg->bit_depth;
@@ -187,7 +187,7 @@ int r_adg_init(st_audio_cfg_t const * const p_cfg)
 	}	
 	else
 	{
-		LogDebug(("This sample rate is currently not supported!\n"));
+		LogError(("This sample rate is currently not supported!\n"));
 		return -1;
 	}
 	
@@ -199,7 +199,7 @@ int r_ssi_start(st_audio_cfg_t const * const p_cfg)
 {
 	if(audio_ssi_conf == NULL)
 	{
-		LogDebug(("SSI module hasn't been initialized!\n"));
+		LogError(("SSI module hasn't been initialized!\n"));
 		return -1;
 	}
 	if(p_cfg->mode <= CAPTURE_MODE)
@@ -209,7 +209,7 @@ int r_ssi_start(st_audio_cfg_t const * const p_cfg)
 	}
 	else
 	{
-		LogDebug(("Unknow format!\n"));
+		LogError(("Unknow format!\n"));
 		return -1;
 	}
 	return 0;
@@ -219,7 +219,7 @@ int r_ssi_trans(uint32_t data)
 {
 	if(audio_ssi_conf == NULL)
 	{
-		LogDebug(("SSI module hasn't been initialized!\n"));
+		LogError(("SSI module hasn't been initialized!\n"));
 		return -1;
 	}
 	ssi_conf_t *ssi_conf = audio_ssi_conf->playback;
@@ -231,7 +231,7 @@ int r_ssi_stop(st_audio_cfg_t const * const p_cfg)
 {
 	if(audio_ssi_conf == NULL)
 	{
-		LogDebug(("SSI module hasn't been initialized!\n"));
+		LogError(("SSI module hasn't been initialized!\n"));
 		return -1;
 	}
 	if(p_cfg->mode <= CAPTURE_MODE)
@@ -241,7 +241,7 @@ int r_ssi_stop(st_audio_cfg_t const * const p_cfg)
 	}
 	else
 	{
-		LogDebug(("Unknow format!\n"));
+		LogError(("Unknow format!\n"));
 		return -1;
 	}
 	return 0;
@@ -261,7 +261,7 @@ int r_ak4619_init(st_audio_cfg_t const * const p_cfg)
 	}
 	else
 	{
-		LogDebug(("Unsupported this sample rate\n"));
+		LogError(("Unsupported this sample rate\n"));
 		return -1;
 	}
 
@@ -269,7 +269,7 @@ int r_ak4619_init(st_audio_cfg_t const * const p_cfg)
 	res = ak4619_power_on();
     if (res != 0)
     {
-        LogDebug(("Can not setup AK4619\n"));
+        LogError(("Can not setup AK4619\n"));
     }
     vTaskDelay(pdMS_TO_TICKS(10)); // delay 10ms
     // After this, PMDA1 bit = RSTN bit = 0, at reset state -> let config register after this state
@@ -286,7 +286,7 @@ int r_ak4619_init(st_audio_cfg_t const * const p_cfg)
     res = ak4619_module_init(&instance_set, 2, 16);
     if (res != 0)
     {
-        LogDebug(("Can not setup AK4619 module\n"));
+        LogError(("Can not setup AK4619 module\n"));
     }
  
 	return res;
@@ -302,7 +302,7 @@ int r_audio_clock_on(void)
 
         if (res != 0)
         {
-            LogDebug(("Error: Failed to set clock id %d ON.\r\n",
+            LogError(("Failed to set clock id %d ON.\r\n",
                    audio_clock_domain_id[i]));
             break;
         }
@@ -321,7 +321,7 @@ int r_audio_clock_off(void)
 
         if (res != 0)
         {
-            LogDebug(("Error: Failed to set clock id %d OFF.\r\n",
+            LogError(("Failed to set clock id %d OFF.\r\n",
                    audio_clock_domain_id[i]));
             break;
         }

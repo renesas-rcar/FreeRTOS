@@ -19,21 +19,21 @@ int R_Audio_Init(st_audio_instance_ctrl_t * const p_instance_ctrl, st_audio_cfg_
 	ret = r_audio_clock_on();
 	if(ret < 0)
 	{
-		LogDebug(("Can't turn on clock for Audio driver!\n"));
+		LogError(("Can't turn on clock for Audio driver!\n"));
 		return ret;
 	}
 
 	ret = r_ak4619_init(p_cfg);
 	if(ret < 0)
 	{
-		LogDebug(("Can't set up AK4619 for Audio driver!\n"));
+		LogError(("Can't set up AK4619 for Audio driver!\n"));
 		return ret;
 	}
 	
 	ret = r_adg_init(p_cfg);
 	if(ret < 0)
 	{
-		LogDebug(("Can't init ADG module!\n"));
+		LogError(("Can't init ADG module!\n"));
 		return ret;
 	}
 	
@@ -43,13 +43,13 @@ int R_Audio_Init(st_audio_instance_ctrl_t * const p_instance_ctrl, st_audio_cfg_
 	}
 	else
 	{
-		LogDebug(("This mode is currently not supported!\n"));
+		LogError(("This mode is currently not supported!\n"));
 		ret = -1;
 	}
 	
 	if(ret < 0)
 	{
-		LogDebug(("Can't init SSI module!\n"));
+		LogError(("Can't init SSI module!\n"));
 		return ret;
 	}
 	
@@ -62,13 +62,13 @@ int R_Audio_Start(st_audio_instance_ctrl_t * const p_instance_ctrl, const uint8_
 	int i;
 	if(p_instance_ctrl->p_cfg == NULL)
 	{
-		LogDebug(("p_instance_ctrl->p_cfg = NULL!\n"));
+		LogError(("p_instance_ctrl->p_cfg = NULL!\n"));
 		return -1;
 	}
 	ret = r_ssi_start((st_audio_cfg_t*)(p_instance_ctrl->p_cfg));
 	if(ret < 0)
 	{
-		LogDebug(("Start audio failed!\n"));
+		LogError(("Start audio failed!\n"));
 		return ret;
 	}
 
@@ -102,7 +102,7 @@ int R_Audio_Start(st_audio_instance_ctrl_t * const p_instance_ctrl, const uint8_
 			}
 			else
 			{
-				LogDebug(("Unsupported format!\n"));
+				LogError(("Unsupported format!\n"));
 				return -1;
 			}
 		}
@@ -125,24 +125,24 @@ int R_Audio_Start(st_audio_instance_ctrl_t * const p_instance_ctrl, const uint8_
 			}
 			else
 			{
-				LogDebug(("Unsupported format!\n"));
+				LogError(("Unsupported format!\n"));
 				return -1;
 			}
 		}
 		else
 		{
-			LogDebug(("Unsupported word size!\n"));
+			LogError(("Unsupported word size!\n"));
 			return -1;
 		}
 	}
 	else if(((st_audio_cfg_t*)(p_instance_ctrl->p_cfg))->mode == CAPTURE_MODE)
 	{
-		LogDebug(("This mode is currently not supported!\n"));
+		LogError(("This mode is currently not supported!\n"));
 		ret = -1;
 	}
 	else
 	{
-		LogDebug(("Unknow mode!\n"));
+		LogError(("Unknow mode!\n"));
 		ret = -1;
 	}
 	
@@ -154,7 +154,7 @@ int R_Audio_Stop(st_audio_instance_ctrl_t * const p_instance_ctrl)
 	int ret;
 	if(p_instance_ctrl->p_cfg == NULL)
 	{
-		LogDebug(("p_instance_ctrl->p_cfg = NULL!\n"));
+		LogError(("p_instance_ctrl->p_cfg = NULL!\n"));
 		return -1;
 	}
 	ret = r_ssi_stop((st_audio_cfg_t*)(p_instance_ctrl->p_cfg));
@@ -171,14 +171,14 @@ int R_Audio_Config(st_audio_instance_ctrl_t * const p_instance_ctrl)
 	}
 	else
 	{
-		LogDebug(("This mode is currently not supported!\n"));
+		LogError(("This mode is currently not supported!\n"));
 		ret = -1;
 	}
 	
 	
 	if(ret < 0)
 	{
-		LogDebug(("Can't config SSI module!\n"));
+		LogError(("Can't config SSI module!\n"));
 		return ret;
 	}
 	return ret;
