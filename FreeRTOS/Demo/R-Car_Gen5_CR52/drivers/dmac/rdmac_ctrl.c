@@ -12,7 +12,8 @@
  #include "dmac_ctrl_common.h"
  #include "r_rtdma_private.h"
  
- extern int printf_delay(const char *format, ...);
+/* Logging Function include. */
+#include "logging_stack.h"
  
  /* Return code of API */
  #define drv_OK                                (0U)    /* API completed without any error. */
@@ -35,7 +36,7 @@ uint16_t R_RTDMAC_RcarDmacExec(DMAC_t dev, uint8_t ch, rDmacCfg_t *cfg, rDmacDes
 
     Value = R_DMAC_RcarDmacExec(dev, ch, cfg, descCfg);
     if (Value != 0U) {
-        (void)printf_delay("RTDMAC execution failed\n");
+        LogError(("RTDMAC execution failed\n"));
         return Value;
     }
 
@@ -49,7 +50,7 @@ uint16_t R_RTDMAC_RcarDmacExec(DMAC_t dev, uint8_t ch, rDmacCfg_t *cfg, rDmacDes
  
      Value = R_DMAC_RcarDmacStop(dev, ch);
      if (Value != 0U) {
-         (void)printf_delay("RTDMAC stop failed\n");
+        LogError(("RTDMAC stop failed\n"));
          return Value;
      }
      
@@ -64,7 +65,7 @@ uint16_t R_RTDMAC_RcarCallBackSet(dmac_ctrl_t * const p_ctrl, void ( *p_callback
     Value = R_DMAC_RcarCallBackSet(p_ctrl, p_callback, p_context);
 
     if (Value != 0U) {
-        (void)printf_delay("RTDMAC IRQ callback failed\n");
+        LogError(("RTDMAC IRQ callback failed\n"));
         return Value;
     }
 

@@ -15,9 +15,6 @@
 /* Logging Function include. */
 #include "logging_stack.h"
 
-/* Logging Function include. */
-#include "logging_stack.h"
-
 #ifndef BIT
 #define BIT(x) (1U << (x))
 #endif
@@ -434,7 +431,7 @@ static uint32_t getRegister(uint8_t module, wcrc_unit_t unit, uint32_t offset)
 
     if (unit < WCRC_00 || unit > WCRC_10)
     {
-        LogDebug(("WCRC unit %d not exist!\n", unit));
+        LogError(("WCRC unit %d not exist!\n", unit));
         return 0;
     }
 
@@ -517,7 +514,7 @@ int wcrcSetMode(wcrc_instance_ctrl_t * const p_instance_ctrl)
         case COMPARING_CRC_RESULT_MODE:
             break;
         default:
-            LogDebug(("%s: mode not exist!\n", __func__));
+            LogError(("%s: mode not exist!\n", __func__));
             ret = -1;
             break;
     }
@@ -549,7 +546,7 @@ static int wcrcPrepareIndependentCrcMode(wcrc_instance_ctrl_t * const p_instance
             ret |= kcrc_setting(unit, p_kcrc_cfg);
             break;
         default:
-            LogDebug(("%s: Invalid module\n", __func__));
+            LogError(("%s: Invalid module\n", __func__));
             ret = -1;
             break;
     }
@@ -586,7 +583,7 @@ int wcrcStart(wcrc_instance_ctrl_t * const p_instance_ctrl)
         case COMPARING_CRC_RESULT_MODE:
             break;
         default:
-            LogDebug(("%s: mode not exist!\n", __func__));
+            LogError(("%s: mode not exist!\n", __func__));
             ret = -1;
             break;
     }
@@ -616,7 +613,7 @@ static int wcrcStartIndependentCrcMode(wcrc_instance_ctrl_t * const p_instance_c
             ret |= kcrc_start(unit, p_kcrc_input, p_kcrc_data);
             break;
         default:
-            LogDebug(("%s: Invalid module\n", __func__));
+            LogError(("%s: Invalid module\n", __func__));
             ret = -1;
             break;
     }
@@ -632,7 +629,7 @@ int wcrc_set_callback(wcrc_sub_module_t module, wcrc_instance_ctrl_t * const p_i
     if (module != CRC_SUB_MODULE &&
         module != KCRC_SUB_MODULE) {
         ret = -1;
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         return ret;
     }
 
@@ -646,7 +643,7 @@ int wcrc_set_callback(wcrc_sub_module_t module, wcrc_instance_ctrl_t * const p_i
     p_instance_ctrl->p_context[module]  = pvPortMalloc(sizeof(Context_t) * E2E_CRC_USE_2_DMA_CHAN);
 
     if (p_instance_ctrl->p_context[module] == NULL) {
-        LogDebug(("%s: Allocate p_context FAILED!", __func__));
+        LogError(("%s: Allocate p_context FAILED!", __func__));
         return -1;
     }
 
@@ -732,7 +729,7 @@ static int wcrcStartE2eCrcMode(wcrc_instance_ctrl_t * const p_instance_ctrl)
             ret |= wcrc_start_e2e(p_instance_ctrl, KCRC_SUB_MODULE);
             break;
         default:
-            LogDebug(("%s: Invalid module\n", __func__));
+            LogError(("%s: Invalid module\n", __func__));
             ret = -1;
             break;
     }
@@ -760,7 +757,7 @@ static int wcrc_start_data_through(wcrc_instance_ctrl_t * const p_instance_ctrl,
     p_instance_ctrl->p_context[module]  = pvPortMalloc(sizeof(Context_t) * num_chan);
 
     if (p_instance_ctrl->p_context[module] == NULL) {
-        LogDebug(("%s: Allocate p_context FAILED!", __func__));
+        LogError(("%s: Allocate p_context FAILED!", __func__));
         return -1;
     }
 
@@ -846,7 +843,7 @@ static int wcrcStartDataThrough(wcrc_instance_ctrl_t * const p_instance_ctrl)
                                  p_callback, p_context);
             break;
         default:
-            LogDebug(("%s: Invalid module\n", __func__));
+            LogError(("%s: Invalid module\n", __func__));
             ret = -1;
             break;
     }
@@ -872,18 +869,18 @@ static int wcrc_check_rtdma_config(uint8_t module, wcrc_cfg_t const * const p_cf
     }
 
     if (!p_rtdma_inst) {
-        LogDebug(("%s: p_rtdma_inst is NULL\n", __func__));
+        LogError(("%s: p_rtdma_inst is NULL\n", __func__));
         return -1;
     }
 
     if (num_rtdma_inst < rtdma_require) {
-        LogDebug(("%s: Require %d RTDMA channels\n", rtdma_require, __func__));
+        LogError(("%s: Require %d RTDMA channels\n", rtdma_require, __func__));
         return -1;
     }
 
     for (i = 0; i < rtdma_require; i++) {
         if (p_rtdma_inst[i] < RTDMA0_CH0 || p_rtdma_inst[i] > RTDMA3_CH15) {
-            LogDebug(("%s: p_rtdma_inst[%d] is out of range rtdma_inst_t\n", __func__, i));
+            LogError(("%s: p_rtdma_inst[%d] is out of range rtdma_inst_t\n", __func__, i));
             return -1;
         }
     }
@@ -902,14 +899,14 @@ static int wcrc_set_e2e_mode(uint8_t module, wcrc_cfg_t const * const p_cfg)
 
     if (module != CRC_SUB_MODULE &&
         module != KCRC_SUB_MODULE) {
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         ret = -1;
         return ret;
     }
 
     ret = wcrc_check_rtdma_config(module, p_cfg, E2E_CRC_USE_2_DMA_CHAN);
     if (ret != 0) {
-        LogDebug(("%s: Invalid rtdma_config\n", __func__));
+        LogError(("%s: Invalid rtdma_config\n", __func__));
         ret = -1;
         return ret;
     }
@@ -962,7 +959,7 @@ static int get_width_input(wcrc_sub_module_t module, wcrc_cfg_t const * const p_
     } else if (module == KCRC_SUB_MODULE) {
         p_input_cfg = &p_kcrc_cfg->input_cfg;
     } else {
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         each_data_size = 0;
         return each_data_size;
     }
@@ -979,7 +976,7 @@ static int get_width_input(wcrc_sub_module_t module, wcrc_cfg_t const * const p_
         each_data_size = 32 / BIT_CONVERT_TO_BYTE;
         break;
     default:
-        LogDebug(("%s: Input bit width INVALID\n", __func__));
+        LogError(("%s: Input bit width INVALID\n", __func__));
         each_data_size = 0;
         return each_data_size;
     }
@@ -1008,7 +1005,7 @@ int wcrcSetBufferAddress(uint8_t module, wcrc_instance_ctrl_t * const p_instance
         p_crc_data = &p_instance_ctrl->crc_data[KCRC_SUB_MODULE];
         break;
     default:
-        LogDebug(("%s: Module INVALID\n", __func__));
+        LogError(("%s: Module INVALID\n", __func__));
         ret = 1;
         return ret;
     }
@@ -1048,7 +1045,7 @@ int wcrcSetBufferAddress(uint8_t module, wcrc_instance_ctrl_t * const p_instance
     }
     else
     {
-        LogDebug(("%s: MODE INVALID\n", __func__));
+        LogError(("%s: MODE INVALID\n", __func__));
         ret = -1;
         return ret;
     }
@@ -1070,7 +1067,7 @@ int wcrcGetCrcSize(wcrc_sub_module_t module, wcrc_instance_ctrl_t * const p_inst
         ret = wcrc_get_crc_data_size(KCRC_SUB_MODULE, p_cfg, p_crc_size);
         break;
     default:
-        LogDebug(("%s: Module INVALID\n", __func__));
+        LogError(("%s: Module INVALID\n", __func__));
         ret = -1;
     }
 
@@ -1105,7 +1102,7 @@ static int wcrc_get_crc_data_size(wcrc_sub_module_t module, wcrc_cfg_t const * c
     } else if (module == KCRC_SUB_MODULE) {
         num_data_input = p_kcrc_cfg->input_cfg.num_data;
     } else {
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         ret = -1;
         crc_data_size = 0;
         *p_crc_size = crc_data_size;
@@ -1132,7 +1129,7 @@ static int wcrc_prepare_e2e(uint8_t module, wcrc_instance_ctrl_t * const p_insta
 
     if (module != CRC_SUB_MODULE &&
         module != KCRC_SUB_MODULE) {
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         return -1;
     }
 
@@ -1144,14 +1141,14 @@ static int wcrc_prepare_e2e(uint8_t module, wcrc_instance_ctrl_t * const p_insta
 
     ret                         = wcrc_get_crc_data_size(module, p_cfg, &crc_data_size);
     if (ret != 0) {
-        LogDebug(("%s: Get CRC size FAIL!\n", __func__));
+        LogError(("%s: Get CRC size FAIL!\n", __func__));
         return -1;
     }
 
     p_crc_data->num_data        = crc_data_size / get_width_input(module, p_cfg);
 
     if ((p_crc_data->num_data % NUM_DATA_ALIGN_AXI_BUS) != 0) {
-        LogDebug(("%s: Data not align on AXI BUS!\n", __func__));
+        LogError(("%s: Data not align on AXI BUS!\n", __func__));
         return -1;
     }
 
@@ -1159,7 +1156,7 @@ static int wcrc_prepare_e2e(uint8_t module, wcrc_instance_ctrl_t * const p_insta
     p_instance_ctrl->p_extend[module]    = pvPortMalloc(sizeof(wcrc_cfg_dma_t) * E2E_CRC_USE_2_DMA_CHAN);
 
     if (p_instance_ctrl->p_extend[module] == NULL) {
-        LogDebug(("%s: Allocate p_extend FAILED!", __func__));
+        LogError(("%s: Allocate p_extend FAILED!", __func__));
         return -1;
     }
 
@@ -1192,7 +1189,7 @@ static int wcrcPrepareE2eCrcMode(wcrc_instance_ctrl_t * const p_instance_ctrl)
             ret |= wcrc_prepare_e2e(KCRC_SUB_MODULE, p_instance_ctrl);
             break;
         default:
-            LogDebug(("%s: Invalid module\n", __func__));
+            LogError(("%s: Invalid module\n", __func__));
             ret = -1;
             return ret;
     }
@@ -1210,7 +1207,7 @@ static int wcrc_set_data_through_mode(uint8_t module, wcrc_cfg_t const * const p
 
     if (module != CRC_SUB_MODULE &&
         module != KCRC_SUB_MODULE) {
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         ret = -1;
         return ret;
     }
@@ -1240,7 +1237,7 @@ static int wcrc_prepare_data_through(uint8_t module, wcrc_instance_ctrl_t * cons
 
     if (module != CRC_SUB_MODULE &&
         module != KCRC_SUB_MODULE) {
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         return -1;
     }
 
@@ -1260,7 +1257,7 @@ static int wcrc_prepare_data_through(uint8_t module, wcrc_instance_ctrl_t * cons
     p_crc_data->p_output_buffer = pvPortMalloc(data_input_readback_size);
 
     if (p_crc_data->p_output_buffer == NULL) {
-        LogDebug(("%s: Allocate p_output_buffer FAILED!", __func__));
+        LogError(("%s: Allocate p_output_buffer FAILED!", __func__));
         return -1;
     }
 
@@ -1270,7 +1267,7 @@ static int wcrc_prepare_data_through(uint8_t module, wcrc_instance_ctrl_t * cons
     p_instance_ctrl->p_extend[module]    = pvPortMalloc(sizeof(wcrc_cfg_dma_t) * DATA_THROUGH_USE_2_DMA_CHAN);
 
     if (p_instance_ctrl->p_extend[module] == NULL) {
-        LogDebug(("%s: Allocate p_extend FAILED!", __func__));
+        LogError(("%s: Allocate p_extend FAILED!", __func__));
         return -1;
     }
 
@@ -1303,7 +1300,7 @@ static int wcrcPrepareDataThrough(wcrc_instance_ctrl_t * const p_instance_ctrl)
             ret |= wcrc_prepare_data_through(KCRC_SUB_MODULE, p_instance_ctrl);
             break;
         default:
-            LogDebug(("%s: Invalid module\n", __func__));
+            LogError(("%s: Invalid module\n", __func__));
             ret = -1;
             return ret;
     }
@@ -1485,7 +1482,7 @@ static uint32_t get_dma_int_id(uint32_t dma_unit_chan)
             int_id = INTID_RTDMA3_CH14; 
             break;
         default:
-            LogDebug(("%s: Invalid interrupt id\n", __func__));
+            LogError(("%s: Invalid interrupt id\n", __func__));
             int_id = 0;
             break;
     }
@@ -1514,7 +1511,7 @@ static int wcrc_get_dma_transf_unit_size_config(uint8_t transfer_size)
         config = DRV_RTDMAC_TRANS_UNIT_64BYTE;
         break;
     default:
-        LogDebug(("%s: Invalid transfer size %d\n", __func__, transfer_size));
+        LogError(("%s: Invalid transfer size %d\n", __func__, transfer_size));
         config = -1;
         break;
     }
@@ -1545,7 +1542,7 @@ static int wcrc_set_rtdma(uint8_t module, wcrc_instance_ctrl_t * const p_instanc
 
     if (module != CRC_SUB_MODULE &&
         module != KCRC_SUB_MODULE) {
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         return -1;
     }
 
@@ -1562,7 +1559,7 @@ static int wcrc_set_rtdma(uint8_t module, wcrc_instance_ctrl_t * const p_instanc
         num_rtdma_inst  = p_kcrc_cfg->num_rtdma_inst;
     }
     if (index > num_rtdma_inst) {
-        LogDebug(("%s: Invalid rtdma_inst_index %d\n", __func__, index));
+        LogError(("%s: Invalid rtdma_inst_index %d\n", __func__, index));
         return -1;
     }
 
@@ -1597,7 +1594,7 @@ static int wcrc_set_rtdma(uint8_t module, wcrc_instance_ctrl_t * const p_instanc
         p_wcrc_cfg_dma->cfg.mLowSpeed       = DRV_RTDMAC_SPEED_NORMAL;
         p_wcrc_cfg_dma->cfg.mPrioLevel      = 0;
     } else {
-        LogDebug(("%s: Invalid DMA Direction %d", __func__, dma_direction));
+        LogError(("%s: Invalid DMA Direction %d", __func__, dma_direction));
         return -1;
     }
 
@@ -1645,7 +1642,7 @@ int wcrcClose(wcrc_instance_ctrl_t * const p_instance_ctrl)
     }
     else
     {
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         return -1;
     }
 
@@ -1700,7 +1697,7 @@ static int crc_setting(wcrc_unit_t unit, crc_module_cfg_t const * const p_cfg)
         initial_set = COUT_15_0X4599;
         break;
     default:
-        LogDebug(("%s: Polynomial mode INVALID\n", __func__));
+        LogError(("%s: Polynomial mode INVALID\n", __func__));
         return -1;
     }
 
@@ -1716,7 +1713,7 @@ static int crc_setting(wcrc_unit_t unit, crc_module_cfg_t const * const p_cfg)
         bit_width_input = ISZ_32;
         break;
     default:
-        LogDebug(("%s: Input bit width INVALID\n", __func__));
+        LogError(("%s: Input bit width INVALID\n", __func__));
         return -1;
     }
 
@@ -1740,7 +1737,7 @@ static int crc_setting(wcrc_unit_t unit, crc_module_cfg_t const * const p_cfg)
         crc_features |= (unsigned int)byteswapmode_11;
         break;
     default:
-        LogDebug(("%s: Out ByteSwap INVALID\n", __func__));
+        LogError(("%s: Out ByteSwap INVALID\n", __func__));
         return -1;
     }
 
@@ -1758,7 +1755,7 @@ static int crc_setting(wcrc_unit_t unit, crc_module_cfg_t const * const p_cfg)
         crc_features |= (unsigned int)byteswapinmode_11;
         break;
     default:
-        LogDebug(("%s: In ByteSwap INVALID\n", __func__));
+        LogError(("%s: In ByteSwap INVALID\n", __func__));
         return -1;
     }
 
@@ -1795,7 +1792,7 @@ static int crc_start(wcrc_unit_t unit,
      * Only check if user buffer is valid or not.
      */
     if (p_crc_data->p_output_buffer == NULL) {
-        LogDebug(("%s: Allocate FAILED!", __func__));
+        LogError(("%s: Allocate FAILED!", __func__));
         return -1;
     }
 
@@ -1832,7 +1829,7 @@ static int crc_start(wcrc_unit_t unit,
         }
         break;
     default:
-        LogDebug(("%s: Width Input INVALID\n", __func__));
+        LogError(("%s: Width Input INVALID\n", __func__));
         return -1;
     }
 
@@ -1880,7 +1877,7 @@ static int kcrc_setting(wcrc_unit_t unit, kcrc_module_cfg_t const * const p_cfg)
         poly_set = KCRC_POL_32_CRC32C;
         break;
     default:
-        LogDebug(("%s: Polominal mode INVALID\n", __func__));
+        LogError(("%s: Polominal mode INVALID\n", __func__));
         return -1;
     }
 
@@ -1896,7 +1893,7 @@ static int kcrc_setting(wcrc_unit_t unit, kcrc_module_cfg_t const * const p_cfg)
         kcrc_cmd |= (unsigned int)CMD2;
         break;
     default:
-        LogDebug(("%s: CMD2 mode INVALID\n", __func__));
+        LogError(("%s: CMD2 mode INVALID\n", __func__));
         return -1;
     }
 
@@ -1911,7 +1908,7 @@ static int kcrc_setting(wcrc_unit_t unit, kcrc_module_cfg_t const * const p_cfg)
         input_dw = DW_32;
         break;
     default:
-        LogDebug(("%s: Bit width input INVALID\n", __func__));
+        LogError(("%s: Bit width input INVALID\n", __func__));
         return -1;
     }
 
@@ -1951,7 +1948,7 @@ static int kcrc_start(wcrc_unit_t unit,
      * Only check if user buffer is valid or not.
      */
     if (p_kcrc_data->p_output_buffer == NULL) {
-        LogDebug(("%s: Allocate FAILED!", __func__));
+        LogError(("%s: Allocate FAILED!", __func__));
         return -1;
     }
 
@@ -1989,7 +1986,7 @@ static int kcrc_start(wcrc_unit_t unit,
         }
         break;
     default:
-        LogDebug(("%s: Width Input INVALID\n", __func__));
+        LogError(("%s: Width Input INVALID\n", __func__));
         return -1;
     }
 

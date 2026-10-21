@@ -50,14 +50,14 @@ static uint64_t *Find_Entry_Table(uint64_t *ttb, uint64_t virt_addr, int tbl_lev
 
         if (get_entry_type(table) != ENTRY_TYPE_TABLE)
         {
-            LogDebug(("Can't find Entry.\n"));
+            LogError(("Can't find Entry.\n"));
             return NULL;
         }
 
         table = (uint64_t *)(uintptr_t)(*table & ENTRY_ADDR_MASK);
     }
 
-    LogDebug(("[%s][%d] Can't reach this line.\n", __func__, __LINE__));
+    LogError(("[%s][%d] Can't reach this line.\n", __func__, __LINE__));
     return NULL;
 }
 
@@ -217,7 +217,7 @@ void freeMemoryRegion(uint64_t *ttb, uint64_t va, uint64_t pa, uint64_t size)
             entry = Find_Entry_Table(ttb, va, level);
             if (!entry)
             {
-                LogDebug(("[%s] PTE not found for va: 0x%llx\n", __func__, va));
+                LogError(("[%s] PTE not found for va: 0x%llx\n", __func__, va));
                 return;
             }
 

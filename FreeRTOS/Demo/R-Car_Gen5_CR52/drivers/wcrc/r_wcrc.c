@@ -21,8 +21,6 @@
 
 #include "board.h"
 
-#include "board.h"
-
 #if (BOARD == MDP_AIACC_HIL)
 #include "module_controller.h"
 #endif
@@ -55,7 +53,7 @@ int R_CRC_Open(wcrc_ctrl_t * const p_ctrl, wcrc_cfg_t const * const p_cfg)
     /* Request WCRC driver to set mode */
     ret = wcrcSetMode(p_instance_ctrl);
     if (ret != 0) {
-        LogDebug(("wcrcSetMode: FAILED\n"));
+        LogError(("wcrcSetMode: FAILED\n"));
         return ret;
     }
 
@@ -72,7 +70,7 @@ int R_CRC_Set_Callback(wcrc_sub_module_t module, wcrc_ctrl_t * const p_ctrl,
     if (module != CRC_SUB_MODULE &&
         module != KCRC_SUB_MODULE) {
         ret = -1;
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
     }
 
     ret = wcrc_set_callback(module, p_instance_ctrl,
@@ -92,7 +90,7 @@ int R_CRC_Calculate(wcrc_ctrl_t * const p_ctrl)
     /* Start WCRC */
     ret = wcrcStart(p_instance_ctrl);
     if (ret != 0) {
-        LogDebug(("wcrcStart: FAILED\n"));
+        LogError(("wcrcStart: FAILED\n"));
         return ret;
     }
 
@@ -149,7 +147,7 @@ int R_CRC_Wait_Operation(wcrc_ctrl_t * p_ctrl, uint32_t timeout)
         ret |= is_done(KCRC_SUB_MODULE, p_ctrl, timeout);
         break;
     default:
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         ret = -1;
         break;
     };
@@ -234,7 +232,7 @@ int R_CRC_Get_Generated_Value(wcrc_ctrl_t const * const p_ctrl)
         ret |= get_kcrc_data(p_kcrc_data);
         break;
     default:
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         ret = -1;
         break;
     }
@@ -301,7 +299,7 @@ int R_CRC_Get_Input_Data(wcrc_ctrl_t const * const p_ctrl)
         ret |= get_kcrc_input(p_cfg);
         break;
     default:
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
         ret = -1;
         break;
     }
@@ -328,7 +326,7 @@ uint32_t R_CRC_Get_BufferSize(wcrc_sub_module_t module, wcrc_ctrl_t * const p_ct
 
     if (module != CRC_SUB_MODULE && module != KCRC_SUB_MODULE) {
         ret = -1;
-        LogDebug(("%s: Invalid module\n", __func__));
+        LogError(("%s: Invalid module\n", __func__));
     }
 
     ret = wcrcGetCrcSize(module, p_instance_ctrl, buf_size);

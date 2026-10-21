@@ -11,8 +11,6 @@
 #include "dmac/dmac_common.h"
 #include "dmac_reg.h"
 
-extern int printf_delay(const char *format, ...);
-
 /* Return code of API */
 #define drv_OK			(0U)    /* API completed without any error. */
 #define drv_FAIL		(1U)    /* Failed. */

@@ -16,13 +16,14 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+/* Logging Function include. */
+#include "logging_stack.h"
+
 /* Return code of API */
 #define drv_OK                                (0U)    /* API completed without any error. */
 #define drv_FAIL                              (1U)    /* Failed. */
 
 #define DMACP(X)    ((uint8_t)(X) + 4U)
-
-extern int printf_delay(const char *format, ...);
 
 uint16_t R_DMAC_RcarDmacExec(DMAC_t dev, uint8_t ch, rDmacCfg_t *cfg, rDmacDescCfg_t *descCfg);
 uint16_t R_DMAC_RcarDmacStop(DMAC_t dev, uint8_t ch);
@@ -179,7 +180,7 @@ uint16_t R_DMAC_RcarDmacExec(DMAC_t dev, uint8_t ch, rDmacCfg_t *cfg, rDmacDescC
         Value = R_RTDMAC_Get_RDMCHCR(dev, ch);
         if (0 != (Value & DRV_RTDMAC_REG_RDMCHCR_DE))
         {
-	        (void)printf_delay("-----CH_BUSY-----\n");
+	        LogError(("-----CH_BUSY-----\n"));
             ret = drv_FAIL;
         }
         else

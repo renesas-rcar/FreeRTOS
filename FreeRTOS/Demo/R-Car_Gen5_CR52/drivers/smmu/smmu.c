@@ -496,7 +496,7 @@ static smmu_l1ste_tbl_t* smmu_alloc_l1ste(e_smmu_domain_t smmu_domain, bool is_s
     l1ste_size = num_l1_entry*sizeof(smmu_l1ste_tbl_t);
     l1ste_tbl = aligned_malloc(1U << (log2size - split + 3U), l1ste_size);
     if (l1ste_tbl == NULL)  {
-        LogDebug(("Allocate l1ste fail\n"));
+        LogError(("Allocate l1ste fail\n"));
         return NULL;
     }
 
@@ -538,7 +538,7 @@ static st_smmu_ste_t* smmu_alloc_l2ste(e_smmu_domain_t smmu_domain, bool is_secu
     l2_tbl_size = (1U << split)*sizeof(st_smmu_ste_t);
     l2ste_tbl = aligned_malloc(1U << (6U + split), l2_tbl_size);
     if (l2ste_tbl == NULL) {
-        LogDebug(("Allocate l2ste fail\n"));
+        LogError(("Allocate l2ste fail\n"));
         return NULL;
     }
     
@@ -581,7 +581,7 @@ static st_smmu_ste_t* smmu_init_ste(st_smmu_streamid_instance_ctrl_t *p_ctrl){
     stream_id_bits = MAX_L1STE_BITS + split;
     stream_id_bits = log2size < stream_id_bits ? log2size : stream_id_bits;
     if (stream_id > (((uint32_t)1 << stream_id_bits) - 1U)) {
-        LogDebug(("Fail to init stream table entry. Stream id is too large\n"));
+        LogError(("Fail to init stream table entry. Stream id is too large\n"));
         return NULL;
     }
 
@@ -629,7 +629,7 @@ static st_smmu_cd_t* smmu_init_cd_table(st_smmu_streamid_instance_ctrl_t *p_ctrl
 
     cd_tbl = aligned_malloc(1U << 6, sizeof(st_smmu_cd_t));
     if (cd_tbl == NULL) {
-        LogDebug(("Allocate cd table fail\n"));
+        LogError(("Allocate cd table fail\n"));
         return NULL;
     }
     
