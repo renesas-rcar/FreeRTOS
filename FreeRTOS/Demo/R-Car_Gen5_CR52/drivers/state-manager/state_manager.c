@@ -18,10 +18,7 @@
 #include "scmi/inc/system.h"
 #include "scmi/inc/vendor-rcar.h"
 #include "state-manager/r_state_manager.h"
-#include "state-manager/r_power_domain_id.h"
-#include "state-manager/r_clock_domain_id.h"
-#include "state-manager/r_reset_domain_id.h"
-#include "board.h"
+#include "state-manager/r_state_manager_private.h"
 #include "FreeRTOS.h"
 
 /* Logging Function include. */
@@ -46,6 +43,8 @@
             return -1; \
         } \
     } while(0)
+
+#define INVALID (-1)
 
 static uint32_t max_clockdomain_num;
 static uint32_t max_powerdomain_num;
@@ -338,7 +337,7 @@ int R_StateManager_Power_Get(int domain_id, e_power_state_t *state)
 	struct scmi_power_state_config pwr_cfg;
 	int ret;
 
-	VALIDATE_ID(domain_id, max_powerdomain_num);
+	VALIDATE_ID(domain_id, (int)max_powerdomain_num);
 	pwr_cfg.domain_id = domain_id;
 	ret = scmi_power_state_get(&pwr_cfg);
 	if (ret != 0) {
@@ -361,66 +360,55 @@ int R_StateManager_Power_Get(int domain_id, e_power_state_t *state)
 
 int R_StateManager_PowerOff(int domain_id)
 {
-	struct scmi_power_state_config pwr_cfg;
-	int ret;
+    struct scmi_power_state_config pwr_cfg;
+    int ret;
 
-	VALIDATE_ID(domain_id, max_powerdomain_num);
-	pwr_cfg.domain_id = domain_id;
-#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
-	if ((X5H_POWER_DOMAIN_ID_VIPN <= domain_id) &&
-			(X5H_POWER_DOMAIN_ID_P_RPU_CORE00 > domain_id)) {
-		pwr_cfg.flags = 0;
-	} else if ((X5H_POWER_DOMAIN_ID_P_RPU_CORE00 <= domain_id) &&
-			(X5H_POWER_DOMAIN_ID_Q_APU_P07 >= domain_id)) {
-		pwr_cfg.flags = SCMI_POWER_STATE_SET_FLAGS_ASYNC;
-	} else {
-		SM_LOG_ERR("Invalid power domain ID.\r\n");
-		return -EINVAL;
-	}
-#else
+    VALIDATE_ID(domain_id, (int)max_powerdomain_num);
+    pwr_cfg.domain_id = domain_id;
+
     pwr_cfg.flags = 0;
-#endif
-	pwr_cfg.power_state= SCMI_POWER_STATE_OFF;
+    if (power_domain_id_async_range.domain_id_low != (int)INVALID) {
+        if ((power_domain_id_async_range.domain_id_low <= domain_id) &&
+            (power_domain_id_async_range.domain_id_high >= domain_id)) {
+            pwr_cfg.flags = SCMI_POWER_STATE_SET_FLAGS_ASYNC;
+        }
+    }
 
-	ret = scmi_power_state_set(&pwr_cfg);
-	if (ret != 0) {
-		SM_LOG_ERR("Failed to set power domain %d OFF (%d)\r\n", domain_id, ret);
-		return ret;
-	}
+    pwr_cfg.power_state= SCMI_POWER_STATE_OFF;
 
-	return 0;
+    ret = scmi_power_state_set(&pwr_cfg);
+    if (ret != 0) {
+        SM_LOG_ERR("Failed to set power domain %d OFF (%d)\r\n", domain_id, ret);
+        return ret;
+    }
+
+    return 0;
 }
 
 int R_StateManager_PowerOn(int domain_id)
 {
-	struct scmi_power_state_config pwr_cfg;
-	int ret;
+    struct scmi_power_state_config pwr_cfg;
+    int ret;
 
-	VALIDATE_ID(domain_id, max_powerdomain_num);
-	pwr_cfg.domain_id = domain_id;
-#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
-	if ((X5H_POWER_DOMAIN_ID_VIPN <= domain_id) &&
-			(X5H_POWER_DOMAIN_ID_P_RPU_CORE00 > domain_id)) {
-		pwr_cfg.flags = 0;
-	} else if ((X5H_POWER_DOMAIN_ID_P_RPU_CORE00 <= domain_id) &&
-			(X5H_POWER_DOMAIN_ID_Q_APU_P07 >= domain_id)) {
-		pwr_cfg.flags = SCMI_POWER_STATE_SET_FLAGS_ASYNC;
-	} else {
-		SM_LOG_ERR("Invalid power domain ID.\r\n");
-		return -EINVAL;
-	}
-#else
+    VALIDATE_ID(domain_id, (int)max_powerdomain_num);
+    pwr_cfg.domain_id = domain_id;
+
     pwr_cfg.flags = 0;
-#endif
-	pwr_cfg.power_state= SCMI_POWER_STATE_ON;
+    if (power_domain_id_async_range.domain_id_low != (int)INVALID) {
+        if ((power_domain_id_async_range.domain_id_low <= domain_id) &&
+            (power_domain_id_async_range.domain_id_high >= domain_id)) {
+            pwr_cfg.flags = SCMI_POWER_STATE_SET_FLAGS_ASYNC;
+        }
+    }
+    pwr_cfg.power_state= SCMI_POWER_STATE_ON;
 
-	ret = scmi_power_state_set(&pwr_cfg);
-	if (ret != 0) {
-		SM_LOG_ERR("Failed to set power domain %d ON (%d)\r\n", domain_id, ret);
-		return ret;
-	}
+    ret = scmi_power_state_set(&pwr_cfg);
+    if (ret != 0) {
+        SM_LOG_ERR("Failed to set power domain %d ON (%d)\r\n", domain_id, ret);
+        return ret;
+    }
 
-	return 0;
+    return 0;
 }
 
 int R_StateManager_SetClock(int clock_id, uint32_t *rates)
@@ -428,7 +416,7 @@ int R_StateManager_SetClock(int clock_id, uint32_t *rates)
 	struct scmi_clock_rate_config clk_cfg = {0};
 	int ret;
 
-	VALIDATE_ID(clock_id, max_clockdomain_num);
+	VALIDATE_ID(clock_id, (int)max_clockdomain_num);
 	clk_cfg.clk_id = clock_id;
 	clk_cfg.flags = SCMI_CLK_RATE_SET_FLAGS_ROUNDS_AUTO;
 	clk_cfg.rate[0] = rates[0];
@@ -446,7 +434,7 @@ int R_StateManager_GetClock(int clock_id, uint32_t *rates)
 {
 	int ret;
 
-	VALIDATE_ID(clock_id, max_clockdomain_num);
+	VALIDATE_ID(clock_id, (int)max_clockdomain_num);
 	ret = scmi_clock_rate_get(clock_id, rates);
 	if (ret != 0) {
 		SM_LOG_ERR("Failed to get clock ID %d rate (%d)\r\n", clock_id, ret);
@@ -461,7 +449,7 @@ int R_StateManager_ClockOff(int clock_id)
 	struct scmi_clock_config clk_cfg = {0};
 	int ret;
 
-	VALIDATE_ID(clock_id, max_clockdomain_num);
+	VALIDATE_ID(clock_id, (int)max_clockdomain_num);
 	clk_cfg.clk_id = clock_id;
 	clk_cfg.attributes = SCMI_CLK_CONFIG_ENABLE_DISABLE(0);
 
@@ -479,7 +467,7 @@ int R_StateManager_ClockOn(int clock_id)
 	struct scmi_clock_config clk_cfg = {0};
 	int ret;
 
-	VALIDATE_ID(clock_id, max_clockdomain_num);
+	VALIDATE_ID(clock_id, (int)max_clockdomain_num);
 	clk_cfg.clk_id = clock_id;
 	clk_cfg.attributes = SCMI_CLK_CONFIG_ENABLE_DISABLE(1);
 
@@ -498,7 +486,7 @@ int R_StateManager_ClockStatusGet(int clock_id, bool *status)
     uint32_t flags = 0; /* Currently unused */
 	int ret;
 
-	VALIDATE_ID(clock_id, max_clockdomain_num);
+	VALIDATE_ID(clock_id, (int)max_clockdomain_num);
 
 	ret = scmi_clock_config_get(clock_id, flags, &clk_cfg_get);
 	if (ret != 0) {
@@ -516,7 +504,7 @@ int R_StateManager_ResetAssert(int domain_id)
 	struct scmi_reset_domain_request_config rst_cfg = {0};
 	int ret;
 
-	VALIDATE_ID(domain_id, max_resetdomain_num);
+	VALIDATE_ID(domain_id, (int)max_resetdomain_num);
 	rst_cfg.domain_id = domain_id;
 	rst_cfg.flags = RESET_DOMAIN_FLAGS_EXPLICIT;
 
@@ -534,7 +522,7 @@ int R_StateManager_ResetDeassert(int domain_id)
 	struct scmi_reset_domain_request_config rst_cfg = {0};
 	int ret;
 
-	VALIDATE_ID(domain_id, max_resetdomain_num);
+	VALIDATE_ID(domain_id, (int)max_resetdomain_num);
 	rst_cfg.domain_id = domain_id;
 	rst_cfg.flags = 0;
 
@@ -552,7 +540,7 @@ int R_StateManager_Reset(int domain_id)
 	struct scmi_reset_domain_request_config rst_cfg = {0};
 	int ret;
 
-	VALIDATE_ID(domain_id, max_resetdomain_num);
+	VALIDATE_ID(domain_id, (int)max_resetdomain_num);
 	rst_cfg.domain_id = domain_id;
 	rst_cfg.flags = RESET_DOMAIN_FLAGS_AUTO;
 
@@ -569,7 +557,7 @@ int R_StateManager_Reset_Status_Get(int domain_id, e_reset_domain_status_t *stat
     struct scmi_vendor_request_config rst_cfg = {0};
     int ret = RET_OK;
 
-    VALIDATE_ID(domain_id, max_resetdomain_num);
+    VALIDATE_ID(domain_id, (int)max_resetdomain_num);
     rst_cfg.domain_id = domain_id;
     
     ret = scmi_vendor_reset_domain_status_get(&rst_cfg);
