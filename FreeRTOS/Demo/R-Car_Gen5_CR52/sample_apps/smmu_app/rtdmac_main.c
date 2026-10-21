@@ -152,31 +152,31 @@ static void prvDMACTask( void *pvParameters )
 
     printf("**********************************************\r\n");
 
-    printf("* Test case 1: Initializes and Enable SMMU. *\r\n");
+    printf("* TC1: Initializes and Enable SMMU. *\r\n");
     ret = R_SMMU_Init(smmu_ctrl.smmu_domain, smmu_ctrl.is_secure);
     if (ret == 0) {
-        printf("Result: Passed\r\n");
+        printf("TC1 Result: Passed\r\n");
     } else {
-        printf("Result: Failed\r\n");
+        printf("TC1 Result: Failed\r\n");
     }
     printf("**********************************************\r\n");
 
-    printf("* Test case 2: Invalidate TLB *\r\n");
+    printf("* TC2: Invalidate TLB *\r\n");
     ret = R_SMMU_InvalidateTLB(smmu_ctrl.smmu_domain, smmu_ctrl.is_secure);
     if (ret == 0) {
-        printf("Result: Passed\r\n");
+        printf("TC2 Result: Passed\r\n");
     } else {
-        printf("Result: Failed\r\n");
+        printf("TC2 Result: Failed\r\n");
     }
     printf("**********************************************\r\n");
     
-    printf("* Test case 3: Attach stream id. *\r\n");
+    printf("* TC3: Attach stream id. *\r\n");
 
     ret = R_SMMU_Attach(&smmu_ctrl);
     if (ret == 0) {
-        printf("Result: Passed\r\n");
+        printf("TC3 Result: Passed\r\n");
     } else {
-        printf("Result: Failed\r\n");
+        printf("TC3 Result: Failed\r\n");
     }
 
     R_SMMU_Map(&smmu_ctrl, cfg0.mSrcAddr, cfg0.mSrcAddr + SOURCE_OFFSET_MAPPING, 0x5006000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
@@ -192,12 +192,12 @@ static void prvDMACTask( void *pvParameters )
 
     printf("**********************************************\r\n");
 
-    printf("* Test case 4: Enable SMMU *\r\n");
+    printf("* TC4: Enable SMMU *\r\n");
     ret = R_SMMU_Enable(smmu_ctrl.smmu_domain, smmu_ctrl.is_secure);
     if (ret == 0) {
-       printf("Result: Passed\r\n");
+       printf("TC4 Result: Passed\r\n");
     } else {
-        printf("Result: Failed \r\n");
+        printf("TC4 Result: Failed \r\n");
     }
     printf("**********************************************\r\n");
 
@@ -215,7 +215,7 @@ static void prvDMACTask( void *pvParameters )
         .ctx = &rDmacIrqHandler_t_irq,
     };
 
-    printf("* Test case 5: Test transaction data *\r\n");
+    printf("* TC5: Test transaction data *\r\n");
     printf("Before DMA: pa dst address: 0x%lx, dst data: 0x%lx\n",pa_dst_ptr, *(volatile uint32_t *)pa_dst_ptr);
     ret = R_RTDMAC_RcarCallBackSet(&rDmacIrqHandler_t_irq, dmacUserCallback, &usr_context);
 
@@ -232,9 +232,9 @@ static void prvDMACTask( void *pvParameters )
     printf("After DMA: pa dst address: 0x%lx, dst data: 0x%lx\n",pa_dst_ptr, destData );
     printf("Source Info: pa src address: 0x%lx, src data: 0x%lx\n",pa_src_ptr, *(volatile uint32_t *)pa_src_ptr );
     if (destData == (*(volatile uint32_t *)pa_src_ptr)) {
-        printf("Result: Passed\n");
+        printf("TC5 Result: Passed\n");
     } else {
-        printf("Result: Failed\n");
+        printf("TC5 Result: Failed\n");
         if ((*(volatile uint32_t *)cfg0.mSrcAddr == *(volatile uint32_t *)cfg0.mDestAddr) && *(volatile uint32_t *)cfg0.mSrcAddr != 0) {
             printf("After DMA: va src address: 0x%lx, src data: 0x%lx\n", cfg0.mSrcAddr, *(volatile uint32_t *)cfg0.mSrcAddr );
             printf("After DMA: va dst address: 0x%lx, dst data: 0x%lx\n", cfg0.mDestAddr, *(volatile uint32_t *)cfg0.mDestAddr);

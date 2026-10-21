@@ -441,12 +441,22 @@ static void prvI2CTask( void *pvParameters )
 
 static void vPrintTestSummary( void )
 {
-	printf("\r\n===================== TEST SUMMARY =====================\r\n");
-	printf("  TC1 - Init i2c channel        : %s\r\n", (g_tc1_pio_init_ok && g_tc1_dma_init_ok) ? "PASS" : "FAILED");
-	printf("  TC2 - Read/write PIO          : %s\r\n", g_tc2_pio_rw_ok ? "PASS" : "FAILED");
-	printf("  TC3 - Read/write DMA          : %s\r\n", g_tc3_dma_rw_ok ? "PASS" : "FAILED");
-	printf("  TC4 - Interrupt read (DMA)    : %s\r\n", g_tc4_dma_intr_read_ok ? "PASS" : "FAILED");
-	printf("  TC5 - Interrupt write (DMA)   : %s\r\n", g_tc5_dma_intr_write_ok ? "PASS" : "FAILED");
+    printf("\r\n===================== TEST SUMMARY =====================\r\n");
+    printf("TC1: Init i2c channel\r\n"
+           "TC1 Result: %s\r\n",
+           (g_tc1_pio_init_ok && g_tc1_dma_init_ok) ? "Passed" : "Failed");
+    printf("TC2: Read/write PIO\r\n"
+           "TC2 Result: %s\r\n",
+           g_tc2_pio_rw_ok ? "Passed" : "Failed");
+    printf("TC3: Read/write DMA\r\n"
+           "TC3 Result: %s\r\n",
+           g_tc3_dma_rw_ok ? "Passed" : "Failed");
+    printf("TC4: Interrupt read (DMA)\r\n"
+           "TC4 Result: %s\r\n",
+           g_tc4_dma_intr_read_ok ? "Passed" : "Failed");
+    printf("TC5: Interrupt write (DMA)\r\n"
+           "TC5 Result: %s\r\n",
+           g_tc5_dma_intr_write_ok ? "Passed" : "Failed");
  
 	bool any_failed = false;
 	for (uint8_t ch = 0; ch <= I2C_TEST_CHANNEL_COUNT; ch++)
@@ -458,7 +468,10 @@ static void vPrintTestSummary( void )
 		}
 	}
  
-	printf("  TC6 - Multi channel           : %s\r\n", any_failed ? "FAILED" : "PASS");
+    printf("TC6: Multi channel\r\n"
+           "TC6 Result: %s\r\n",
+           any_failed ? "Passed" : "Failed");
+
 	if (any_failed)
 	{
 		for (uint8_t ch = 0; ch <= I2C_TEST_CHANNEL_COUNT; ch++)

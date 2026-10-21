@@ -120,62 +120,62 @@ static void prvEcmTask( void *pvParameters )
     uint8_t ret;
 
     printf("---------- ECM TEST START ----------- \r\n");
-    printf("TC1: R_ECM_DisableAll\n");
+    printf("* TC1: R_ECM_DisableAll *\n");
     ret = R_ECM_DisableAll();
     if (ret)
     {
-        printf("Result: Failed\n");
+        printf("TC1 Result: Failed\n");
     }
     else
     {
-        printf("Result: Passed\n");
+        printf("TC1 Result: Passed\n");
     }
     
-    printf("TC2: R_ECM_SetInterruptCallback\n");
+    printf("* TC2: R_ECM_SetInterruptCallback *\n");
     ret = R_ECM_SetInterruptCallback(IrqErrorHandler);
     if (ret)
     {
-        printf("Result: Failed\n");
+        printf("TC2 Result: Failed\n");
     }
     else
     {
-        printf("Result: Passed\n");
+        printf("TC2 Result: Passed\n");
     }
 
-    printf("TC3: R_ECM_SetDetection\n");
+    printf("* TC3: R_ECM_SetDetection *\n");
     R_ECM_SetDetection(WWDT_ECM_NMI_OUTPUT, 1);
     if (ret)
     {
-        printf("Result: Failed\n");
+        printf("TC3 Result: Failed\n");
     }
     else
     {
-        printf("Result: Passed\n");
+        printf("TC3 Result: Passed\n");
     }
 
-    printf("TC4: R_ECM_SetInterruptNotification\n");
+    printf("* TC4: R_ECM_SetInterruptNotification *\n");
     R_ECM_SetInterruptNotification(WWDT_ECM_NMI_OUTPUT, 1);
     if (ret)
     {
-        printf("Result: Failed\n");
+        printf("TC4 Result: Failed\n");
     }
     else
     {
-        printf("Result: Passed\n");
+        printf("TC4 Result: Passed\n");
     }
 
-    printf("TC5: Irq Error Handler\n");
+    printf("* TC5: Irq Error Handler *\n");
 	/* Device driver part */
 	R_WWDT_Init(WWDT_UNIT, WINDOW_100P, 68, false, ERM_NMI_MODE);
 	err = R_WWDT_Refresh(WWDT_UNIT);
 
     if(xSemaphoreTake(xSemaphore, 2000) == pdTRUE)
     {
-        printf("Result: Passed\n");
+        printf("TC5 Result: Passed\n");
     }
     else
     {
-        printf("Result: Failed\n");
+        printf("TC5 Result: Failed\n");
     }
 
     printf("<APP_END>\n");

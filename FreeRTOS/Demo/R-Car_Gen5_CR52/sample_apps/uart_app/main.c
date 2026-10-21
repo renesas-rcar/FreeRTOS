@@ -180,21 +180,21 @@ static void uartAppExample(uint8_t *channelArr, uint8_t arrLength)
 
     // --- TC 1: Support Log Test ---
     printf("**********************************************\r\n");
-    printf("TEST CASE %d: Support log test\n", tcNum);
-    printf(">>> TC%d result: PASS. <<<\r\n", tcNum);
+    printf("TC%d: Support log test\n", tcNum);
+    printf("TC%d Result: Passed\r\n", tcNum);
     // --- TC 2: Disable Log Test ---
     printf("**********************************************\r\n");
-    printf("TEST CASE %d: Silent console test\n", ++tcNum);
+    printf("TC%d: Silent console test\n", ++tcNum);
     printf("MSG: Unexpect log out below (Silent for 8s)\n");
 
     R_SERIAL_SetLogState(LOG_OFF);
     for (loopIndex = 0; loopIndex < 4; loopIndex++)
     {
-        printf("This message should NOT appear. TC%d result: FAIL.\n", tcNum);
+        printf("This message should NOT appear. TC%d Result: Failed.\n", tcNum);
         vTaskDelay(2000);
     }
     R_SERIAL_SetLogState(LOG_ON);
-    printf(">>> Logs re-enabled. TC%d result: PASS. <<<\n\n",tcNum);
+    printf(">>> Logs re-enabled. TC%d Result: Passed\n\n",tcNum);
 
     // --- TC: Multi-channel Test ---
     for (uint8_t setIndex = 0; setIndex < ARRAY_SIZE(allChannel); setIndex++) {
@@ -215,7 +215,7 @@ static void uartAppExample(uint8_t *channelArr, uint8_t arrLength)
         R_SERIAL_ReConfigure(serialChannelArr[0]);
         uartIDtoString(allChannel[setIndex],uartNameBuf);
         printf("\n**********************************************\r\n");
-        printf("TEST CASE %d: Test %s\n", tcNum, uartNameBuf);
+        printf("TC%d: Test %s\n", tcNum, uartNameBuf);
         printf("\n=== Please manually switch to %s and update Terminal to 115200 baudrate on NEW COM ===\n", uartNameBuf);
         vTaskDelay(500);
 
@@ -224,30 +224,30 @@ static void uartAppExample(uint8_t *channelArr, uint8_t arrLength)
             /* NA TC*/
             R_SERIAL_ReConfigure(serialChannelArr[0]);
             uartIDtoString(serialChannelArr[0],uartNameBuf);
-            printf("\n>>> TC%d result: NA. <<<\r\n", tcNum, uartNameBuf);
+            printf("\nTC%d Result: NA\r\n", tcNum, uartNameBuf);
             vTaskDelay(500);
         } else {
             /* Normal TC */
             if (R_SERIAL_ReConfigure(allChannel[setIndex]) == 0) {
                 uartIDtoString(allChannel[setIndex],uartNameBuf);
                 printf("\n**********************************************\r\n");
-                printf("TEST CASE %d: Test %s\n\n", tcNum, uartNameBuf);
+                printf("TC%d: Test %s\n\n", tcNum, uartNameBuf);
                 for (loopIndex = 0; loopIndex < 12; loopIndex++)   /* Loop provides sufficient time for user to switch COM port connection */
                 {
-                    printf(">>> TC%d result: PASS. <<<\n", tcNum);
+                    printf("TC%d Result: Passed\n", tcNum);
                     vTaskDelay(1000);
                 }
 
                 R_SERIAL_ReConfigure(serialChannelArr[0]);
-                printf("\n>>> TC%d result: PASS. <<<\n", tcNum);
+                printf("\nTC%d Result: Passed\n", tcNum);
             } else {
                 for (loopIndex = 0; loopIndex < 10; loopIndex++) {
-                    printf(">>> TC%d result: FAIL. <<<\n", tcNum);
+                    printf("TC%d Result: Failed\n", tcNum);
                     vTaskDelay(1000);
                 }
 
                 R_SERIAL_ReConfigure(serialChannelArr[0]);
-                printf("\n>>> TC%d result: FAIL. <<<\n", tcNum);
+                printf("\nTC%d Result: Failed\n", tcNum);
             }
         }
     }
@@ -326,7 +326,7 @@ static void prvLogTask( void *pvParameters )
 
     uartAppExample(serialChannelArr,ARRAY_SIZE(serialChannelArr));
 
-    printf("\nTEST CASE %d: UART Interrupt is ready - Please type to RX terminal for testing\n",tcNum);
+    printf("\nTC%d: UART Interrupt is ready - Please type to RX terminal for testing\n",tcNum);
     for( ;; )
     {
         vTaskDelay(3000);
@@ -349,7 +349,7 @@ void UartIrqTriggerTask(void *pvParameters) {
 
     if (xSemaphoreTake(xSemaphore, portMAX_DELAY) == pdTRUE) {
         printf("Task has been triggered by interrupt! Receive char: %c\n", p_char);
-        printf(">>> TC%d result: PASS. UART Irq triggered successfully. <<<\n\n", tcNum);
+        printf("TC%d Result: Passed. UART Irq triggered successfully\n\n", tcNum);
         printf("\n<APP_END>\n");
     }
 

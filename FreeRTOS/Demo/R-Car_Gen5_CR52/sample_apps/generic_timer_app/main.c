@@ -52,7 +52,7 @@ int main(void)
     #endif
     /* Configure the hardware ready to run the demo. */
     prvSetupHardware();
-    printf_raw(">> TC1: Testing get timer counter <<\n");
+    printf_raw("* TC1: Testing get timer counter *\n");
     uint64_t timer_counter_before = R_UTILS_GetTimerCounter();
     printf_raw("Counter before: %llu\nDelay a little time...\n", timer_counter_before);
     for (uint32_t i = 0; i < 300000000; i++)
@@ -61,11 +61,11 @@ int main(void)
     printf_raw("Counter after: %llu\n", timer_counter_after);
     if (timer_counter_after > timer_counter_before)
     {
-        printf_raw("TC 1 result: PASS\n");
+        printf_raw("TC1 Result: Passed\n");
     }
     else
     {
-        printf_raw("TC 1 result: FAIL\n");
+        printf_raw("TC1 Result: Failed\n");
     }
     printf_raw("<APP_END>");
     for (;;)

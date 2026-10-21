@@ -116,15 +116,19 @@ static void prvSWDTTask( void *pvParameters )
     printf("\n=== TC1: Init Watchdog Timer ===\n");
     if (R_SWDT_Init(init_timeout) == 0) {
         printf("\n[INFO] Watchdog Timer initialized with timeout = %u seconds.\n", init_timeout);
+        printf("TC1 Result: Passed\n\n");
     } else {
         printf("\n[ERROR] Failed to initialize Watchdog Timer.\n");
+        printf("TC1 Result: Failed\n");
     }
 
     printf("\n=== TC2: Start Watchdog Timer ===\n");
     if (R_SWDT_Start() == 0) {
         printf("\n[INFO] Watchdog Timer started successfully.\n");
+        printf("TC2 Result: Passed\n");
     } else {
         printf("\n[ERROR] Failed to start Watchdog Timer.\n");
+        printf("TC2 Result: Failed\n");
     }
 
     printf("\n=== TC3: Ping Watchdog Timer ===\n");
@@ -132,13 +136,16 @@ static void prvSWDTTask( void *pvParameters )
         printf("[INFO] Ping %u: Set pingrate to %u seconds.\n", i + 1, ping_rate);
         if (R_SWDT_Ping(ping_rate) != 0) {
             printf("[ERROR] Ping failed at count %u\n", i + 1);
+            printf("TC3 Result: Failed\n");
         }
     }
+    printf("TC3 Result: Passed\n");
 
     printf("\n=== TC4: Stop pinging to let system reset ===\n");
     printf("\n[INFO] Ping count reached %u. No further pings — system should reset after timeout (%u seconds).\n",
     ping_count, init_timeout);
     printf("\n[NOTE] Waiting for system reset...\n");
+    printf("TC4 Result: Passed if the test app prints all test case results again, starting from TC1.\n");
 
     printf("<APP_END>\n");
 

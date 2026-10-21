@@ -114,10 +114,10 @@ static void ucie_comm_task(void *pvParameters)
     printf("<----- [X5H] TC1: UCIE0 INIT ----->\n");
     ret = R_UCIE_Setup(UCIE_CH0, UCIE_MODE_RC, LINKSPEED_16GTPS);
     if (ret != LINKUP_ERROR) {
-        printf("Result: PASSED\n");
+        printf("TC1 Result: Passed\n");
     }
     else {
-        printf("Result: FAILED\n");
+        printf("TC1 Result: Failed\n");
     }
 
     printf("<----- [X5H] TC2: UCIE0 LINKUP ----->\n");
@@ -126,19 +126,19 @@ static void ucie_comm_task(void *pvParameters)
         ret = R_UCIE_Retry_Linkup(UCIE_CH0, UCIE_MODE_RC, LINKSPEED_16GTPS, 30);
     }
     if(ret) {
-        printf("Result: FAILED\n");
+        printf("TC2 Result: Failed\n");
     }
     else {
-        printf("Result: PASSED\n");
+        printf("TC2 Result: Passed\n");
     }
 
     printf("<----- [X5H] TC3: UCIE1 INIT ----->\n");
     ret = R_UCIE_Setup(UCIE_CH1, UCIE_MODE_RC, LINKSPEED_16GTPS);
     if (ret != LINKUP_ERROR) {
-        printf("Result: PASSED\n");
+        printf("TC3 Result: Passed\n");
     }
     else {
-        printf("Result: FAILED\n");
+        printf("TC3 Result: Failed\n");
     }
 
     printf("<----- [X5H] TC4: UCIE1 LINKUP ----->\n");
@@ -147,19 +147,19 @@ static void ucie_comm_task(void *pvParameters)
         ret = R_UCIE_Retry_Linkup(UCIE_CH1, UCIE_MODE_RC, LINKSPEED_16GTPS, 30);
     }
     if(ret) {
-        printf("Result: FAILED\n");
+        printf("TC4 Result: Failed\n");
     }
     else {
-        printf("Result: PASSED\n");
+        printf("TC4 Result: Passed\n");
     }
 
     printf("<----- [X5H] TC5: UCIE0 HDMA Transfer ----->\n");
     printf("HDMA not suppport now\n");
-    printf("Result: NA\n");
+    printf("TC5 Result: NA\n");
 
     printf("<----- [X5H] TC6: UCIE1 HDMA Transfer ----->\n");
     printf("HDMA not suppport now\n");
-    printf("Result: NA\n");
+    printf("TC6 Result: NA\n");
 
     /* Setup PIO region for X5H-AIACC0 */
     st_ucie_iatu_cfg_t cfg = {
@@ -203,10 +203,10 @@ static void ucie_comm_task(void *pvParameters)
     printf("Value at 0x%llX: 0x%X\n", X5H_RC0_ADDR, *(volatile uint32_t*)(uintptr_t)X5H_RC0_ADDR);
 
     if (ret1 || ret3) {
-        printf("Result: FAILED\n");
+        printf("TC7 Result: Failed\n");
     }
     else {
-        printf("Result: PASSED\n");
+        printf("TC7 Result: Passed\n");
     }
 
     printf("<----- [X5H] TC8: UCIE1 PIO Transfer ----->\n");
@@ -223,17 +223,17 @@ static void ucie_comm_task(void *pvParameters)
     printf("Value at 0x%llX: 0x%X\n", X5H_RC1_ADDR, *(volatile uint32_t*)(uintptr_t)X5H_RC1_ADDR);
 
     if (ret2 || ret4) {
-        printf("Result: FAILED\n");
+        printf("TC8 Result: Failed\n");
     }
     else {
-        printf("Result: PASSED\n");
+        printf("TC8 Result: Passed\n");
     }
 
     printf("<----- [X5H] TC9: UCIE0 interrupt ----->\n");
-    printf("Result: NA\n");
+    printf("TC9 Result: NA\n");
 
     printf("<----- [X5H] TC10: UCIE1 interrupt ----->\n");
-    printf("Result: NA\n");
+    printf("TC10 Result: NA\n");
 
     printf("<----- [X5H] <APP_END> ----->\n");
 

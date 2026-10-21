@@ -155,7 +155,7 @@ static void prvSMMU_RT_Task( void *pvParameters )
 
     printf("**********************************************\r\n");
 
-    printf("* Test case 5: Disable SMMU bypass mode and Enable SMMU *\r\n");
+    printf("* TC5: Disable SMMU bypass mode and Enable SMMU *\r\n");
 
     volatile uint32_t *RCTBUBYPSEN = (volatile uint32_t *)RCTBUBYPSEN_ADDRESS;
     
@@ -171,15 +171,15 @@ static void prvSMMU_RT_Task( void *pvParameters )
 
     if (R_SMMU_Enable(SMMU_RT, is_secure) != 0)
     {
-        printf("TC5 result: Failed\n");
+        printf("TC5 Result: Failed\n");
     }
     else
     {
-        printf("TC5 result: Passed\n");  
+        printf("TC5 Result: Passed\n");
     }
     printf("**********************************************\r\n");
 
-    printf("* Test case 6: Verify data *\r\n");
+    printf("* TC6: Verify data *\r\n");
 
     *(uint32_t *)0x90000000 = 0x7012;
     *(uint32_t *)0x70000000 = 0x123;
@@ -189,13 +189,13 @@ static void prvSMMU_RT_Task( void *pvParameters )
     printf("Value at VA 0x90000000 - PA 0x90000000:   0x%x\n", *(uint32_t *)0x90000000);
 
     if (*(uint32_t *)0x70000000 == *(uint32_t *)0x90000000) {
-        printf("Result: Passed\r\n");
+        printf("TC6 Result: Passed\r\n");
     }
     else {
-        printf("Result: Failed\r\n");
+        printf("TC6 Result: Failed\r\n");
     }
 
-    printf("* Test case 7: SMMU-UnMap *\r\n");
+    printf("* TC7: SMMU-UnMap *\r\n");
 
     for (uint8_t i = 0; i < sizeof(streamId[coreid])/sizeof(uint32_t); i ++) {
         smmu_ctrl.stream_id = streamId[coreid][i];
@@ -214,20 +214,20 @@ static void prvSMMU_RT_Task( void *pvParameters )
     printf("Value at VA 0x90000000 - PA 0x90000000:     0x%x\n", *(uint32_t *)0x90000000);
 
     if (*(uint32_t *)0x70000000 != *(uint32_t *)0x90000000) {
-        printf("Result: Passed\r\n");
+        printf("TC7 Result: Passed\r\n");
     }
     else {
-        printf("Result: Failed\r\n");
+        printf("TC7 Result: Failed\r\n");
     }
 
     printf("**********************************************\r\n");
 
-    printf("* Test case 8: Test Read only permission *\r\n");
-    printf("TC8: Pass if no further logs after <APP_END>\r\n<APP_END>\n");
+    printf("* TC8: Test Read only permission *\r\n");
+    printf("TC8: Passed if no further logs after <APP_END>\r\n<APP_END>\n");
     *(uint32_t *)0xB0000000 = 0xBEFFBEFF;
     if (*(uint32_t *)0xB0000000 == 0xBEFFBEFF)
     {
-        printf("TC8 result: FAIL\n");
+        printf("TC8 Result: Failed\n");
         printf("**********************************************\r\n");
     }
 

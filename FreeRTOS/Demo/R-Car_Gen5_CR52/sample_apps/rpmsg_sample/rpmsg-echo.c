@@ -58,8 +58,8 @@ static int rpmsg_endpoint_cb(struct rpmsg_endpoint *ept, void *data, size_t len,
 
     if(is_print_result == 1)
     {
-        LPRINTF("TC1 result: PASS\r\n");
-        LPRINTF("TC2: If the TC1 OK log is found on both Core 0 and Core 1, judge as OK. Otherwise, judge as NG.\r\n");
+        LPRINTF("TC1 Result: Passed\r\n");
+        LPRINTF("TC2 Result: Passed if the TC1 OK log is found on both Core 0 and Core 1, judge as OK. Otherwise, judge as NG.\r\n");
         LPRINTF("<APP_END>\r\n");
         is_print_result = 0;
     }

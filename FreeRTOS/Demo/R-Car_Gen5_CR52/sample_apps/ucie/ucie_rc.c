@@ -203,13 +203,13 @@ static void ucie_comm_task(void *pvParameters)
 
     printf("<----- [RC] TC1: UCIE LINKUP ----->\n");
     if (ret) {
-        printf("Result: FAILED\n");
+        printf("TC1 Result: Failed\n");
     }
     else {
-        printf("Result: PASSED\n");
+        printf("TC1 Result: Passed\n");
     }
 
-    printf("<----- [RC] TC 2: TRANSFER DATA USING HDMA ----->\n");
+    printf("<----- [RC] TC2: TRANSFER DATA USING HDMA ----->\n");
     printf("Generate test data\n");
     create_test_data(hdma_tbl_wrtest_dt->mSrcAddr, TEST_DATA0, hdma_tbl_wrtest_dt->size); 
     print_test_data(hdma_tbl_wrtest_dt->mSrcAddr, hdma_tbl_wrtest_dt->size);
@@ -242,10 +242,10 @@ static void ucie_comm_task(void *pvParameters)
 
     printf("End RC HDMA transfer\n");
     if (ret) {
-        printf("Result: FAILED\n");
+        printf("TC2 Result: Failed\n");
     }
     else {
-        printf("Result: PASSED\n");
+        printf("TC2 Result: Passed\n");
 
         /* Send trigger signal to EP */
         *((st_ucie_trigger_sig_t*)(uintptr_t)hdma_tbl_wrtest_dt[0].mSrcAddr) = (st_ucie_trigger_sig_t) {
@@ -261,7 +261,7 @@ static void ucie_comm_task(void *pvParameters)
         R_UCIE_HDMA_Start(hdma_tbl_wrtest_dt + 0);
     }
 
-    printf("<----- [RC] TC 3: VERIFY TRANSFER DATA ----->\n");
+    printf("<----- [RC] TC3: VERIFY TRANSFER DATA ----->\n");
     st_ucie_trigger_sig_t *signal = (st_ucie_trigger_sig_t *)UCIE_LOOPCHECK_ADDR;
     uint32_t timer_freq = R_UTILS_GetTimerFrequency();
     uint64_t start = R_UTILS_GetTimerCounter();
@@ -278,18 +278,18 @@ static void ucie_comm_task(void *pvParameters)
         printf("Data after transfer:\n");
         print_test_data(signal->addr, signal->size);
         if (verify_test_data(signal->addr, TEST_DATA1, signal->size)) {
-            printf("Result: FAILED\n");
+            printf("TC3 Result: Failed\n");
         }
         else {
-            printf("Result: PASSED\n");
+            printf("TC3 Result: Passed\n");
         }
     }
     else {
-        printf("Result: FAILED\n");
+        printf("TC3 Result: Failed\n");
     }
 
     vTaskDelay(500);
-    printf("<----- [RC] TC 4: PIO TRANSFER ----->\n");
+    printf("<----- [RC] TC4: PIO TRANSFER ----->\n");
     uint64_t ucie1_pa = UCIE_D2D_MEM;
     uint32_t ucie1_va = 0x8E600000;
 
@@ -343,10 +343,10 @@ static void ucie_comm_task(void *pvParameters)
     
     printf("Data after transfer: 0x%X\n", *((volatile uint32_t*)ucie1_va));
     if(ret) {
-        printf("Result: FAILED\n");
+        printf("TC4 Result: Failed\n");
     }
     else {
-        printf("Result: PASSED\n");
+        printf("TC4 Result: Passed\n");
     }
 
     /* RC Write EP Read */

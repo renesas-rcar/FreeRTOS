@@ -79,11 +79,11 @@ void echoTask( void *pvParameters )
     virtio_iommu_inst = R_VIRTIO_IOMMU_Backend_Init(mfis_ch);
     if(virtio_iommu_inst == NULL)
     {
-        printf("VIRTIO IOMMU Backend:  Result: Failed\r\n");
+        printf("VIRTIO IOMMU Backend: TC1 Result: Failed\r\n");
     }
     else
     {
-        printf("VIRTIO IOMMU Backend:  Result: Passed\r\n");
+        printf("VIRTIO IOMMU Backend: TC1 Result: Passed\r\n");
     };
 
     for( ;; )

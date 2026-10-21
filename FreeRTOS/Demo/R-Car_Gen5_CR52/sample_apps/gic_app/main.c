@@ -190,11 +190,11 @@ int main(void)
     
     if (irq_flag == INTERRUPT_FLAG_SET)
     {
-        printf_raw("TC 1 result: PASS\n");
+        printf_raw("TC1 Result: Passed\n");
     }
     else
     {
-        printf_raw("TC 1 result: FAIL\n");
+        printf_raw("TC1 Result: Failed\n");
     }
 
     printf_raw(">> TC2: Private Peripheral Interrupt (PPI) testing <<\n");
@@ -213,22 +213,22 @@ int main(void)
     if (irq_flag == INTERRUPT_FLAG_SET)
     {
         irq_flag = INTERRUPT_FLAG_UNSET;
-        printf_raw("TC 2 result: PASS\n");
+        printf_raw("TC2 Result: Passed\n");
     }
     else
     {
-        printf_raw("TC 2 result: FAIL\n");
+        printf_raw("TC2 Result: Failed\n");
     }
 
     printf_raw(">> TC3: Shared Peripheral Interrupt (SPI) testing <<\n");
     int ret = vConfigureSPIInterrupt();
     if ((ret == 0) && (g_spi_irq_flag == INTERRUPT_FLAG_SET))
     {
-        printf_raw("TC 3 result: PASS\n");
+        printf_raw("TC3 Result: Passed\n");
     }
     else
     {
-        printf_raw("TC 3 result: FAIL\n");
+        printf_raw("TC3 Result: Failed\n");
     }
 
     printf_raw("<APP_END>");

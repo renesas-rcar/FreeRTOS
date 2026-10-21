@@ -151,41 +151,41 @@ static void prvInitiatorTask( void *pvParameters )
     core0_ch.cb_function = core0_mfis_cb;
     core0_ch.arg         = NULL;
 
-    printf("[CPU-%d] TC1 | Initialize MFIS channel\n", cpu_id);
+    printf("[CPU-%d] TC1: Initialize MFIS channel\n", cpu_id);
     if (mfis_init(&core0_ch) == 0)
     {
-        printf("[CPU-%d] TC1 result PASS\n", cpu_id);
+        printf("[CPU-%d] TC1 Result: Passed\n", cpu_id);
     }
     else
     {
-        printf("[CPU-%d] TC1 result FAIL\n", cpu_id);
+        printf("[CPU-%d] TC1 Result: Failed\n", cpu_id);
     }
 
-    printf("[CPU-%d] TC2 | Trigger interrupt: send signal to peer core\n", cpu_id);
+    printf("[CPU-%d] TC2: Trigger interrupt: send signal to peer core\n", cpu_id);
     if (mfis_trigger_interrupt(&core0_ch, 0U) == 0)
     {
-        printf("[CPU-%d] TC2 result PASS\n", cpu_id);
+        printf("[CPU-%d] TC2 Result: Passed\n", cpu_id);
     }
     else
     {
-        printf("[CPU-%d] TC2 result FAIL\n", cpu_id);
+        printf("[CPU-%d] TC2 Result: Failed\n", cpu_id);
     }
 
-    printf("[CPU-%d] TC3 | Wait for interrupt signal from peer core\n\n", cpu_id);
+    printf("[CPU-%d] TC3: Wait for interrupt signal from peer core\n\n", cpu_id);
     if (xSemaphoreTake(xSem_mfis_cpu0, TIME_OUT_INTERRUPT_MS) == pdTRUE)
     {
         is_irq_received = true;
         vTaskDelay(500);
-        printf("[CPU-%d] TC3 |   Interrupt received from peer core\n", cpu_id);
+        printf("[CPU-%d] TC3: Interrupt received from peer core\n", cpu_id);
     }
 
     if (is_irq_received == true)
     {
-        printf("[CPU-%d] TC3 result PASS\n", cpu_id);
+        printf("[CPU-%d] TC3 Result: Passed\n", cpu_id);
     }
     else
     {
-        printf("[CPU-%d] TC3 result FAIL\n", cpu_id);
+        printf("[CPU-%d] TC1 Result: Failed\n", cpu_id);
     }
 
     for( ;; )
@@ -208,42 +208,42 @@ static void prvResponderTask( void *pvParameters )
     core1_ch.cb_function = core1_mfis_cb;
     core1_ch.arg         = NULL;
 
-    printf("[CPU-%d] TC1 | Initialize MFIS channel\n", cpu_id);
+    printf("[CPU-%d] TC1: Initialize MFIS channel\n", cpu_id);
     if (mfis_init(&core1_ch) == 0)
     {
-        printf("[CPU-%d] TC1 result PASS\n", cpu_id);
+        printf("[CPU-%d] TC1 Result: Passed\n", cpu_id);
     }
     else
     {
-        printf("[CPU-%d] TC1 result FAIL\n", cpu_id);
+        printf("[CPU-%d] TC1 Result: Failed\n", cpu_id);
     }
 
-    printf("[CPU-%d] TC2 | Wait for interrupt signal from peer core\n", cpu_id);
+    printf("[CPU-%d] TC2: Wait for interrupt signal from peer core\n", cpu_id);
     if (xSemaphoreTake(xSem_mfis_cpu1, TIME_OUT_INTERRUPT_MS) == pdTRUE)
     {
         is_irq_received = true;
         vTaskDelay(500);
-        printf("[CPU-%d] TC2 |   Interrupt received from peer core\n", cpu_id);
+        printf("[CPU-%d] TC2: Interrupt received from peer core\n", cpu_id);
     }
 
     if (is_irq_received == true)
     {
-        printf("[CPU-%d] TC2 result PASS\n", cpu_id);
+        printf("[CPU-%d] TC2 Result: Passed\n", cpu_id);
     }
     else
     {
-        printf("[CPU-%d] TC2 result FAIL\n", cpu_id);
+        printf("[CPU-%d] TC2 Result: Failed\n", cpu_id);
     }
 
     vTaskDelay(1000);
-    printf("[CPU-%d] TC3 | Trigger interrupt: send signal to peer core\n", cpu_id);
+    printf("[CPU-%d] TC3: Trigger interrupt: send signal to peer core\n", cpu_id);
     if (mfis_trigger_interrupt(&core1_ch, 0U) == 0)
     {
-        printf("[CPU-%d] TC3 result PASS\n\n", cpu_id);
+        printf("[CPU-%d] TC3 Result: Passed\n\n", cpu_id);
     }
     else
     {
-        printf("[CPU-%d] TC3 result FAIL\n\n", cpu_id);
+        printf("[CPU-%d] TC3 Result: Failed\n\n", cpu_id);
     }
 
     for( ;; )

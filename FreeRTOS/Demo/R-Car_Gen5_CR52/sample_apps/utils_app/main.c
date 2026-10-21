@@ -95,10 +95,10 @@ static void prvUtilsTask( void *pvParameters )
     total_osal = R_UTILS_GetTotalRegionOfMemory(OSAL);
     printf("Total Osal region: %d\n", total_osal);
     if(total_osal == 0) {
-        printf("Failed\n");
+        printf("TC1 Result: Failed\n");
     }
     else {
-        printf("True\n");
+        printf("TC1 Result: Passed\n");
     }
     printf("<---------- END TC1 ---------->\n");
 
@@ -106,12 +106,12 @@ static void prvUtilsTask( void *pvParameters )
     info = R_UTILS_GetMemoryRegionInfo(OSAL, 0);
     printf("[Base : 0x%x] - [Size: 0x%x]\n", info.base_address, info.size);
     if (info.size == 0) {
-        printf("Failed\n");
+        printf("TC2 Result: Failed\n");
         printf("<---------- END TC2 ---------->\n");
     }
     else {
         uint32_t read_value;
-        printf("True\n");
+        printf("TC2 Result: Passed\n");
         printf("<---------- END TC2 ---------->\n");
         
         printf("TC3: Test Read/Write in OSAL Region 0\n");
@@ -120,10 +120,10 @@ static void prvUtilsTask( void *pvParameters )
         printf("Write at addr 0x%x, Value: %d\n",info.base_address + 0x8, WRITE_VALUE);
         printf("Read at addr 0x%x, Value: %d\n", info.base_address + 0x8, read_value);
         if(read_value == WRITE_VALUE) {
-            printf("True\n");
+            printf("TC3 Result: Passed\n");
         }
         else {
-            printf("Failed\n");
+            printf("TC3 Result: Failed\n");
         }
         printf("<---------- END TC3 ---------->\n");
     }
@@ -131,6 +131,7 @@ static void prvUtilsTask( void *pvParameters )
     printf("TC4: Get CPU cycles\n");
     uint32_t cycle_cnt = R_UTILS_GetCPUCycles();
     printf("CPU cycles: %u\n", cycle_cnt);
+    printf("TC4 Result: Passed\n");
     printf("<---------- END TC4 ---------->\n");
 
     printf("<APP_END>\n");

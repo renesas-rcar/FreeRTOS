@@ -78,6 +78,7 @@ static int rpmsg_endpoint_cb(struct rpmsg_endpoint *ept, void *data, size_t len,
 static void rpmsg_service_unbind(struct rpmsg_endpoint *ept);
 static int rpmsg_endpoint_cb1(struct rpmsg_endpoint *ept, void *data, size_t len,
                  uint32_t src, void *priv);
+int is_print_result = 1;
 /*-----------------------------------------------------------*/
 
 /*
@@ -164,15 +165,15 @@ static void ucie_comm_task(void *pvParameters)
         printf("R_VIRTIO_FE_Create fail\n");
     }
     vTaskDelay(1000);
+    printf("TC1: Echo\n\r");
     printf("rpmsg_send\n");
     char msg0[16];
     for (int i = 0; i <100; i++)
     {
-        snprintf(msg0, sizeof(msg0), "hello fe0 %d", i);
+        snprintf(msg0, sizeof(msg0), "hello fe%d", i);
         rpmsg_send(lept, msg0, strlen(msg0));
         // vTaskDelay(100);
     }
-    
 
     for(;;) {
         __asm__ volatile("nop");
@@ -207,7 +208,7 @@ static void ucie_comm_task1(void *pvParameters)
 
     uint32_t ret = 0;
     
-    printf("RPMSG BECKEND\n");
+    printf("RPMSG BACKEND\n");
     vTaskDelay(1000);
 
     // st_virtio_instance_ctrl_t *result = NULL;
@@ -251,7 +252,15 @@ static int rpmsg_endpoint_cb1(struct rpmsg_endpoint *ept, void *data, size_t len
     memset(payload, 0, RPMSG_BUFFER_SIZE);
     memcpy(payload, data, len);
 
-    printf("Incoming msg0: %s\r\n", payload);
+    if(is_print_result == 1)
+    {
+        printf("TC1 Result: Passed if 100 messages are received from the VIRTIO FRONTEND.\r\n");
+        printf("<APP_END>\r\n");
+        is_print_result = 0;
+    }
+
+    printf("Incoming msg%d: %s\r\n", i, payload);
+    i++;
 
     return RPMSG_SUCCESS;
 }

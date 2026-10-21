@@ -219,33 +219,33 @@ static void prvVIOMMUFETask( void *pvParameters )
     }
 
     vTaskDelay(1000);
-    printf("VIRTIO IOMMU Frontend:  * Test case 1: Test R_VIRTIO_IOMMU_Init\n");
+    printf("VIRTIO IOMMU Frontend:  * TC1: Test R_VIRTIO_IOMMU_Init\n");
     virtio_iommu_inst = R_VIRTIO_IOMMU_Init(mfis_ch);
     smmu_ctrl.p_context = virtio_iommu_inst;
     vTaskDelay(1000);
     if(virtio_iommu_inst == NULL)
     {
-        printf("VIRTIO IOMMU Frontend:  Result: Failed\r\n");
+        printf("VIRTIO IOMMU Frontend: TC1 Result: Failed\r\n");
     }
     else
     {
-        printf("VIRTIO IOMMU Frontend:  Result: Passed\r\n");
+        printf("VIRTIO IOMMU Frontend: TC1 Result: Passed\r\n");
     };
 
-    printf("VIRTIO IOMMU Frontend:  * Test case 2: Test R_VIRTIO_IOMMU_Attach\n");
+    printf("VIRTIO IOMMU Frontend:  * TC2: Test R_VIRTIO_IOMMU_Attach\n");
     ret = R_VIRTIO_IOMMU_Attach(&smmu_ctrl);
     if (ret == 0) {
-        printf("VIRTIO IOMMU Frontend:  Result: Passed\r\n");
+        printf("VIRTIO IOMMU Frontend: TC2 Result: Passed\r\n");
     } else {
-        printf("VIRTIO IOMMU Frontend:  Result: Failed\r\n");
+        printf("VIRTIO IOMMU Frontend: TC2 Result: Failed\r\n");
     }
 
-    printf("VIRTIO IOMMU Frontend:  * Test case 3: Test R_VIRTIO_IOMMU_Map\n");
+    printf("VIRTIO IOMMU Frontend:  * TC3: Test R_VIRTIO_IOMMU_Map\n");
     ret = R_VIRTIO_IOMMU_Map(&smmu_ctrl, cfg.mSrcAddr, cfg.mSrcAddr + SOURCE_OFFSET_MAPPING, 0x5000000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
     if (ret == 0) {
-        printf("VIRTIO IOMMU Frontend:  Result: Passed\r\n");
+        printf("VIRTIO IOMMU Frontend: TC3 Result: Passed\r\n");
     } else {
-        printf("VIRTIO IOMMU Frontend:  Result: Failed\r\n");
+        printf("VIRTIO IOMMU Frontend: TC3 Result: Failed\r\n");
     }
     /*----------------------------------------------------------*/
 
@@ -261,7 +261,7 @@ static void prvVIOMMUFETask( void *pvParameters )
         .ctx = &rDmacIrqHandler_t_irq,
     };
 
-    printf("VIRTIO IOMMU Frontend:  * Test case 4: Test transaction data *\r\n");
+    printf("VIRTIO IOMMU Frontend:  * TC4: Test transaction data *\r\n");
     printf("VIRTIO IOMMU Frontend:  Before DMA: pa dst address: 0x%lx, dst data: 0x%lx\n",pa_dst_ptr, *(volatile uint32_t *)pa_dst_ptr);
 
     ret = DMAC_CALLBACK_SET(&rDmacIrqHandler_t_irq, dmacUserCallback, &usr_context);
@@ -279,14 +279,14 @@ static void prvVIOMMUFETask( void *pvParameters )
     printf("VIRTIO IOMMU Frontend:  After DMA: pa dst address: 0x%lx, dst data: 0x%lx\n",pa_dst_ptr, destData );
     printf("VIRTIO IOMMU Frontend:  Source Info: pa src address: 0x%lx, src data: 0x%lx\n",pa_src_ptr, *(volatile uint32_t *)pa_src_ptr );
     if (destData == (*(volatile uint32_t *)pa_src_ptr)) {
-        printf("VIRTIO IOMMU Frontend:  Result: Passed\n");
+        printf("VIRTIO IOMMU Frontend: TC4 Result: Passed\n");
     } else {
         if ((*(volatile uint32_t *)cfg.mSrcAddr == *(volatile uint32_t *)cfg.mDestAddr) && *(volatile uint32_t *)cfg.mSrcAddr != 0) {
             printf("VIRTIO IOMMU Frontend:  After DMA: va src address: 0x%lx, src data: 0x%lx\n", cfg.mSrcAddr, *(volatile uint32_t *)cfg.mSrcAddr );
             printf("VIRTIO IOMMU Frontend:  After DMA: va dst address: 0x%lx, dst data: 0x%lx\n", cfg.mDestAddr, *(volatile uint32_t *)cfg.mDestAddr);
             printf("VIRTIO IOMMU Frontend:  DMAC worked without VIRTIO IOMMU.\n");
         }
-        printf("VIRTIO IOMMU Frontend:  Result: Failed\n");
+        printf("VIRTIO IOMMU Frontend: TC4 Result: Failed\n");
     }
     
     printf("VIRTIO IOMMU Frontend:  * Test case 5: Test R_VIRTIO_IOMMU_UnMap\n");

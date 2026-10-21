@@ -102,7 +102,7 @@ static void prvWWDTTask( void *pvParameters )
     /* Device driver part */
     printf("---------- PROGRAM START ----------- \r\n");
 
-    printf("=== Test Case 2: %s, 273ms, 75% window OPEN ===\r\n", XSTR(WWDT_UNIT));
+    printf("=== TC2: %s, 273ms, 75% window OPEN ===\r\n", XSTR(WWDT_UNIT));
     R_WWDT_Init(WWDT_UNIT, WINDOW_75P, 273, false, ERM_RESET_MODE);
 
     printf("R_WWDT_Init: done\r\n");
@@ -120,6 +120,7 @@ static void prvWWDTTask( void *pvParameters )
         err = R_WWDT_Refresh(WWDT_UNIT);
         if (err != 0) break;
     }
+    printf("\nTC2 Result: Passed if the test app prints all test log again.\n");
     printf("<APP_END>\n");
     for( ;; )
     {

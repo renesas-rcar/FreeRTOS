@@ -210,14 +210,18 @@ static void vPrintTestSummary(void)
 
     printf("\r\n");
     printf("============= I2C TEST SUMMARY =============\r\n");
-
-    printf("TC1 - Init I2C channel 	: %s\r\n", tc1_init_ok ? "PASS" : "FAILED");
-
-    printf("TC2 - Read PIO       	: %s\r\n", tc2_read_ok ? "PASS" : "FAILED");
-
-    printf("TC3 - Write PIO      	: %s\r\n", tc3_write_ok ? "PASS" : "FAILED");
-
-    printf("TC4 - Multi-Channel 	: %s\r\n", tc4_multi_channel_ok ? "PASS" : "FAILED");
+    printf("TC1: Init i2c channel\r\n"
+           "TC1 Result: %s\r\n",
+           tc1_init_ok ? "Passed" : "Failed");
+    printf("TC2: Read PIO\r\n"
+           "TC2 Result: %s\r\n",
+           tc2_read_ok ? "Passed" : "Failed");
+    printf("TC3: Write PIO\r\n"
+           "TC3 Result: %s\r\n",
+           tc3_write_ok ? "Passed" : "Failed");
+    printf("TC4: Multi-Channel\r\n"
+           "TC4 Result: %s\r\n",
+           tc4_multi_channel_ok ? "Passed" : "Failed");
 
     if (!tc4_multi_channel_ok)
     {

@@ -102,70 +102,70 @@ static void prvAudioTestTask( void *pvParameters )
 	int init_flag = 1;
 	unsigned int reg_val;
 
-	printf("* Test case 1: Initializes Audio driver. *\r\n");
+	printf("* TC1: Initializes Audio driver. *\r\n");
     res = R_Audio_Init(&g_audio_device_ctrl, &audio_config);
 
 	if(res == 0)
 	{
-        printf("Result: Passed!\n");
+        printf("TC1 Result: Passed\n");
 	}
 	else
 	{
-		printf("Result: Failed!\n");
+		printf("TC1 Result: Failed\n");
 	}
 	printf("***********************************************\r\n");
 	
 	audio_config.num_channel = 2;
-	printf("* Test case 2: Config Audio configuration. *\r\n");
+	printf("* TC2: Config Audio configuration. *\r\n");
     res = R_Audio_Config(&g_audio_device_ctrl);
 	if(res == 0)
 	{
-		printf("Result: Passed!\n");
+		printf("TC2 Result: Passed\n");
 	}
 	else
 	{
-		printf("Result: Failed!\n");
+		printf("TC2 Result: Failed\n");
 	}
 	printf("***********************************************\r\n");
 	
-	printf("* Test case 3: Start Audio driver. *\r\n");
+	printf("* TC3: Start Audio driver. *\r\n");
     res = R_Audio_Start(&g_audio_device_ctrl, file_audio_create(), file_audio_create_len());
 	if(res == 0)
 	{
-		printf("Result: Passed!\n");
+		printf("TC3 Result: Passed\n");
 	}
 	else
 	{
-		printf("Result: Failed!\n");
+		printf("TC3 Result: Failed\n");
 	}
 	printf("***********************************************\r\n");
 	
-	printf("* Test case 4: Verify Audio sound output. *\r\n");
-	printf("Result: Passed if the recorded file on your PC matches the input sound \n");
+	printf("* TC4: Verify Audio sound output. *\r\n");
+	printf("TC4 Result: Passed if the recorded file on your PC matches the input sound\n");
 	printf("***********************************************\r\n");
 	
-	printf("* Test case 5: Stop Audio driver. *\r\n");
+	printf("* TC5: Stop Audio driver. *\r\n");
     res = R_Audio_Stop(&g_audio_device_ctrl);
 	if(res == 0)
 	{
-		printf("Result: Passed!\n");
+		printf("TC5 Result: Passed\n");
 	}
 	else
 	{
-		printf("Result: Failed!\n");
+		printf("TC5 Result: Failed\n");
 	}
 	printf("***********************************************\r\n");
 	
 	
-	printf("* Test case 6: Deinitialize Audio driver. *\r\n");
+	printf("* TC6: Deinitialize Audio driver. *\r\n");
     res = R_Audio_Deinit(&g_audio_device_ctrl);
 	if(res == 0)
 	{
-		printf("Result: Passed!\n");
+		printf("TC6 Result: Passed\n");
 	}
 	else
 	{
-		printf("Result: Failed!\n");
+		printf("TC6 Result: Failed\n");
 	}
 	printf("***********************************************\r\n");
 	printf("<APP_END>\n");

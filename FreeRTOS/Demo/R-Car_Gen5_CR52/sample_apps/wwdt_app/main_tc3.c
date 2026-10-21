@@ -102,7 +102,7 @@ static void prvWWDTTask( void *pvParameters )
     /* Device driver part */
     printf("---------- PROGRAM START ----------- \r\n");
 
-    printf_delay("=== Test Case 3: %s, 68ms, 50% window ===\r\n", XSTR(WWDT_UNIT));
+    printf_delay("=== TC3: %s, 68ms, 50% window ===\r\n", XSTR(WWDT_UNIT));
     R_WWDT_Init(WWDT_UNIT, WINDOW_50P, 68, false, ERM_RESET_MODE);
     printf_delay("R_WWDT_Init: done\r\n");
 
@@ -112,7 +112,7 @@ static void prvWWDTTask( void *pvParameters )
         err = R_WWDT_Refresh(WWDT_UNIT);
         if (err != 0) break;
     }
-
+    printf("\nTC3 Result: Passed if the test app prints all test log again.\n");
     printf("<APP_END>\n");
     for( ;; )
     {

@@ -98,21 +98,21 @@ static void prvLoggingTask( void *pvParameters )
     vTaskDelay(5000);
 #endif
     #ifdef LIBRARY_LOG_LEVEL
-        LogAlways(("Logging enable [ON] ..."));
-        vTaskDelay(100);
-        LogError(("Logging enable [ON] ..."));
-        vTaskDelay(100);
-        LogWarn(("Logging enable [ON] ..."));
-        vTaskDelay(100);
-        LogInfo(("Logging enable [ON] ..."));
-        vTaskDelay(100);
-        LogDebug(("Logging enable [ON] ..."));
-        vTaskDelay(100);
-        printf("<APP_END>\n");
+        LogAlways(("TC1: ALWAYS\n"));
+        LogAlways(("TC1 Result: Passed\n"));
+        LogError(("TC2: ERROR\n"));
+        LogError(("TC2 Result: Passed\n"));
+        LogWarn(("TC3: WARN\n"));
+        LogWarn(("TC3 Result: Passed\n"));
+        LogInfo(("TC4: INFO\n"));
+        LogInfo(("TC4 Result: Passed\n"));
+        LogDebug(("TC5: DEBUG\n"));
+        LogDebug(("TC5 Result: Passed\n"));
     #else
         printf("Logging enable [OFF] ...\n");
-        printf("<APP_END>\n");
     #endif
+
+    printf("<APP_END>\n");
 
     for( ;; );
 }

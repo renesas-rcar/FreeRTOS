@@ -173,18 +173,18 @@ static void prvEcmTask( void *pvParameters )
 
     printf("---------- PROGRAM START ----------- \r\n");
 
-    printf("=== Test Case 7: %s, 68ms, 50% window OPEN, NMI MODE ===\r\n", XSTR(WWDT_UNIT));
+    printf("=== TC7: %s, 68ms, 50% window OPEN, NMI MODE ===\r\n", XSTR(WWDT_UNIT));
     /* Device driver part */
     R_WWDT_Init(WWDT_UNIT, WINDOW_50P, 68, false, ERM_NMI_MODE);
     err = R_WWDT_Refresh(WWDT_UNIT);
 
     if(xSemaphoreTake(xSemaphore, 2000) == pdTRUE)
     {
-        printf("Result: Passed\n");
+        printf("TC7 Result: Passed\n");
     }
     else
     {
-        printf("Result: Failed\n");
+        printf("TC7 Result: Failed\n");
     }
 
     printf("<APP_END>\n");
