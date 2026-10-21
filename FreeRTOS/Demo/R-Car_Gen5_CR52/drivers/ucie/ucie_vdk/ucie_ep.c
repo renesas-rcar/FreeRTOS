@@ -168,7 +168,7 @@ void R_PCIE_EPF_Test_CmdHandler(struct st_pcie_ep *ep)
 	    ucie_epf_test_raise_irq(ep, bar0_reg);
 	    vTaskDelay(2);
 	} else {
-		LogDebug("Command is invalid!\n");
+		LogError("Command is invalid!\n");
 	}
     }
 }

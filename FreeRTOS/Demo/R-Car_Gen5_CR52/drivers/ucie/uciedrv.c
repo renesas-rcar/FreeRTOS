@@ -62,17 +62,17 @@ uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
     e_ucie_hdma_mode_t rw = cfg->rw;
     
     if (ucieCh != UCIE_CH0 && ucieCh != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (dmaCh < HDMA_CH0 || dmaCh > HDMA_CH31) {
-        LogDebug(("ERROR: Invalid HDMA channel\n"));
+        LogError(("ERROR: Invalid HDMA channel\n"));
         return 1;
     }
 
     if (rw != HDMA_WRITE && rw != HDMA_READ) {
-        LogDebug(("ERROR: Invalid HDMA transfer mode\n"));
+        LogError(("ERROR: Invalid HDMA transfer mode\n"));
         return 1;
     }
 
@@ -80,7 +80,7 @@ uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
                             (dmaCh * HDMA_CH_BLOCK_SIZE) + (rw * HDMA_RW_BLOCK_SIZE);
 
     if (mem_read32(base + (uintptr_t)HDMA_STATUS_OFF) == HDMA_STATUS_RUNNING) {
-        LogDebug(("ERROR: Channel is running\n"));
+        LogError(("ERROR: Channel is running\n"));
         return 1;
     }
 
@@ -131,17 +131,17 @@ uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
     e_ucie_hdma_mode_t rw = cfg->rw;
     
     if (ucieCh != UCIE_CH0 && ucieCh != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (dmaCh < HDMA_CH0 || dmaCh > HDMA_CH31) {
-        LogDebug(("ERROR: Invalid HDMA channel\n"));
+        LogError(("ERROR: Invalid HDMA channel\n"));
         return 1;
     }
 
     if (rw != HDMA_WRITE && rw != HDMA_READ) {
-        LogDebug(("ERROR: Invalid HDMA transfer mode\n"));
+        LogError(("ERROR: Invalid HDMA transfer mode\n"));
         return 1;
     }
 
@@ -149,7 +149,7 @@ uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
                             ((uint32_t)dmaCh * HDMA_CH_BLOCK_SIZE) + ((uint32_t)rw * HDMA_RW_BLOCK_SIZE);
 
     if (mem_read32(base + (uintptr_t)HDMA_STATUS_OFF) == HDMA_STATUS_RUNNING) {
-        LogDebug(("ERROR: Channel is running\n"));
+        LogError(("ERROR: Channel is running\n"));
         return 1;
     }
 
@@ -170,17 +170,17 @@ uint32_t R_UCIE_HDMA_WaitStop(st_ucie_hdma_cfg_t *cfg)
     uint32_t timeout;
 
     if (ucieCh != UCIE_CH0 && ucieCh != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (dmaCh < HDMA_CH0 || dmaCh > HDMA_CH31) {
-        LogDebug(("ERROR: Invalid HDMA channel\n"));
+        LogError(("ERROR: Invalid HDMA channel\n"));
         return 1;
     }
 
     if (rw != HDMA_WRITE && rw != HDMA_READ) {
-        LogDebug(("ERROR: Invalid HDMA transfer mode\n"));
+        LogError(("ERROR: Invalid HDMA transfer mode\n"));
         return 1;
     }
 
@@ -211,17 +211,17 @@ uint32_t R_UCIE_HDMA_Stop(st_ucie_hdma_cfg_t *cfg)
     e_ucie_hdma_mode_t rw = cfg->rw;
 
     if (ucieCh != UCIE_CH0 && ucieCh != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (dmaCh < HDMA_CH0 || dmaCh > HDMA_CH31) {
-        LogDebug(("ERROR: Invalid HDMA channel\n"));
+        LogError(("ERROR: Invalid HDMA channel\n"));
         return 1;
     }
 
     if (rw != HDMA_WRITE && rw != HDMA_READ) {
-        LogDebug(("ERROR: Invalid HDMA transfer mode\n"));
+        LogError(("ERROR: Invalid HDMA transfer mode\n"));
         return 1;
     }
 
@@ -1074,7 +1074,7 @@ uint32_t Ucie_Setup_PCIE_Wait_LinkUp(e_ucie_ch_t ch)
     uint32_t mask, expect;
 
     if (ch != UCIE_CH0 && ch != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
@@ -1418,8 +1418,8 @@ void Ucie_PowerOn(e_ucie_ch_t ucie_ch)
     ret = R_StateManager_PowerOn(X5H_POWER_DOMAIN_ID_UCI);
     if (ret != 0)
     {
-        (void)printf("Error: Failed to set power domain id %d ON.\r\n",
-                X5H_POWER_DOMAIN_ID_UCI);
+        LogError(("Error: Failed to set power domain id %d ON.\r\n",
+                X5H_POWER_DOMAIN_ID_UCI));
     }
 #endif
 
@@ -1427,14 +1427,14 @@ void Ucie_PowerOn(e_ucie_ch_t ucie_ch)
     ret = R_StateManager_ClockOn(ucie_peri_clk_id);
     if (ret != 0)
     {
-        (void)printf("Error: Failed to set clock id %d ON.\r\n",
-                ucie_peri_clk_id);
+        LogError(("Error: Failed to set clock id %d ON.\r\n",
+                ucie_peri_clk_id));
     }
     ret = R_StateManager_Reset(ucie_peri_reset_id);
     if (ret != 0)
     {
-        (void)printf("Error: Failed to reset domain id %d.\r\n",
-                ucie_peri_reset_id);
+        LogError(("Error: Failed to reset domain id %d.\r\n",
+                ucie_peri_reset_id));
     }
 #endif
 
@@ -1449,14 +1449,14 @@ void Ucie_PowerOn(e_ucie_ch_t ucie_ch)
     ret = R_StateManager_ClockOn(ucie_core_clk_id);
     if (ret != 0)
     {
-        (void)printf("Error: Failed to set clock id %d ON.\r\n",
-                ucie_core_clk_id);
+        LogError(("Error: Failed to set clock id %d ON.\r\n",
+                ucie_core_clk_id));
     }
     ret = R_StateManager_Reset(ucie_core_reset_id);
     if (ret != 0)
     {
-        (void)printf("Error: Failed to reset domain id %d.\r\n",
-                ucie_core_reset_id);
+        LogError(("Error: Failed to reset domain id %d.\r\n",
+                ucie_core_reset_id));
     }
 #endif
 }
@@ -1516,26 +1516,26 @@ void Ucie_PowerOFF(e_ucie_ch_t ch)
     ret = R_StateManager_Reset(ucie_core_reset_id);
     if (ret != 0)
     {
-        (void)printf("Error: Failed to reset domain id %d.\r\n",
-                ucie_core_reset_id);
+        LogError(("Error: Failed to reset domain id %d.\r\n",
+                ucie_core_reset_id));
     }
     ret = R_StateManager_ClockOff(ucie_core_clk_id);
     if (ret != 0)
     {
-        (void)printf("Error: Failed to set clock id %d OFF.\r\n",
-                ucie_core_clk_id);
+        LogError(("Error: Failed to set clock id %d OFF.\r\n",
+                ucie_core_clk_id));
     }
     ret = R_StateManager_Reset(ucie_peri_reset_id);
     if (ret != 0)
     {
-        (void)printf("Error: Failed to reset domain id %d.\r\n",
-                ucie_peri_reset_id);
+        LogError(("Error: Failed to reset domain id %d.\r\n",
+                ucie_peri_reset_id));
     }
     ret = R_StateManager_ClockOff(ucie_peri_clk_id);
     if (ret != 0)
     {
-        (void)printf("Error: Failed to set clock id %d OFF.\r\n",
-                ucie_peri_clk_id);
+        LogError(("Error: Failed to set clock id %d OFF.\r\n",
+                ucie_peri_clk_id));
     }
 }
 
@@ -1554,17 +1554,17 @@ e_ucie_linkup_status_t R_UCIE_Setup(e_ucie_ch_t ch, e_ucie_mode_t mode,
     e_ucie_linkup_status_t ret;
 
     if (ch != UCIE_CH0 && ch != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return LINKUP_ERROR;
     }
 
     if (mode != UCIE_MODE_EP && mode != UCIE_MODE_RC) {
-        LogDebug(("ERROR: Invalid UCIe mode\n"));
+        LogError(("ERROR: Invalid UCIe mode\n"));
         return LINKUP_ERROR;
     }
 
     if (speed < LINKSPEED_4GTPS || speed > LINKSPEED_16GTPS){
-        LogDebug(("ERROR: Invalid UCIe link speed\n"));
+        LogError(("ERROR: Invalid UCIe link speed\n"));
         return LINKUP_ERROR;
     }
 
@@ -1659,23 +1659,23 @@ uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg)
     uint32_t base;
 
     if (ucie_ch != UCIE_CH0 && ucie_ch != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (rgn < IATU_RGN0 || rgn > IATU_RGN31) {
-        LogDebug(("ERROR: Invalid iATU region\n"));
+        LogError(("ERROR: Invalid iATU region\n"));
         return 1;
     }
 
     if (type != IATU_OUTBOUND && type != IATU_INBOUND) {
-        LogDebug(("ERROR: Invalid iATU type\n"));
+        LogError(("ERROR: Invalid iATU type\n"));
         return 1;
     }
 
     if ((mSrcAddr & IATU_ADDR_MASK) || (mDestAddr & IATU_ADDR_MASK) || 
                                                     (size & IATU_ADDR_MASK)) {
-        LogDebug(("ERROR: Src addr, dest addr and size must be aligned with 4KB\n"));
+        LogError(("ERROR: Src addr, dest addr and size must be aligned with 4KB\n"));
         return 1;
     }
     
@@ -1702,17 +1702,17 @@ uint32_t R_UCIE_IATU_UnsetRegion(st_ucie_iatu_cfg_t *cfg)
     uint32_t base;
 
     if (ucie_ch != UCIE_CH0 && ucie_ch != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (rgn < IATU_RGN0 || rgn > IATU_RGN31) {
-        LogDebug(("ERROR: Invalid iATU region\n"));
+        LogError(("ERROR: Invalid iATU region\n"));
         return 1;
     }
 
     if (type != IATU_OUTBOUND && type != IATU_INBOUND) {
-        LogDebug(("ERROR: Invalid iATU type\n"));
+        LogError(("ERROR: Invalid iATU type\n"));
         return 1;
     }
 

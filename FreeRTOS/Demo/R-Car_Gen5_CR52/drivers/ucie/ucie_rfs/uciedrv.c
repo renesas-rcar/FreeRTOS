@@ -20,17 +20,17 @@ e_ucie_linkup_status_t R_UCIE_Setup(e_ucie_ch_t ch, e_ucie_mode_t mode,
     e_ucie_linkup_status_t ret;
     
     if (ch != UCIE_CH0 && ch != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return LINKUP_ERROR;
     }
 
     if (mode != UCIE_MODE_EP && mode != UCIE_MODE_RC) {
-        LogDebug(("ERROR: Invalid UCIe mode\n"));
+        LogError(("ERROR: Invalid UCIe mode\n"));
         return LINKUP_ERROR;
     }
 
     if (speed < LINKSPEED_4GTPS || speed > LINKSPEED_16GTPS){
-        LogDebug(("ERROR: Invalid UCIe link speed\n"));
+        LogError(("ERROR: Invalid UCIe link speed\n"));
         return LINKUP_ERROR;
     }
 
@@ -57,28 +57,28 @@ e_ucie_linkup_status_t R_UCIE_Retry_Linkup(e_ucie_ch_t ch, e_ucie_mode_t mode,
 uint32_t R_UCIE_HDMA_SetConfig(st_ucie_hdma_cfg_t *cfg)
 {
     (void)cfg;
-    LogDebug(("ERROR: This feature isn't supported in this environment\n"));
+    LogError(("ERROR: This feature isn't supported in this environment\n"));
     return 0;
 }
 
 uint32_t R_UCIE_HDMA_Start(st_ucie_hdma_cfg_t *cfg)
 {
     (void)cfg;
-    LogDebug(("ERROR: This feature isn't supported in this environment\n"));
+    LogError(("ERROR: This feature isn't supported in this environment\n"));
     return 0;
 }
 
 uint32_t R_UCIE_HDMA_WaitStop(st_ucie_hdma_cfg_t *cfg)
 {
     (void)cfg;
-    LogDebug(("ERROR: This feature isn't supported in this environment\n"));
+    LogError(("ERROR: This feature isn't supported in this environment\n"));
     return 0;
 }
 
 uint32_t R_UCIE_HDMA_Stop(st_ucie_hdma_cfg_t *cfg)
 {
     (void)cfg;
-    LogDebug(("ERROR: This feature isn't supported in this environment\n"));
+    LogError(("ERROR: This feature isn't supported in this environment\n"));
     return 0;
 }
 
@@ -95,18 +95,18 @@ uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg)
     uint32_t timeout;
 
     if (ucie_ch != UCIE_CH0 && ucie_ch != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (rgn > IATU_RGN31) {
-        LogDebug(("ERROR: Invalid iATU region\n"));
+        LogError(("ERROR: Invalid iATU region\n"));
         return 1;
     }
 
     if ((mSrcAddr & UCIE_ADDR_MASK) || (mDestAddr & UCIE_ADDR_MASK) || 
                                                     (size & UCIE_ADDR_MASK)) {
-        LogDebug(("ERROR: Src addr, dest addr and size must be aligned with 4KB\n"));
+        LogError(("ERROR: Src addr, dest addr and size must be aligned with 4KB\n"));
         return 1;
     }
 
@@ -114,7 +114,7 @@ uint32_t R_UCIE_IATU_SetRegion(st_ucie_iatu_cfg_t *cfg)
 
     val = *(volatile uint32_t*)(base + UCIE_MAPPING_EN_OFF);
     if ((val & (1 << UCIE_MAPPING_STATUS_BIT)) != 0U) {
-        LogDebug(("ERROR: This region has been used\n"));
+        LogError(("ERROR: This region has been used\n"));
         return 1;
     }
 
@@ -163,12 +163,12 @@ uint32_t R_UCIE_IATU_UnsetRegion(st_ucie_iatu_cfg_t *cfg)
     uint32_t timeout;
 
     if (ucie_ch != UCIE_CH0 && ucie_ch != UCIE_CH1) {
-        LogDebug(("ERROR: Invalid UCIe channel\n"));
+        LogError(("ERROR: Invalid UCIe channel\n"));
         return 1;
     }
 
     if (rgn != IATU_RGN0) {
-        LogDebug(("ERROR: Invalid iATU region. This environment only supports region 0\n"));
+        LogError(("ERROR: Invalid iATU region. This environment only supports region 0\n"));
         return 1;
     }
 
