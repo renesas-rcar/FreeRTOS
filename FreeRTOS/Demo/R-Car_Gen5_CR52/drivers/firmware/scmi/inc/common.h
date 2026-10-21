@@ -9,6 +9,8 @@
 #define SCMI_COMMON_H
 
 #include <stdint.h>
+/* Logging Function include. */
+#include "logging_stack.h"
 
 #define SCMI_MAX_STR_SIZE			64
 #define SCMI_SHORT_NAME_MAX_SIZE    16
@@ -41,26 +43,12 @@ typedef enum {
 /* Configuration of log level */
 #define SCMI_LOG_LEVEL_DEFAULT   SCMI_LOG_LEVEL_ERR
 
-#ifdef SCMI_DEBUG
-#include "stdio.h"
-
-/* SCMI debug log macro */
-#define SCMI_LOG(level, format, ...)\
-    if (SCMI_LOG_LEVEL_DEFAULT <= (level))\
-    {\
-        printf("SCMI [%s:%d] ", __func__, __LINE__);\
-        printf(format "\r\n", ##__VA_ARGS__);\
-    }
-#else   /* SCMI_DEBUG */
-    #define SCMI_LOG(level, ...)
-#endif  /* SCMI_DEBUG */
-
 /* SCMI debug log */
-#define SCMI_LOG_DBG(...) SCMI_LOG(SCMI_LOG_LEVEL_DBG, "[D] " __VA_ARGS__)
+#define SCMI_LOG_DBG(...) LogDebug((__VA_ARGS__))
 /* SCMI information log */
-#define SCMI_LOG_INFO(...) SCMI_LOG(SCMI_LOG_LEVEL_INFO, "[I] " __VA_ARGS__)
+#define SCMI_LOG_INFO(...) LogInfo((__VA_ARGS__))
 /* SCMI error log */
-#define SCMI_LOG_ERR(...) SCMI_LOG(SCMI_LOG_LEVEL_ERR, "[E] " __VA_ARGS__)
+#define SCMI_LOG_ERR(...) LogError((__VA_ARGS__))
 
 
 /*******************************************************************************************************************//**

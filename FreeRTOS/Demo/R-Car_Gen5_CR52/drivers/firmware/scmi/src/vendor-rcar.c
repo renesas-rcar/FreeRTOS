@@ -57,11 +57,11 @@ int scmi_vendor_reset_domain_status_get(struct scmi_vendor_request_config *cfg) 
 
         ret = scmi_send_message(proto, &msg, &reply);
         if (ret < 0) {
-            (void) printf("scmi_send_message failed, return %d \r\n", ret);
+            (void) LogError(("scmi_send_message failed, return %d \r\n", ret));
         } else {
             if (reply_buffer.status != SCMI_SUCCESS) {
                 ret = scmi_status_to_errno(reply_buffer.status);
-                (void) printf("scmi_status_to_errno, return %d \r\n", ret);
+                (void) LogError(("scmi_status_to_errno, return %d \r\n", ret));
             }
         }
 
