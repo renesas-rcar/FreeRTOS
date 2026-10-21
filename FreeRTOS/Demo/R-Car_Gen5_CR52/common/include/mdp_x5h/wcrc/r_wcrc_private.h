@@ -1,0 +1,42 @@
+/*
+ *
+ * Copyright (c) 2025 Renesas Electronics Corporation
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ */
+
+#ifndef R_WCRC_PRIVATE_H
+#define R_WCRC_PRIVATE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "stdint.h"
+#include "wcrc/r_wcrc_common.h"
+#include "r_wcrc_common_private.h"
+#include "state-manager/r_clock_domain_id.h"
+
+#define UNIT_MAX WCRC_10
+
+static const crc_domain_id_list domain_id_lists[UNIT_MAX + 1] = {
+    {X5H_CLOCK_ID_MDLC_WCRC0, X5H_CLOCK_ID_MDLC_CRC0, X5H_CLOCK_ID_MDLC_KCRC0},
+    {X5H_CLOCK_ID_MDLC_WCRC1, X5H_CLOCK_ID_MDLC_CRC1, X5H_CLOCK_ID_MDLC_KCRC1},
+    {X5H_CLOCK_ID_MDLC_WCRC2, X5H_CLOCK_ID_MDLC_CRC2, X5H_CLOCK_ID_MDLC_KCRC2},
+    {X5H_CLOCK_ID_MDLC_WCRC3, X5H_CLOCK_ID_MDLC_CRC3, X5H_CLOCK_ID_MDLC_KCRC3},
+    {X5H_CLOCK_ID_MDLC_WCRC4, X5H_CLOCK_ID_MDLC_CRC4, X5H_CLOCK_ID_MDLC_KCRC4},
+    {X5H_CLOCK_ID_MDLC_WCRC5, X5H_CLOCK_ID_MDLC_CRC5, X5H_CLOCK_ID_MDLC_KCRC5},
+    {X5H_CLOCK_ID_MDLC_WCRC6, X5H_CLOCK_ID_MDLC_CRC6, X5H_CLOCK_ID_MDLC_KCRC6},
+    {X5H_CLOCK_ID_MDLC_WCRC7, X5H_CLOCK_ID_MDLC_CRC7, X5H_CLOCK_ID_MDLC_KCRC7},
+    {X5H_CLOCK_ID_MDLC_WCRC8, X5H_CLOCK_ID_MDLC_CRC8, X5H_CLOCK_ID_MDLC_KCRC8},
+    {X5H_CLOCK_ID_MDLC_WCRC9, X5H_CLOCK_ID_MDLC_CRC9, X5H_CLOCK_ID_MDLC_KCRC9},
+    {X5H_CLOCK_ID_MDLC_WCRC10, X5H_CLOCK_ID_MDLC_CRC10, X5H_CLOCK_ID_MDLC_KCRC10},
+};
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* R_WCRC_PRIVATE_H */
+

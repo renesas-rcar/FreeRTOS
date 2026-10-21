@@ -10,19 +10,12 @@
 
 #include "wcrc/r_wcrc_common.h"
 #include "wcrc/r_wcrc.h"
+#include "wcrc/r_wcrc_private.h"
 #include "r_crc_wrapper.h"
 #include "rcar_utils.h"
 #include "state-manager/r_state_manager.h"
-#include "state-manager/r_clock_domain_id.h"
-
 /* Logging Function include. */
 #include "logging_stack.h"
-
-#include "board.h"
-
-#if (BOARD == MDP_AIACC_HIL)
-#include "module_controller.h"
-#endif
 
 #define CRC_OPEN    (0x00000001U)
 #define CRC_CLOSE   (0x00000002U)
@@ -334,110 +327,21 @@ uint32_t R_CRC_Get_BufferSize(wcrc_sub_module_t module, wcrc_ctrl_t * const p_ct
 
 static int wcrc_get_clock_ids(wcrc_unit_t unit, uint32_t *wcrc_id, uint32_t *crc_id, uint32_t *kcrc_id)
 {
+    int ret = 0;
     if ((wcrc_id == NULL) || (crc_id == NULL) || (kcrc_id == NULL))
     {
-        return -1;
+        ret = -1;
     }
 
-#if (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
-    switch (unit)
-    {
-        case WCRC_00:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC0;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC0;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC0;
-            break;
-            
-        case WCRC_01:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC1;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC1;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC1;
-            break;
-
-        case WCRC_02:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC2;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC2;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC2;
-            break;
-
-        case WCRC_03:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC3;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC3;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC3;
-            break;
-
-        case WCRC_04:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC4;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC4;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC4;
-            break;
-
-        case WCRC_05:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC5;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC5;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC5;
-            break;
-
-        case WCRC_06:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC6;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC6;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC6;
-            break;
-
-        case WCRC_07:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC7;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC7;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC7;
-            break;
-
-        case WCRC_08:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC8;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC8;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC8;
-            break;
-
-        case WCRC_09:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC9;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC9;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC9;
-            break;
-
-        case WCRC_10:
-            *wcrc_id = X5H_CLOCK_ID_MDLC_WCRC10;
-            *crc_id  = X5H_CLOCK_ID_MDLC_CRC10;
-            *kcrc_id = X5H_CLOCK_ID_MDLC_KCRC10;
-            break;
-        default:
-            return -1;
+    if ((ret == 0) && (unit > UNIT_MAX)) {
+        ret = -1;
+    } else {
+        *wcrc_id = domain_id_lists[unit].wcrc_id;
+        *crc_id  = domain_id_lists[unit].crc_id;
+        *kcrc_id = domain_id_lists[unit].kcrc_id;
     }
-#elif (BOARD == MDP_AIACC_HIL)
-    switch (unit)
-    {
-        case WCRC_00:
-            *wcrc_id = AIACC_CLOCK_ID_WCRC0;
-            *crc_id  = AIACC_CLOCK_ID_CRC0;
-            *kcrc_id = AIACC_CLOCK_ID_KCRC0;
-            break;
-            
-        case WCRC_01:
-            *wcrc_id = AIACC_CLOCK_ID_WCRC1;
-            *crc_id  = AIACC_CLOCK_ID_CRC1;
-            *kcrc_id = AIACC_CLOCK_ID_KCRC1;
-            break;
 
-        case WCRC_02:
-            *wcrc_id = AIACC_CLOCK_ID_WCRC2;
-            *crc_id  = AIACC_CLOCK_ID_CRC2;
-            *kcrc_id = AIACC_CLOCK_ID_KCRC2;
-            break;
-
-        default:
-            return -1;
-    }
-#else
-    /* Do nothing */
-#endif
-    return 0;
+    return ret;
 }
 
 static int wcrc_enable_clock(wcrc_cfg_t const * const p_cfg)
