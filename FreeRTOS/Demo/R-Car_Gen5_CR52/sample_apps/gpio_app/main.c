@@ -51,6 +51,7 @@ static void prvSetupHardware( void );
 static void prvGPIOTask( void *pvParameters );
 
 static void gpioUserCallback(void *data);
+static volatile uint32_t g_gpio_irq_count = 0U;
 /*-----------------------------------------------------------*/
 
 #if(BOARD == X5H_VDK || BOARD == X5H_IRONHIDE || BOARD == X5H_RFS2 || BOARD == MDP_X5H_HIL)
@@ -162,8 +163,23 @@ static void prvGPIOTask( void *pvParameters )
 {
     uint8_t ret;
     int i;
-    gpio_level_t lv = GPIO_LEVEL_LOW;
+    int tc1_pass = 1;
+    int tc2_pass = 1;
+    int tc3_pass = 1;
     gpio_level_t readLevel;
+    gpio_level_t expected_levels[] =
+    {
+        GPIO_LEVEL_HIGH, /* Pull-up */
+        GPIO_LEVEL_LOW,  /* Pull-down */
+        GPIO_LEVEL_LOW   /* No-pull */
+    };
+    gpio_request_pull_t pull_modes[] =
+    {
+        GPIO_REQ_PULL_UP,
+        GPIO_REQ_PULL_DOWN,
+        GPIO_REQ_NO_PULL
+    };
+    gpio_level_t lv = GPIO_LEVEL_LOW;
 
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
@@ -171,40 +187,68 @@ static void prvGPIOTask( void *pvParameters )
     vTaskDelay(500);
 
     printf("\n********** TC1: GPIO Pull up/down/disable **********\n");
+
     ret = R_GPIO_Open(&g_gpio_instance_ctrl_pull, &g_gpio_cfg_pull);
     printf("Open : ret = %d\n", ret);
+    if (ret != 0)
+    {
+        tc1_pass = 0;
+    }
 
-    ret = R_GPIO_PinSetPull(&g_gpio_instance_ctrl_pull, g_gpio_cfg_pull.p_pin_cfg_data[0].pin,
-                            GPIO_REQ_PULL_UP);
-    printf("R_GPIO_PinSetPull: Up ret = %d\n", ret);
-    ret = R_GPIO_PinRead(&g_gpio_instance_ctrl_pull, g_gpio_cfg_pull.p_pin_cfg_data[0].pin,
-                        &readLevel);
-    printf("PinRead: %d\n", readLevel);
+    for (i = 0; i < 3; i++)
+    {
+        ret = R_GPIO_PinSetPull(
+            &g_gpio_instance_ctrl_pull,
+            g_gpio_cfg_pull.p_pin_cfg_data[0].pin,
+            pull_modes[i]);
 
-    ret = R_GPIO_PinSetPull(&g_gpio_instance_ctrl_pull, g_gpio_cfg_pull.p_pin_cfg_data[0].pin,
-                            GPIO_REQ_PULL_DOWN);
-    printf("R_GPIO_PinSetPull: Down ret = %d\n", ret);
-    ret = R_GPIO_PinRead(&g_gpio_instance_ctrl_pull, g_gpio_cfg_pull.p_pin_cfg_data[0].pin,
-                        &readLevel);
-    printf("PinRead: %d\n", readLevel);
+        printf("R_GPIO_PinSetPull: mode %d ret = %d\n",
+            (int)pull_modes[i], ret);
 
-    ret = R_GPIO_PinSetPull(&g_gpio_instance_ctrl_pull, g_gpio_cfg_pull.p_pin_cfg_data[0].pin,
-                            GPIO_REQ_NO_PULL);
-    printf("R_GPIO_PinSetPull: No-pull ret = %d\n", ret);
-    ret = R_GPIO_PinRead(&g_gpio_instance_ctrl_pull, g_gpio_cfg_pull.p_pin_cfg_data[0].pin,
-                        &readLevel);
-    printf("PinRead: %d\n", readLevel);
+        if (ret != 0)
+        {
+            tc1_pass = 0;
+            continue;
+        }
+
+        ret = R_GPIO_PinRead(
+            &g_gpio_instance_ctrl_pull,
+            g_gpio_cfg_pull.p_pin_cfg_data[0].pin,
+            &readLevel);
+
+        printf("PinRead: %d\n", readLevel);
+
+        if ((ret != 0) || (readLevel != expected_levels[i]))
+        {
+            tc1_pass = 0;
+        }
+    }
 
     ret = R_GPIO_Close(&g_gpio_instance_ctrl_pull);
     printf("Close: ret = %d\n", ret);
+
+    if (ret != 0)
+    {
+        tc1_pass = 0;
+    }
+
+    printf("TC1 Result: %s\n", tc1_pass ? "Passed" : "Failed");
 
     printf("\n********** TC2: Output/Input General Mode **********\n");
 
     ret = R_GPIO_Open(&g_gpio_instance_ctrl, &g_gpio_cfg);
     printf("Open : ret = %d\n", ret);
+    if (ret != 0)
+    {
+        tc2_pass = 0;
+    }
 
     ret = R_GPIO_PinSetPull(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, GPIO_REQ_PULL_DOWN);
     printf("R_GPIO_PinSetPull: Down ret = %d\n", ret);
+    if (ret != 0)
+    {
+        tc2_pass = 0;
+    }
 
 #if(BOARD == MDP_AIACC_HIL)
 
@@ -215,19 +259,35 @@ static void prvGPIOTask( void *pvParameters )
 
     ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, &readLevel);
     while (readLevel != 1)
-        ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, &readLevel);
+    ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, &readLevel);
     printf("PinRead: After IN  =%d\n\n", readLevel);
+    /* Judge input level */
+    if ((ret != 0) || (readLevel != GPIO_LEVEL_HIGH))
+    {
+        tc2_pass = 0;
+    }
 
     vTaskDelay(1000);
 
-    ret  = R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[1].pin, &readLevel);
+    ret = R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[1].pin, &readLevel);
     printf("PinRead: Before OUT =%d\n", readLevel);
 
     printf("AIACC: Send signal to MDP_X5H\n");
-    ret  = R_GPIO_PinWrite(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[1].pin, GPIO_LEVEL_HIGH);
+    ret = R_GPIO_PinWrite(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[1].pin, GPIO_LEVEL_HIGH);
+
+    if (ret != 0)
+    {
+        tc2_pass = 0;
+    }
 
     ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[1].pin, &readLevel);
     printf("PinRead: After OUT =%d\n\n", readLevel);
+
+    /* Judge output level */
+    if ((ret != 0) || (readLevel != GPIO_LEVEL_HIGH))
+    {
+        tc2_pass = 0;
+    }
 
 #else
 
@@ -235,6 +295,7 @@ static void prvGPIOTask( void *pvParameters )
     printf("PinRead: Before OUT =%d\n", readLevel);
     ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, &readLevel);
     printf("PinRead: Before IN  =%d\n", readLevel);
+
     vTaskDelay(1000);
 
     for (i = 0; i < 2; i++)
@@ -248,26 +309,54 @@ static void prvGPIOTask( void *pvParameters )
 
         ret = R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[1].pin, &readLevel);
         printf("PinRead: After OUT =%d\n", readLevel);
+        /* Judge output level */
+        if ((ret != 0) || (readLevel != lv))
+        {
+            tc2_pass = 0;
+        }
         ret |= R_GPIO_PinRead(&g_gpio_instance_ctrl, g_gpio_cfg.p_pin_cfg_data[0].pin, &readLevel);
         printf("PinRead: After IN  =%d\n", readLevel);
+        /* Judge input level */
+        if ((ret != 0) || (readLevel != lv))
+        {
+            tc2_pass = 0;
+        }
         vTaskDelay(1000);
     }
-
 #endif
 
     ret = R_GPIO_Close(&g_gpio_instance_ctrl);
     printf("Close: ret = %d\n", ret);
-
+    if (ret != 0)
+    {
+        tc2_pass = 0;
+    }
+    printf("TC2 Result: %s\n", (tc2_pass != 0) ? "Passed" : "Failed");
     printf("\n********** TC3: Interrupt Input Mode **********\n");
     /* Config GPIO as General interrupt input mode */
     ret = R_GPIO_Open(&g_gpio_instance_ctrl_irq, &g_gpio_cfg_irq);
     printf("Open : ret = %d\n", ret);
 
+    if (ret != 0)
+    {
+        tc3_pass = 0;
+    }
+
     ret = R_GPIO_PinSetPull(&g_gpio_instance_ctrl_irq, g_gpio_cfg_irq.p_pin_cfg_data->pin, GPIO_REQ_PULL_DOWN);
     printf("R_GPIO_PinSetPull: Down ret = %d\n", ret);
 
+    if (ret != 0)
+    {
+        tc3_pass = 0;
+    }
+
     ret = R_GPIO_CallbackSet(&g_gpio_instance_ctrl_irq, gpioUserCallback, &g_gpio_instance_ctrl_irq);
     printf("CallbackSet: ret = %d\n", ret);
+
+    if (ret != 0)
+    {
+        tc3_pass = 0;
+    }
 
 #if(BOARD == MDP_AIACC_HIL)
 
@@ -281,6 +370,11 @@ static void prvGPIOTask( void *pvParameters )
                         g_gpio_cfg.p_pin_cfg_data[1].pin_cfg);
     printf("PinCfg: ret = %d\n", ret);
 
+    if (ret != 0)
+    {
+        tc3_pass = 0;
+    }
+
     /* Create signal to test interrupt */
     for(i = 0; i < 4; i++)
     {
@@ -290,14 +384,39 @@ static void prvGPIOTask( void *pvParameters )
         else
             printf("Out: 1\n");
         ret = R_GPIO_PinWrite(&g_gpio_instance_ctrl_irq, g_gpio_cfg.p_pin_cfg_data[1].pin, lv);
+
+        if (ret != 0)
+        {
+            tc3_pass = 0;
+        }
+
+        /* Judge output value */
+        if ((i % 2 == 0) && (lv != GPIO_LEVEL_HIGH))
+        {
+            tc3_pass = 0;
+        }
+        else if ((i % 2 != 0) && (lv != GPIO_LEVEL_LOW))
+        {
+            tc3_pass = 0;
+        }
+
         vTaskDelay(500);
+    }
+    /* Judge interrupt callback count */
+    if (g_gpio_irq_count != 4U)
+    {
+        tc3_pass = 0;
     }
 
 #endif
 
     ret = R_GPIO_Close(&g_gpio_instance_ctrl_irq);
     printf("Close: ret = %d\n", ret);
-
+    if (ret != 0)
+    {
+        tc3_pass = 0;
+    }
+    printf("TC3 Result: %s\n", (tc3_pass != 0) ? "Passed" : "Failed");
     printf("<APP_END>\n");
 
     for( ;; )
@@ -309,6 +428,7 @@ static void prvGPIOTask( void *pvParameters )
 
 void gpioUserCallback(void *data) {
     gpio_instance_ctrl_t * p_instance_ctrl = (gpio_instance_ctrl_t *) data;
+    g_gpio_irq_count++;
     printf("Handle GPIO interrupt\n");
 }
 
