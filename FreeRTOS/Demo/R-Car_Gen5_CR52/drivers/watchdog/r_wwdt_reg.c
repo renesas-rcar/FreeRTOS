@@ -6,7 +6,6 @@
  */
 
 #include <stdint.h>
-#include <stdio.h>
 #include "r_wwdt_reg.h"
 
 /* Logging Function include. */

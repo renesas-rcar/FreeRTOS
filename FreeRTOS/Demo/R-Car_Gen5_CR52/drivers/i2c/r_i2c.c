@@ -6,7 +6,6 @@
  */
 
 #include "interrupts.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>

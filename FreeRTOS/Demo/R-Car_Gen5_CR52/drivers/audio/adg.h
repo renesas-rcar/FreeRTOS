@@ -12,7 +12,6 @@
 #include "r_audio_conf.h"
 #include <stdint.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <stdbool.h>
 
 #define ADG0_BASE			0xec530000u

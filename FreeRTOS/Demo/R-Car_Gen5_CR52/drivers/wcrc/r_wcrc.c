@@ -14,7 +14,6 @@
 #include "rcar_utils.h"
 #include "state-manager/r_state_manager.h"
 #include "state-manager/r_clock_domain_id.h"
-#include <stdio.h>
 
 /* Logging Function include. */
 #include "logging_stack.h"

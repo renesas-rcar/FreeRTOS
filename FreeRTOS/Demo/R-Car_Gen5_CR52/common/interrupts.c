@@ -12,7 +12,6 @@
 #include "CMSIS_5/irq_ctrl.h"
 #include "irq_ctrl.h"
 #include "drivers/gic/gic.h"
-#include <stdio.h>
 #include "cmsis_cp15.h"
 #include "merge_interrupt_private.h"
 

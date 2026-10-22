@@ -7,7 +7,6 @@
 
 #include "FreeRTOS.h"
 #include "semphr.h"
-#include <stdio.h>
 #include "r_crc_wrapper.h"
 #include "dmac/dmac_common.h"
 #include "interrupts.h"

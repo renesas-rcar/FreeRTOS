@@ -8,7 +8,6 @@
  #include <stdint.h>
  #include <stddef.h>
  #include <stdbool.h>
- #include <stdio.h>
  #include "dmac_ctrl_common.h"
  #include "r_rtdma_private.h"
  

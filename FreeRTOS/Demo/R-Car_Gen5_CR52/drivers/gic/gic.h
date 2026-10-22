@@ -12,7 +12,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <stdio.h>
+#include <stddef.h>
 
 #define GICV3_GROUP0                     (0)
 #define GICV3_GROUP1_SECURE              (1)

@@ -13,7 +13,6 @@
 #include "interrupts.h"
 #include "state-manager/r_state_manager.h"
 #include "state-manager/r_clock_domain_id.h"
-#include <stdio.h>
 #include "gic.h"
 #include "board.h"
 

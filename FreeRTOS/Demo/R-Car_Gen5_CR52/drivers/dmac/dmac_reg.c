@@ -7,7 +7,6 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include <stdio.h>
 #include "dmac/dmac_common.h"
 #include "dmac_reg.h"
 

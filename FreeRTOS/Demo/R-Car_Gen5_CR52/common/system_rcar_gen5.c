@@ -7,7 +7,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "portmacro.h"

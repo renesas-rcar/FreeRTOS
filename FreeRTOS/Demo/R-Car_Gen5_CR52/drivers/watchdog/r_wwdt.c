@@ -7,7 +7,6 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include <stdio.h>
 #include <stdbool.h>
 #include "watchdog/r_wwdt_api.h"
 #include "state-manager/r_state_manager.h"
