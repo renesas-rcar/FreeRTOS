@@ -1,0 +1,31 @@
+#ifndef PM_SKIP_CONFIG_H
+#define PM_SKIP_CONFIG_H
+
+@PM_HEADER_COMMENT@
+
+typedef struct {
+    int from;   /* inclusive */
+    int to;     /* inclusive */
+} pm_id_range_t;
+
+#define PM_UNUSED __attribute__((unused))
+
+static const pm_id_range_t pm_power_skip[] PM_UNUSED = {
+@PM_POWER_SKIP_ENTRIES@    { 0, -1 }
+};
+static const pm_id_range_t pm_power_restore_skip[] PM_UNUSED = {
+@PM_POWER_RESTORE_SKIP_ENTRIES@    { 0, -1 }
+};
+static const pm_id_range_t pm_clock_skip[] PM_UNUSED = {
+@PM_CLOCK_SKIP_ENTRIES@    { 0, -1 }
+};
+static const pm_id_range_t pm_clock_off_skip[] PM_UNUSED = {
+@PM_CLOCK_OFF_SKIP_ENTRIES@    { 0, -1 }
+};
+static const pm_id_range_t pm_reset_skip[] PM_UNUSED = {
+@PM_RESET_SKIP_ENTRIES@    { 0, -1 }
+};
+
+#define PM_RANGE_COUNT(a)  ((int)(sizeof(a) / sizeof((a)[0])) - 1)
+
+#endif /* PM_SKIP_CONFIG_H */

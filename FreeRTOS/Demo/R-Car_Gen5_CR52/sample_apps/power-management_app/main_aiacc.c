@@ -17,6 +17,7 @@
 #include "state-manager/r_clock_domain_id.h"
 #include "state-manager/r_reset_domain_id.h"
 #include "pfc/r_pfc_api.h"
+#include "pm_skip_config.h"
 
 #define pmApp_TASK_PRIORITY ( tskIDLE_PRIORITY + 1 )
 int printf_raw(const char *format, ...);
@@ -36,6 +37,24 @@ int printf_raw(const char *format, ...);
 
 static void prvPmAppTask(void *pvParameters);
 static void pmAppExample(void);
+
+static bool pmInRanges(const pm_id_range_t *r, int n, int id)
+{
+    for (int i = 0; i < n; i++) {
+        if (id >= r[i].from && id <= r[i].to) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static int pmClockDomainSkip(int id) {
+    return pmInRanges(pm_clock_skip, PM_RANGE_COUNT(pm_clock_skip), id) ? 0 : 1;
+}
+
+static int pmResetDomainSkip(int id) {
+    return pmInRanges(pm_reset_skip, PM_RANGE_COUNT(pm_reset_skip), id) ? 0 : 1;
+}
 
 static void prvSetupHardware(void)
 {
@@ -479,10 +498,7 @@ static void pmAppExample(void)
          domain_id < AIACC_CLOCK_ID_COUNT;
          ++domain_id)
     {
-        if ((AIACC_CLOCK_ID_HSCIF0 == domain_id) ||
-            (AIACC_CLOCK_ID_HSCIF1 == domain_id) ||
-            (AIACC_CLOCK_ID_SCIF0 == domain_id) ||
-            (AIACC_CLOCK_ID_SCIF1 == domain_id)) {
+        if (0 == pmClockDomainSkip(domain_id)) {
             continue;
         }
         pmClockTest(domain_id, rates);
@@ -495,10 +511,7 @@ static void pmAppExample(void)
 	for (domain_id = AIACC_RESET_DOMAIN_ID_COUNT - 1;
 		 domain_id >= 0;
 		 domain_id--) {
-        if ((AIACC_RESET_DOMAIN_ID_SCIF1 == domain_id) ||
-            (AIACC_RESET_DOMAIN_ID_SCIF0 == domain_id) || 
-            (AIACC_RESET_DOMAIN_ID_HSCIF1 == domain_id) || 
-            (AIACC_RESET_DOMAIN_ID_HSCIF0 == domain_id)) {
+        if (0 == pmResetDomainSkip(domain_id)) {
             PM_LOG("Skip domain id %d due to UART logging.\r\n", domain_id);
         } else {
             pmResetTest(domain_id);

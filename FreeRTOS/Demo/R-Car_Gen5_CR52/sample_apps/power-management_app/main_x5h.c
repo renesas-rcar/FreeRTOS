@@ -18,6 +18,7 @@
 #include "state-manager/r_reset_domain_id.h"
 #include "pfc/r_pfc_api.h"
 #include "rcar_utils.h"
+#include "pm_skip_config.h"
 
 #define pmApp_TASK_PRIORITY ( tskIDLE_PRIORITY + 1 )
 #define PM_LOG(format, ...) \
@@ -36,6 +37,36 @@
 
 static void prvPmAppTask(void *pvParameters);
 static void pmAppExample(void);
+
+static bool pmInRanges(const pm_id_range_t *r, int n, int id)
+{
+    for (int i = 0; i < n; i++) {
+        if (id >= r[i].from && id <= r[i].to) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static int pmPowerDomainSkip(int id) {
+    return pmInRanges(pm_power_skip, PM_RANGE_COUNT(pm_power_skip), id) ? 0 : 1;
+}
+
+static int pmPowerRestoreSkip(int id) {
+    return pmInRanges(pm_power_restore_skip, PM_RANGE_COUNT(pm_power_restore_skip), id) ? 0 : 1;
+}
+
+static int pmClockDomainSkip(int id) {
+    return pmInRanges(pm_clock_skip, PM_RANGE_COUNT(pm_clock_skip), id) ? 0 : 1;
+}
+
+static int pmClockOffSkip(int id) {
+    return pmInRanges(pm_clock_off_skip, PM_RANGE_COUNT(pm_clock_off_skip), id) ? 0 : 1;
+}
+
+static int pmResetDomainSkip(int id) {
+    return pmInRanges(pm_reset_skip, PM_RANGE_COUNT(pm_reset_skip), id) ? 0 : 1;
+}
 
 static void prvSetupHardware(void)
 {
@@ -163,56 +194,6 @@ static int pmPowerdomainOnTest(int domain_id)
     return 0;
 }
 
-static int pmPowerDomainSkip(int domain_id) {
-    int ret = 0;
-    int cpu_id = R_UTILS_GetCpuID();
-    if (((cpu_id == 0) &&
-        (X5H_POWER_DOMAIN_ID_RC00 == domain_id)) ||
-        ((cpu_id == 1) &&
-        (X5H_POWER_DOMAIN_ID_RC01 == domain_id))) {
-        /* Do nothing */
-    } else {
-        ret = 1;
-    }
-    return ret;
-}
-
-static int pmResetDomainSkip(int domain_id) {
-    int ret = 0;
-    int cpu_id = R_UTILS_GetCpuID();
-    if (((cpu_id == 0) &&
-        ((X5H_RESET_DOMAIN_ID_CR52TOP0 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52TOP0_BD == domain_id) ||
-        (X5H_RESET_DOMAIN_ID_CR52CORE0 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52CORE0_PO == domain_id) ||
-        (X5H_RESET_DOMAIN_ID_CR52SHADOW0 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52SHADOW0_PO == domain_id)))
-        ||
-        ((cpu_id == 1) &&
-        ((X5H_RESET_DOMAIN_ID_CR52TOP1 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52TOP1_DEB == domain_id) ||
-        (X5H_RESET_DOMAIN_ID_CR52CORE1 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52CORE1_PO == domain_id) ||
-        (X5H_RESET_DOMAIN_ID_CR52SHADOW1 == domain_id) || (X5H_RESET_DOMAIN_ID_CR52SHADOW1_PO == domain_id)))) {
-        /* Do nothing */
-    } else {
-        ret = 1;
-    }
-    return ret;
-}
-
-static int pmClockDomainSkip(int clock_id) {
-    int ret = 0;
-    int cpu_id = R_UTILS_GetCpuID();
-    if (((cpu_id == 0) &&
-        ((X5H_CLOCK_ID_MDLC_CR52CORE0 == clock_id) || (X5H_CLOCK_ID_MDLC_CR52CORE0_PO == clock_id) ||
-        (X5H_CLOCK_ID_MDLC_CR52SHADOW0 == clock_id) || (X5H_CLOCK_ID_MDLC_CR52SHADOW0_PO == clock_id)))
-        ||
-        ((cpu_id == 1) &&
-        ((X5H_CLOCK_ID_MDLC_CR52CORE1 == clock_id) || (X5H_CLOCK_ID_MDLC_CR52CORE1_PO == clock_id) ||
-        (X5H_CLOCK_ID_MDLC_CR52SHADOW1 == clock_id) || (X5H_CLOCK_ID_MDLC_CR52SHADOW1_PO == clock_id)))) {
-        /* Do nothing */
-    } else {
-        ret = 1;
-    }
-    return ret;
-}
-
 static int pmClockTest(int clock_id, uint32_t *rate_set)
 {
     int ret;
@@ -286,8 +267,7 @@ static int pmClockTest(int clock_id, uint32_t *rate_set)
     /* Set clock off  */
     PM_LOG("**********TC%d %d-5: set clock id %d OFF.**********\r\n",
             tc_number, clock_id, clock_id);
-    if ((X5H_CLOCK_ID_MDLC_VIPN_MSYNC == clock_id) ||
-        (X5H_CLOCK_ID_MDLC_VIPS_MSYNC == clock_id)) {
+    if (0 == pmClockOffSkip) {
         PM_LOG("Currently not supported this operation.\r\n");
     } else {
         ret = R_StateManager_ClockOff(clock_id);
@@ -432,13 +412,8 @@ static void pmAppExample(void)
     for (domain_id = X5H_POWER_DOMAIN_ID_COUNT - 1;
         domain_id >= 0;
         domain_id--) {
-        if (((X5H_POWER_DOMAIN_ID_P_RPU_CORE00 <= domain_id) &&
-            (X5H_POWER_DOMAIN_ID_Q_APU_P07 >= domain_id))) {
+        if (0 == pmPowerDomainSkip(domain_id)) {
             PM_LOG("Skip domain id %d \r\n", domain_id);
-        } else if ((0 == pmPowerDomainSkip(domain_id)) ||
-        ((X5H_POWER_DOMAIN_ID_RC00 == domain_id) || (X5H_POWER_DOMAIN_ID_RC01 == domain_id))) {
-            PM_LOG("Skip domain id %d, because this sample is running on core %d \r\n",
-                domain_id, R_UTILS_GetCpuID());
         } else {
             pmPowerdomainOnTest(domain_id);
         }
@@ -450,13 +425,8 @@ static void pmAppExample(void)
         domain_id < X5H_POWER_DOMAIN_ID_COUNT;
         domain_id++)
     {
-        if (((X5H_POWER_DOMAIN_ID_P_RPU_CORE00 <= domain_id) &&
-            (X5H_POWER_DOMAIN_ID_Q_APU_P07 >= domain_id))) {
+        if (0 == pmPowerDomainSkip(domain_id)) {
             PM_LOG("Skip domain id %d \r\n", domain_id);
-        } else if ((0 == pmPowerDomainSkip(domain_id)) ||
-         ((X5H_POWER_DOMAIN_ID_RC00 == domain_id) || (X5H_POWER_DOMAIN_ID_RC01 == domain_id))) {
-            PM_LOG("Skip domain id %d, because this sample is running on core %d \r\n",
-                domain_id, R_UTILS_GetCpuID());
         } else {
             pmPowerdomainOffTest(domain_id);
         }
@@ -468,13 +438,11 @@ static void pmAppExample(void)
          domain_id >= 0;
          domain_id--)
     {
-        if (((X5H_POWER_DOMAIN_ID_P_RPU_CORE00 <= domain_id) &&
-            (X5H_POWER_DOMAIN_ID_Q_APU_P07 >= domain_id))) {
+        if (0 == pmPowerRestoreSkip(domain_id)) {
             // Skip domain id because this is core's domain ids
-            continue;
-        } else if ((X5H_POWER_DOMAIN_ID_RC00 <= domain_id) && (X5H_POWER_DOMAIN_ID_RC11 >= domain_id)) {
-            PM_LOG("Skip domain id %d, because re-powering on any core may cause the system to hang \r\n",
+            PM_LOG("Skip domain id %d, because re-powering on any core may cause the system to hang. \r\n",
                 domain_id);
+            PM_LOG("Or this is core's domain id. \r\n");
             continue;
         } else {
             ret = R_StateManager_PowerOn(domain_id);
@@ -494,11 +462,7 @@ static void pmAppExample(void)
          domain_id < X5H_CLOCK_ID_COUNT;
          ++domain_id)
     {
-        if ((X5H_CLOCK_ID_MDLC_HSCIF0 == domain_id) ||
-            (X5H_CLOCK_ID_MDLC_SCIF0 == domain_id) ||
-            (X5H_CLOCK_ID_MDLC_SCIF1 == domain_id) ||
-            (X5H_CLOCK_ID_MDLC_INTAP1 <= domain_id) ||
-            (0 == pmClockDomainSkip(domain_id))) {
+        if (0 == pmClockDomainSkip(domain_id)) {
             continue;
         }
 
@@ -517,15 +481,7 @@ static void pmAppExample(void)
          domain_id < X5H_RESET_DOMAIN_ID_COUNT;
          ++domain_id)
     {
-        if ((X5H_RESET_DOMAIN_ID_HSCIF0 == domain_id) ||
-            (X5H_RESET_DOMAIN_ID_SCIF0 == domain_id) ||
-            (X5H_RESET_DOMAIN_ID_SCIF1 == domain_id) ||
-            (X5H_RESET_DOMAIN_ID_CSITOP2 == domain_id) ||
-            (domain_id >= X5H_RESET_DOMAIN_ID_VCON0 && domain_id <= X5H_RESET_DOMAIN_ID_VCON9) ||
-            (X5H_RESET_DOMAIN_ID_INTAP1 <= domain_id) ||
-            (0 == pmResetDomainSkip(domain_id)) ||
-            (domain_id >= X5H_RESET_DOMAIN_ID_CR52TOP0 && domain_id <= X5H_RESET_DOMAIN_ID_CR52TOP1_DEB)
-            ) {
+        if (0 == pmResetDomainSkip(domain_id)) {
                 printf("Skip domain id %d \r\n", domain_id);
                 continue;
         }

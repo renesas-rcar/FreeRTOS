@@ -1,0 +1,141 @@
+{
+  "_note": [
+    "Skip list = socs.<soc>.<type>.{all,cpuN} + boards.<board>.<type>.{all,cpuN}",
+    "Item: \"ID_NAME\" (single id) or { \"from\": \"ID_A\", \"to\": \"ID_B\" } (inclusive range)",
+    "Keys starting with '_' are comments and ignored by the generator"
+  ],
+
+  "socs": {
+    "x5h": {
+      "power_skip": {
+        "_note": [
+          "Used by Power ON / Power OFF tests",
+          "all : RPU/APU core power domains, always skipped",
+          "cpuN: power domain of the core running this sample"
+        ],
+        "all": [
+          { "from": "X5H_POWER_DOMAIN_ID_P_RPU_CORE00", "to": "X5H_POWER_DOMAIN_ID_Q_APU_P07" }
+        ],
+        "cpu0": [
+          "X5H_POWER_DOMAIN_ID_RC00"
+        ],
+        "cpu1": [
+          "X5H_POWER_DOMAIN_ID_RC01"
+        ]
+      },
+
+      "power_restore_skip": {
+        "_note": "Used by restore step. Re-powering on any core may cause the system to hang",
+        "all": [
+          { "from": "X5H_POWER_DOMAIN_ID_P_RPU_CORE00", "to": "X5H_POWER_DOMAIN_ID_Q_APU_P07" },
+          { "from": "X5H_POWER_DOMAIN_ID_RC00",         "to": "X5H_POWER_DOMAIN_ID_RC11" }
+        ]
+      },
+
+      "clock_skip": {
+        "_note": "UART console clocks and INTAP1..end cause board hang",
+        "all": [
+          "X5H_CLOCK_ID_MDLC_HSCIF0",
+          "X5H_CLOCK_ID_MDLC_SCIF0",
+          "X5H_CLOCK_ID_MDLC_SCIF1",
+          { "from": "X5H_CLOCK_ID_MDLC_INTAP1", "to": "X5H_CLOCK_ID_COUNT - 1" }
+        ],
+        "cpu0": [
+          "X5H_CLOCK_ID_MDLC_CR52CORE0",
+          "X5H_CLOCK_ID_MDLC_CR52CORE0_PO",
+          "X5H_CLOCK_ID_MDLC_CR52SHADOW0",
+          "X5H_CLOCK_ID_MDLC_CR52SHADOW0_PO"
+        ],
+        "cpu1": [
+          "X5H_CLOCK_ID_MDLC_CR52CORE1",
+          "X5H_CLOCK_ID_MDLC_CR52CORE1_PO",
+          "X5H_CLOCK_ID_MDLC_CR52SHADOW1",
+          "X5H_CLOCK_ID_MDLC_CR52SHADOW1_PO"
+        ]
+      },
+
+      "clock_off_skip": {
+        "_note": "Clock OFF operation currently not supported",
+        "all": [
+          "X5H_CLOCK_ID_MDLC_VIPN_MSYNC",
+          "X5H_CLOCK_ID_MDLC_VIPS_MSYNC"
+        ]
+      },
+
+      "reset_skip": {
+        "_note": "UART console, CSITOP2, VCON, CR52 TOP and INTAP1..end cause board hang",
+        "all": [
+          "X5H_RESET_DOMAIN_ID_HSCIF0",
+          "X5H_RESET_DOMAIN_ID_SCIF0",
+          "X5H_RESET_DOMAIN_ID_SCIF1",
+          "X5H_RESET_DOMAIN_ID_CSITOP2",
+          { "from": "X5H_RESET_DOMAIN_ID_VCON0",    "to": "X5H_RESET_DOMAIN_ID_VCON9" },
+          { "from": "X5H_RESET_DOMAIN_ID_CR52TOP0", "to": "X5H_RESET_DOMAIN_ID_CR52TOP1_DEB" },
+          { "from": "X5H_RESET_DOMAIN_ID_INTAP1",   "to": "X5H_RESET_DOMAIN_ID_COUNT - 1" }
+        ],
+        "cpu0": [
+          "X5H_RESET_DOMAIN_ID_CR52TOP0",
+          "X5H_RESET_DOMAIN_ID_CR52TOP0_BD",
+          "X5H_RESET_DOMAIN_ID_CR52CORE0",
+          "X5H_RESET_DOMAIN_ID_CR52CORE0_PO",
+          "X5H_RESET_DOMAIN_ID_CR52SHADOW0",
+          "X5H_RESET_DOMAIN_ID_CR52SHADOW0_PO"
+        ],
+        "cpu1": [
+          "X5H_RESET_DOMAIN_ID_CR52TOP1",
+          "X5H_RESET_DOMAIN_ID_CR52TOP1_DEB",
+          "X5H_RESET_DOMAIN_ID_CR52CORE1",
+          "X5H_RESET_DOMAIN_ID_CR52CORE1_PO",
+          "X5H_RESET_DOMAIN_ID_CR52SHADOW1",
+          "X5H_RESET_DOMAIN_ID_CR52SHADOW1_PO"
+        ]
+      }
+    },
+
+    "aiacc": {
+      "power_skip":         { "all": [] },
+      "power_restore_skip": { "all": [] },
+
+      "clock_skip": {
+        "_note": "UART logging",
+        "all": [
+          "AIACC_CLOCK_ID_HSCIF0",
+          "AIACC_CLOCK_ID_HSCIF1",
+          "AIACC_CLOCK_ID_SCIF0",
+          "AIACC_CLOCK_ID_SCIF1",
+          "AIACC_CLOCK_ID_INTTP",
+          "AIACC_CLOCK_ID_SCPCORE_SYSRES",
+          "AIACC_CLOCK_ID_UCIE01",
+          "AIACC_CLOCK_ID_INTSCP",
+          "AIACC_CLOCK_ID_UCIE02",
+          "AIACC_CLOCK_ID_ZT_SCP_MAIN"
+        ]
+      },
+
+      "clock_off_skip": { "all": [] },
+
+      "reset_skip": {
+        "_note": "UART logging",
+        "all": [
+          "AIACC_RESET_DOMAIN_ID_HSCIF0",
+          "AIACC_RESET_DOMAIN_ID_HSCIF1",
+          "AIACC_RESET_DOMAIN_ID_SCIF0",
+          "AIACC_RESET_DOMAIN_ID_SCIF1"
+        ]
+      }
+    }
+  },
+
+  "boards": {
+    "ironhide": {
+      "soc": "x5h",
+      "_note": "Add board-specific skip lists here, same structure as socs.<soc>"
+    },
+    "mdp_x5h": {
+      "soc": "x5h"
+    },
+    "mdp_aiacc": {
+      "soc": "aiacc"
+    }
+  }
+}
