@@ -30,6 +30,8 @@ if(NOT DEFINED RAM_REGION)
 endif()
 set(LDFILE ${BSP_DIR}/common/linker/lscript_sram.ld)
 
+# set(ADDITIONAL_OPTIONS )
+
 if(BOARD STREQUAL "x5h_vdk" OR BOARD STREQUAL "x5h_ironhide" OR BOARD STREQUAL "x5h_rfs2" OR BOARD STREQUAL "mdp_aiacc_rfs2" OR BOARD STREQUAL "mdp_aiacc_hil" OR BOARD STREQUAL "mdp_x5h_hil")
     if(BOARD STREQUAL "x5h_vdk")
         set(BOARD_ID 1)
@@ -134,6 +136,38 @@ message(STATUS "LIBRARY_LOG_LEVEL is defined as: ${LIBRARY_LOG_LEVEL}")
 
 set(CMAKE_ASM_FLAGS "--specs=nosys.specs -mfloat-abi=hard")
 set(CMAKE_C_FLAGS "-std=c99")
+
+# =======================================
+# Convert all -DAOxxx=<value> options to -Dxxx=<value>
+#
+# Example:
+#   -DAOCLOCK_TEST=0  -> -DCLOCK_TEST=0
+#   -DAORESET_TEST=0  -> -DRESET_TEST=0
+# =======================================
+set(ADDITIONAL_COMPILE_OPTIONS)
+
+get_cmake_property(CACHE_VARIABLES CACHE_VARIABLES)
+list(SORT CACHE_VARIABLES)
+
+foreach(CACHE_VAR IN LISTS CACHE_VARIABLES)
+    if(CACHE_VAR MATCHES "^AO(.+)$")
+        set(COMPILE_DEFINE_NAME "${CMAKE_MATCH_1}")
+
+        # Important:
+        # Dereference the variable directly so CMake considers it "used"
+        set(COMPILE_DEFINE_VALUE "${${CACHE_VAR}}")
+
+        list(APPEND ADDITIONAL_COMPILE_OPTIONS
+            "-D${COMPILE_DEFINE_NAME}=${COMPILE_DEFINE_VALUE}"
+        )
+
+        message(STATUS
+            "AO option: ${CACHE_VAR}=${COMPILE_DEFINE_VALUE} "
+            "-> -D${COMPILE_DEFINE_NAME}=${COMPILE_DEFINE_VALUE}"
+        )
+    endif()
+endforeach()
+
 add_compile_options(
     -ffreestanding -mfpu=neon-fp-armv8 -mcpu=cortex-r52 -mtune=cortex-r52 -mfloat-abi=softfp
     -Wno-unknown-pragmas -DSCMI_DEBUG -DBOARD=${BOARD_ID} -DRAM_REGION=${RAM_REGION} -g
@@ -142,6 +176,7 @@ add_compile_options(
     ${global_definition}
     -D${UCIE_VER}=2 -D${UCIE_CONW}=1
     -DLIBRARY_LOG_LEVEL=${LIBRARY_LOG_LEVEL}
+    ${ADDITIONAL_COMPILE_OPTIONS}
     -ffile-prefix-map=${FREERTOS_DIR}/=
 )
 

@@ -26,6 +26,14 @@
         printf(format "\r\n", ##__VA_ARGS__);\
     }
 
+#ifndef SYSTEM_RST_TEST
+#define SYSTEM_RST_TEST 1
+#endif
+
+#ifndef SYSTEM_SHUTDOWN_TEST
+#define SYSTEM_SHUTDOWN_TEST 1
+#endif
+
 static void prvPmAppTask(void *pvParameters);
 static void pmAppExample(void);
 
@@ -480,7 +488,6 @@ static void pmAppExample(void)
     PM_LOG("*******TC%d: Powerdomain control end!*******\r\n\r\n",
             tc_number);
 
-
     PM_LOG("*******TC%d: SCMI Clock control starting!*******\r\n",
             ++tc_number);
     for (domain_id = X5H_CLOCK_ID_MDLC_VIPN_FCPCS0;
@@ -531,17 +538,26 @@ static void pmAppExample(void)
     PM_LOG("*******TC%d: SCMI Reset control end!*******\r\n\r\n",
             tc_number);
 
+#if (SYSTEM_RST_TEST == 1)
     PM_LOG("*******TC%d: SCMI System Reset starting!*******\r\n",
             ++tc_number);
-#ifdef SYSTEM_RST_TEST
     ret = R_StateManager_SysReboot();
     if (ret) {
         PM_LOG("Error: Failed to request System Reboot.\r\n");
         return;
     }
-#else
-    PM_LOG("Don't run the TC System Reset for much logs output!\r\n");
-#endif /* SYSTEM_RST_TEST */
     PM_LOG("*******TC%d: SCMI System Reset end!*******\r\n",
             tc_number);
+#else if (SYSTEM_SHUTDOWN_TEST == 1)
+    PM_LOG("*******TC%d: SCMI System Shutdown starting!*******\r\n",
+            ++tc_number);
+    vTaskDelay(3000);
+    ret = R_StateManager_SysPowerOff();
+    if (ret) {
+        PM_LOG("Error: Failed to request System Shutdown.\r\n");
+        return;
+    }
+    PM_LOG("*******TC%d: SCMI System Shutdown end!*******\r\n",
+            tc_number);
+#endif /* SYSTEM_RST_TEST */
 }
