@@ -64,39 +64,50 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
     uint8_t val;
     uintptr_t wwdt_base_addr = R_WWDT_PRV_GetRegbase(unit);
     int clock_id, clock_id_0, clock_id_1, ret;
+    int reset_id, reset_id_0, reset_id_1;
 
     if ((uint32_t)unit >= WWDT_CH_NUM) {
         LogError(("Wrong Unit for Clock ID\n"));
         return;
     }
-
-    clock_id = WWDT_CLK_ID;
-    ret = R_StateManager_ClockOn(clock_id);
-    if (ret != 0) {
-        LogError(("Failed to set clock id %d ON.\r\n", clock_id));
+    
+    /* Clock On and Reset */
+    if ((uint32_t)unit == WWDT_CH_NUM - 1) {
+        /* This unit is belonging SCP hierachy, there is no common domain_id for WDT. */
+    } else {
+        /* Other units are belonging RT hierachy, there are some common domain_id for WDT. */
+        for (int i = 0; i < WWDT_ID_REQUIRED_NUM; i++) {
+            clock_id = wwdt_clock_required_tbl[i];
+            ret = R_StateManager_ClockOn(clock_id);
+            if (ret != 0) {
+                LogError(("Failed to set clock id %d ON.\r\n", clock_id));
+            }
+            reset_id = wwdt_reset_required_tbl[i];
+            ret = R_StateManager_Reset(reset_id);
+            if (ret != 0) {
+                LogError(("Failed to reset domain id %d.\r\n", reset_id));
+            }
+        }
     }
-
     clock_id_0 = wwdt_clock_tbl[unit].clock_id_0;
     clock_id_1 = wwdt_clock_tbl[unit].clock_id_1;
-
-    ret = R_StateManager_ResetAssert(clock_id_0);
+    ret = R_StateManager_ClockOn(clock_id_0);
     if (ret != 0) {
-        LogError(("Failed to reset clock id %d.\r\n", clock_id_0));
+        LogError(("Failed to set clock id %d ON.\r\n", clock_id_0));
     }
-
-    ret = R_StateManager_ResetAssert(clock_id_1);
+    ret = R_StateManager_ClockOn(clock_id_1);
     if (ret != 0) {
-        LogError(("Failed to reset clock id %d.\r\n", clock_id_1));
+        LogError(("Failed to set clock id %d ON.\r\n", clock_id_1));
     }
-
-    ret = R_StateManager_ResetDeassert(clock_id_0);
+    reset_id_0 = wwdt_reset_tbl[unit].reset_id_0;
+    reset_id_1 = wwdt_reset_tbl[unit].reset_id_1;
+    ret = R_StateManager_Reset(reset_id_0);
     if (ret != 0) {
-        LogError(("Failed to DeassertReset clock id %d.\r\n", clock_id_0));
+        LogError(("Failed to reset domain id %d.\r\n", reset_id_0));
     }
-
-    ret = R_StateManager_ResetDeassert(clock_id_1);
+    ret = R_StateManager_Reset(reset_id_1);
     if (ret != 0) {
-        LogError(("Failed to DeassertReset clock id %d.\r\n", clock_id_1));
+        LogError(("Failed to reset domain id %d.\r\n", reset_id_1));
     }
 
     clk_rate = (wwdt_base_addr == 0xC1380000) ? CLK_LSIOSC : RCLK;
@@ -114,6 +125,7 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
     /* Enable Generating internal reset when WWDT overflow */
     r_wwdt_write(RST_DM0_BASE + RST_RESKCPROT0, RST_KCPROT_DIS);
     r_wwdt_write(RST_DM0_BASE + RST_RESFC, r_rst_read(RST_DM0_BASE + RST_RESFC) & ~RST_SRES1FC4);
+    r_wwdt_write(RST_DM0_BASE + RST_RESKCPROT0, RST_KCPROT_DIS);
     r_wwdt_write(RST_DM0_BASE + RST_WDTRSTCR, r_rst_read(RST_DM0_BASE + RST_WDTRSTCR) & ~WWDT_RSTMSK);
 }
 

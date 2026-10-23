@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include "state-manager/r_clock_domain_id.h"
+#include "state-manager/r_reset_domain_id.h"
 
 #define R_WWDT0_BASE	0x1C100000U
 #define R_WWDT1_BASE	0x1C110000U
@@ -60,13 +61,29 @@ static const uintptr_t wwdt_base_tbl[] =
 
 #define WWDT_CH_NUM    ((uint32_t)(sizeof(wwdt_base_tbl) / sizeof(wwdt_base_tbl[0])))
 
-#define WWDT_CLK_ID     X5H_CLOCK_ID_MDLC_WDT0
+#define WWDT_ID_REQUIRED_NUM 2U
 
 typedef struct
 {
     int clock_id_0;
     int clock_id_1;
 } wwdt_clock_t;
+
+typedef struct
+{
+    int reset_id_0;
+    int reset_id_1;
+} wwdt_reset_t;
+
+static const int wwdt_clock_required_tbl[WWDT_ID_REQUIRED_NUM] = {
+    X5H_CLOCK_ID_MDLC_WDT0,
+    X5H_CLOCK_ID_MDLC_WDT1
+};
+
+static const int wwdt_reset_required_tbl[WWDT_ID_REQUIRED_NUM] = {
+    X5H_RESET_DOMAIN_ID_WDT0,
+    X5H_RESET_DOMAIN_ID_WDT1
+};
 
 static const wwdt_clock_t wwdt_clock_tbl[] =
 {
@@ -91,6 +108,31 @@ static const wwdt_clock_t wwdt_clock_tbl[] =
     { X5H_CLOCK_ID_MDLC_WWDT180, X5H_CLOCK_ID_MDLC_WWDT181 },
     { X5H_CLOCK_ID_MDLC_WWDT190, X5H_CLOCK_ID_MDLC_WWDT191 },
     { X5H_CLOCK_ID_MDLC_WWDT200, X5H_CLOCK_ID_MDLC_WWDT201 },
+};
+
+static const wwdt_reset_t wwdt_reset_tbl[] =
+{
+    { X5H_RESET_DOMAIN_ID_WWDT00,  X5H_RESET_DOMAIN_ID_WWDT01   },
+    { X5H_RESET_DOMAIN_ID_WWDT10,  X5H_RESET_DOMAIN_ID_WWDT11   },
+    { X5H_RESET_DOMAIN_ID_WWDT20,  X5H_RESET_DOMAIN_ID_WWDT21   },
+    { X5H_RESET_DOMAIN_ID_WWDT30,  X5H_RESET_DOMAIN_ID_WWDT31   },
+    { X5H_RESET_DOMAIN_ID_WWDT40,  X5H_RESET_DOMAIN_ID_WWDT41   },
+    { X5H_RESET_DOMAIN_ID_WWDT50,  X5H_RESET_DOMAIN_ID_WWDT51   },
+    { X5H_RESET_DOMAIN_ID_WWDT60,  X5H_RESET_DOMAIN_ID_WWDT61   },
+    { X5H_RESET_DOMAIN_ID_WWDT70,  X5H_RESET_DOMAIN_ID_WWDT71   },
+    { X5H_RESET_DOMAIN_ID_WWDT80,  X5H_RESET_DOMAIN_ID_WWDT81   },
+    { X5H_RESET_DOMAIN_ID_WWDT90,  X5H_RESET_DOMAIN_ID_WWDT91   },
+    { X5H_RESET_DOMAIN_ID_WWDT100,  X5H_RESET_DOMAIN_ID_WWDT101 },
+    { X5H_RESET_DOMAIN_ID_WWDT110,  X5H_RESET_DOMAIN_ID_WWDT111 },
+    { X5H_RESET_DOMAIN_ID_WWDT120,  X5H_RESET_DOMAIN_ID_WWDT121 },
+    { X5H_RESET_DOMAIN_ID_WWDT130,  X5H_RESET_DOMAIN_ID_WWDT131 },
+    { X5H_RESET_DOMAIN_ID_WWDT140,  X5H_RESET_DOMAIN_ID_WWDT141 },
+    { X5H_RESET_DOMAIN_ID_WWDT150,  X5H_RESET_DOMAIN_ID_WWDT151 },
+    { X5H_RESET_DOMAIN_ID_WWDT160,  X5H_RESET_DOMAIN_ID_WWDT161 },
+    { X5H_RESET_DOMAIN_ID_WWDT170,  X5H_RESET_DOMAIN_ID_WWDT171 },
+    { X5H_RESET_DOMAIN_ID_WWDT180,  X5H_RESET_DOMAIN_ID_WWDT181 },
+    { X5H_RESET_DOMAIN_ID_WWDT190,  X5H_RESET_DOMAIN_ID_WWDT191 },
+    { X5H_RESET_DOMAIN_ID_WWDT200,  X5H_RESET_DOMAIN_ID_WWDT201 },
 };
 
 #endif /* R_WWDT_PRIVATE_H */
