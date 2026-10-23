@@ -10,63 +10,12 @@
 #include "mfis_internal.h"
 #include "interrupts.h"
 #include "rcar_utils.h"
+#include "cmsis_rcar_gen5.h"
+#include "stdio.h"
+#include "mfis/r_mfis_private.h"
 
-
-#define MFIS_RT_BCH_BASE            (0x18A40000U)
-#define MFIS_RT_BASE                (0x18800000U)
-
-#define MFIS_RT_COMMON_BASE         (0x189E1000U)
-#define MFIS_RT_UNLOCK_WRITE        (MFIS_RT_COMMON_BASE + 0x900U) /* MFISWPCNTR */
-
-#define MFISIMR_RR_A(i)             (MFIS_RT_BASE     + 0x808U + (0x1000U * (uint32_t)(i)))
-#define MFISIMR_RR_B(i)             (MFIS_RT_BCH_BASE + 0x808U + (0x1000U * (uint32_t)(i)))
-
-#define MFISCHN_CTRL_RR_A(i)        (MFIS_RT_BASE     + 0x81CU + (0x1000U * (uint32_t)(i)))
-#define MFISCHN_CTRL_RR_B(i)        (MFIS_RT_BCH_BASE + 0x81CU + (0x1000U * (uint32_t)(i)))
-
-#define MFISCHN_ACK_ST_RR_A(i)      (MFIS_RT_BASE     + 0x830U + (0x1000U * (uint32_t)(i)))
-#define MFISCHN_ACK_ST_RR_B(i)      (MFIS_RT_BCH_BASE + 0x830U + (0x1000U * (uint32_t)(i)))
-
-#define MFISISR_RR_A(i)             (MFIS_RT_BASE     + 0x804U + (0x1000U * (uint32_t)(i)))
-#define MFISISR_RR_B(i)             (MFIS_RT_BCH_BASE + 0x804U + (0x1000U * (uint32_t)(i)))
-
-#define MFISCHN_SIG_RR_A(i)         (MFIS_RT_BASE     + 0x820U + (0x1000U * (uint32_t)(i)))
-#define MFISCHN_SIG_RR_B(i)         (MFIS_RT_BCH_BASE + 0x820U + (0x1000U * (uint32_t)(i)))
-
-#define MFISICR_RR_A(i)             (MFIS_RT_BASE     + 0x80CU + (0x1000U * (uint32_t)(i)))
-#define MFISICR_RR_B(i)             (MFIS_RT_BCH_BASE + 0x80CU + (0x1000U * (uint32_t)(i)))
-
-#define MFISCHN_RCV_ACK_RR_A(i)     (MFIS_RT_BASE     + 0x840U + (0x1000U * (uint32_t)(i)))
-#define MFISCHN_RCV_ACK_RR_B(i)     (MFIS_RT_BCH_BASE + 0x840U + (0x1000U * (uint32_t)(i)))
-
-/*----------------------------------------------------------------------*/
-
-#define BIT(n)                              (1UL << (n))
-
-#define MFISIMR_ACK_INT_BIT                 BIT(0U) /* bit 0 */
-#define MFISIMR_RCV_INT_BIT                 BIT(1U) /* bit 1 */
-
-#define MFISISR_ACK_INT                     BIT(0U)
-#define MFISISR_RCV_INT_BIT                 BIT(1U)
-
-#define MFISCHN_ACK_ST_PND_ACK_BIT          BIT(0U) /* bit 0 */
-#define MFISCHN_SIG_SND_SIG_BIT             BIT(0U) /* bit 0 */
-
-#define MFISICR_ACK_INT_BIT                 BIT(0U) /* bit 0 */
-#define MFISICR_RCV_INT_BIT                 BIT(1U) /* bit 1 */
-
-#define MFISCHN_CTRL_EN_AUTO_ACK_INTCLR     BIT(0U) /* bit 0 */
-#define MFISCHN_RCV_ACK_RCV_ACK_BIT         BIT(0U) /* bit 0 */
-
-/* NOTE: original file defined MFISISR_RCV_INT twice with different
- * names (MFISISR_RCV_INT and MFISISR_RCV_INT_BIT). The duplicate
- * definition has been removed to avoid a redefinition and to keep a
- * single, unambiguous symbol (MISRA C:2012 Rule 20.5 / Dir 4.10 -
- * avoid duplicate/ambiguous macro definitions).
- */
-#define MFISISR_RCV_INT                     MFISISR_RCV_INT_BIT
-
-/*--------------------------- MFIS Driver ---------------------------------*/
+#define CLUSTER0_CORE0              0U
+#define CLUSTER0_CORE1              1U
 
 static inline uint32_t mfis_read32(uintptr_t addr)
 {
@@ -96,9 +45,6 @@ static inline void mfis_clear_bits(uintptr_t addr, uint32_t mask)
 /* Get interrupt source number of a channel */
 uint16_t mfis_get_int_source_num(struct mfis_channel *ch)
 {
-    /* ch is currently unused; kept in the prototype for API
-     * consistency and future use. Cast to void to satisfy
-     * MISRA C:2012 Rule 2.7 (unused parameter). */
     (void)ch;
 
     uint16_t result = 1U;
@@ -108,48 +54,32 @@ uint16_t mfis_get_int_source_num(struct mfis_channel *ch)
 /* Get message of a channel */
 uint16_t mfis_get_message(struct mfis_channel *ch)
 {
-    /* ch is currently unused; kept in the prototype for API
-     * consistency and future use. Cast to void to satisfy
-     * MISRA C:2012 Rule 2.7 (unused parameter). */
     (void)ch;
 
-    /* NOTE: the original function had no return statement, which is
-     * undefined behaviour for a non-void function (MISRA C:2012
-     * Rule 17.4). No message-data register was defined in this file,
-     * so a safe default of 0 is returned here. Replace this with a
-     * read of the actual MFIS message register once its address is
-     * defined. */
     uint16_t result = 0U;
     return result;
 }
 
-
-/* Forward declaration required so that a compatible declaration is
- * visible before this externally-linked function is defined
- * (MISRA C:2012 Rule 8.4). Ideally this belongs in mfis_internal.h
- * alongside the other driver prototypes; it is declared here as a
- * local fallback in case the header does not already expose it. */
 void mfis_interrupt_cb(void *data);
 
 /* Interrupt callback sample */
 void mfis_interrupt_cb(void *data)
 {
     struct mfis_channel *ch = (struct mfis_channel *)data;
-
-    /* Unlock MFIS register write protection */
-    mfis_write32(MFIS_RT_UNLOCK_WRITE, 0xACC00001U);
+	uint32_t mfis_rtcore_num = CURRENT_CORE_IDX;
 
     if (ch->type == MFIS_TYPE_RECEVER)
     {
+        /* Unlock MFIS register write protection */
+        mfis_write32(MFIS_RT_UNLOCK_WRITE, 0xACC00001U);
         if (mfis_read_bit(MFISISR_RR_A(ch->ch), MFISISR_ACK_INT) != 0U)
         {
-            /* Step A5: Write 1 to MFISICR_A0.ACK_INT */
+            /* Write 1 to MFISICR_A0.ACK_INT */
             mfis_set_bits(MFISICR_RR_A(ch->ch), MFISICR_ACK_INT_BIT);
         }
 
         if (mfis_read_bit(MFISISR_RR_A(ch->ch), MFISISR_RCV_INT) != 0U)
         {
-            /* Step B4, B5 */
             mfis_set_bits(MFISICR_RR_A(ch->ch), MFISICR_RCV_INT_BIT);
             mfis_set_bits(MFISCHN_RCV_ACK_RR_A(ch->ch), MFISCHN_RCV_ACK_RCV_ACK_BIT);
 
@@ -162,11 +92,12 @@ void mfis_interrupt_cb(void *data)
             }
         }
     }
-    else
+    else if (ch->type == MFIS_TYPE_SENDER)
     {
+        /* Unlock MFIS register write protection */
+        mfis_write32(MFIS_RT_UNLOCK_WRITE, 0xACC00001U);
         if (mfis_read_bit(MFISISR_RR_B(ch->ch), MFISISR_RCV_INT) != 0U)
         {
-            /* Step B4, B5 */
             mfis_set_bits(MFISICR_RR_B(ch->ch), MFISICR_RCV_INT_BIT);
             mfis_set_bits(MFISCHN_RCV_ACK_RR_B(ch->ch), MFISCHN_RCV_ACK_RCV_ACK_BIT);
 
@@ -181,8 +112,26 @@ void mfis_interrupt_cb(void *data)
 
         if (mfis_read_bit(MFISISR_RR_B(ch->ch), MFISISR_ACK_INT) != 0U)
         {
-            /* Step A5: Write 1 to MFISICR_A0.ACK_INT */
+            /* Write 1 to MFISICR_A0.ACK_INT */
             mfis_set_bits(MFISICR_RR_B(ch->ch), MFISICR_ACK_INT_BIT);
+        }
+    }
+
+    else
+    {
+        mfis_write32(MFIS_SCP_UNLOCK_WRITE, 0xACC00001U);
+        if (mfis_read_bit(MFISISR_RS_B(mfis_rtcore_num), MFISISR_ACK_INT) != 0U)
+        {
+            mfis_set_bits(MFISICR_RS_B(mfis_rtcore_num), MFISICR_ACK_INT_BIT);
+        }
+
+        if (mfis_read_bit(MFISISR_RS_B(mfis_rtcore_num), MFISISR_RCV_INT) != 0U)
+        {
+            mfis_set_bits(MFISICR_RS_B(mfis_rtcore_num), MFISICR_RCV_INT_BIT);
+            if (ch->cb_function != NULL)
+            {
+                ch->cb_function(ch->arg);
+            }  
         }
     }
 }
@@ -190,24 +139,58 @@ void mfis_interrupt_cb(void *data)
 /* Initialize MFIS */
 int mfis_init(struct mfis_channel *ch)
 {
+    uint32_t mfis_rtcore_num = CURRENT_CORE_IDX;
+    int intid;
+    int ret = 0;
+
     /* Initialize */
     ch->int_source = 0U;
     ch->recv_message = 0U;
 
-    uint32_t intid = (uint32_t)MFIS_INTID((uint32_t)ch->ch, (uint32_t)ch->type);
+    if (ch->type == MFIS_TYPE_CR_SCP)
+    {
+        mfis_write32(MFIS_SCP_UNLOCK_WRITE, 0xACC00001U);
+        if (mfis_rtcore_num == CLUSTER0_CORE0)
+        {
+            intid = SCP2RT0_IRQ_ID;
+        }
+        else if (mfis_rtcore_num == CLUSTER0_CORE1)
+        {
+            intid = SCP2RT1_IRQ_ID;
+        }
+        else
+        {
+            return -1;
+        }
+        /* Set Handler for Irq */
+        Irq_SetupEntry(intid, (IrqHandlerFn)mfis_interrupt_cb, (void *)ch);
+        /* Set priority for Irq */
+        Irq_SetPriority(intid, IPRIORITY(5U));
+        /* Enable Irq */
+        Irq_Enable(intid);
 
-    /* Set callback function */
-    Irq_SetupEntry(intid, (IrqHandlerFn)mfis_interrupt_cb, (void *)ch);
-    /* Enable interrupt from Receiver to Sender */
-    Irq_SetPriority(intid, IPRIORITY(2U));
-    Irq_Enable(intid);
+        mfis_set_bits(MFISIMR_RS_B(mfis_rtcore_num), MFISIMR_ACK_INT_BIT); // Enable ACK interrupt
+        while (mfis_read_bit(MFISCHN_ACK_ST_RS_B(mfis_rtcore_num), MFISCHN_ACK_ST_PND_ACK_BIT) != 0U)
+        {};
+        mfis_set_bits(MFISIMR_RS_B(mfis_rtcore_num), MFISIMR_RCV_INT_BIT); // Enable receive interrupt
+    }
+    
+    else
+    {
+        intid = (uint32_t)MFIS_INTID((uint32_t)ch->ch, (uint32_t)ch->type);
+        /* Set callback function */
+        Irq_SetupEntry(intid, (IrqHandlerFn)mfis_interrupt_cb, (void *)ch);
+        /* Enable interrupt from Receiver to Sender */
+        Irq_SetPriority(intid, IPRIORITY(2U));
+        Irq_Enable(intid);
+        /* Unlock MFIS register write protection */
+        mfis_write32(MFIS_RT_UNLOCK_WRITE, 0xACC00001U);
+    }
 
-    /* Unlock MFIS register write protection */
-    mfis_write32(MFIS_RT_UNLOCK_WRITE, 0xACC00001U);
 
     if (ch->type == MFIS_TYPE_RECEVER)
     {
-        mfis_set_bits(MFISIMR_RR_A(ch->ch), MFISIMR_ACK_INT_BIT); /* Step: A1 */
+        mfis_set_bits(MFISIMR_RR_A(ch->ch), MFISIMR_ACK_INT_BIT);
         mfis_set_bits(MFISIMR_RR_A(ch->ch), MFISIMR_RCV_INT_BIT);
 
         while (mfis_read_bit(MFISCHN_ACK_ST_RR_A(ch->ch), MFISCHN_ACK_ST_PND_ACK_BIT) != 0U)
@@ -215,27 +198,52 @@ int mfis_init(struct mfis_channel *ch)
             /* wait for pending ack to clear */
         }
     }
-    else
+    else if (ch->type == MFIS_TYPE_SENDER)
     {
-        mfis_set_bits(MFISIMR_RR_B(ch->ch), MFISIMR_RCV_INT_BIT); /* Step: A1 */
+        mfis_set_bits(MFISIMR_RR_B(ch->ch), MFISIMR_RCV_INT_BIT);
         mfis_set_bits(MFISIMR_RR_B(ch->ch), MFISIMR_ACK_INT_BIT);
 
         while (mfis_read_bit(MFISCHN_ACK_ST_RR_B(ch->ch), MFISCHN_ACK_ST_PND_ACK_BIT) != 0U)
         {
             /* wait for pending ack to clear */
         }
+    } else {
+        /* Do nothing */
     }
 
-    return 0;
+    return ret;
 }
 
 int mfis_deinit(struct mfis_channel *ch)
 {
-    uint32_t intid = (uint32_t)MFIS_INTID((uint32_t)ch->ch, (uint32_t)ch->type);
+    int ret = 0;
+    uint32_t intid;
+    uint32_t mfis_rtcore_num = CURRENT_CORE_IDX;
 
+    if (ch->type == MFIS_TYPE_CR_SCP)
+    {
+        if (mfis_rtcore_num == CLUSTER0_CORE0)
+        {
+            intid = SCP2RT0_IRQ_ID;
+        }
+        else if (mfis_rtcore_num == CLUSTER0_CORE1)
+        {
+            intid = SCP2RT1_IRQ_ID;
+        }
+        else
+        {
+            return -1;
+        } 
+    }
+    
+    else
+    {
+        intid = (uint32_t)MFIS_INTID((uint32_t)ch->ch, (uint32_t)ch->type);
+    }
     Irq_Disable(intid);
     Irq_RemoveEntry(intid);
-    return 0;
+
+    return ret;
 }
 
 /* Trigger interrupt to Receiver channel ch
@@ -243,32 +251,39 @@ int mfis_deinit(struct mfis_channel *ch)
  */
 int mfis_trigger_interrupt(struct mfis_channel *ch, uint16_t int_number)
 {
-    if ((ch->ch > 63U) || (int_number > 0x7FFFU))
+    uint32_t mfis_rtcore_num = CURRENT_CORE_IDX;
+    if (ch->type == MFIS_TYPE_CR_SCP)
     {
-        return -1;
+        /* Unlock MFIS register write protection */
+        mfis_write32(MFIS_SCP_UNLOCK_WRITE, 0xACC00001U);
+        mfis_write32(MFISCHN_SIG_RS_B(mfis_rtcore_num), MFISCHN_SIG_SND_SIG_BIT);
     }
 
-    /* Unlock MFIS register write protection */
-    mfis_write32(MFIS_RT_UNLOCK_WRITE, 0xACC00001U);
-
-    if (ch->type == MFIS_TYPE_RECEVER)
-    {
-        mfis_write32(MFISCHN_SIG_RR_A(ch->ch), MFISCHN_SIG_SND_SIG_BIT); /* Step: A3 */
-    }
     else
     {
-        mfis_write32(MFISCHN_SIG_RR_B(ch->ch), MFISCHN_SIG_SND_SIG_BIT); /* Step: A3 */
-    }
+        if ((ch->ch > 63U) || (int_number > 0x7FFFU))
+        {
+            return -1;
+        }
+        /* Unlock MFIS register write protection */
+        mfis_write32(MFIS_RT_UNLOCK_WRITE, 0xACC00001U);
 
+        if (ch->type == MFIS_TYPE_RECEVER)
+        {
+            mfis_write32(MFISCHN_SIG_RR_A(ch->ch), MFISCHN_SIG_SND_SIG_BIT);
+        }
+        else
+        {
+            mfis_write32(MFISCHN_SIG_RR_B(ch->ch), MFISCHN_SIG_SND_SIG_BIT);
+        }
+    }
+    
     return 0;
 }
 
 /* Send a 32-bit int to Receiver via message register */
 int mfis_send_message(struct mfis_channel *ch, uint32_t value)
 {
-    /* ch and value are currently unused; kept in the prototype for
-     * API consistency and future use. Cast to void to satisfy
-     * MISRA C:2012 Rule 2.7 (unused parameter). */
     (void)ch;
     (void)value;
 

@@ -20,130 +20,53 @@
 #include "scmi/inc/rcar_scmi_common.h"
 #include "scmi/rcar_scmi_private.h"
 #include "scmi/inc/mbox.h"
-#include "board.h"
+#include "mfis/mfis.h"
 
 #define MAILBOX_MAX_CHANNELS 4
 #define MAILBOX_MBOX_SIZE    3
-#define CLUSTER0_CORE0	     0
-#define CLUSTER0_CORE1	     1
-
-#if (BOARD == MDP_AIACC_HIL)
-
-static inline uint32_t mfis_read32(uintptr_t addr)
-{
-    return *(volatile uint32_t *)addr;
-}
-
-static inline void mfis_write32(uintptr_t addr, uint32_t val)
-{
-    *(volatile uint32_t *)addr = val;
-}
-
-static inline uint32_t mfis_read_bit(uintptr_t addr, uint32_t mask)
-{
-    return (*(volatile uint32_t *)addr) & mask;
-}
-
-static inline void mfis_set_bits(uintptr_t addr, uint32_t mask)
-{
-    *(volatile uint32_t *)addr |= mask;
-}
-
-static inline void mfis_clear_bits(uintptr_t addr, uint32_t mask)
-{
-    *(volatile uint32_t *)addr &= ~mask;
-}
-#endif
 
 static struct scmi_dev mfis_dev;
 
+static Context_t mfis_mailbox_cxt = {
+	.ctx = (void *)&mfis_dev,
+};
 struct mfis_mailbox_data {
 	mbox_callback_t cb[MAILBOX_MAX_CHANNELS];
 	void *user_data[MAILBOX_MAX_CHANNELS];
 	bool channel_enable[MAILBOX_MAX_CHANNELS];
-	//uint32_t received_data;
 };
 
 struct mfis_mailbox_config {
 	uintptr_t base;
 };
 
-static void mfis_mailbox_isr(Context_t *context)
-{
-	struct scmi_dev *dev = (struct scmi_dev *)context->ctx;
-	struct mfis_mailbox_data *data = dev->data;
-	const struct mfis_mailbox_config *cfg = dev->config;
-	uint32_t mfis_rtcore_num = CURRENT_CORE_IDX;
-	uint32_t mfis_irq = MFIS_SCP_DISABLE_MFIS_WRITE_PROTECTION(0U) |
-						MFIS_SCP_IRQ_REG_INT(0U);
-
-#if (BOARD == MDP_AIACC_HIL)
-	if (mfis_read_bit(MFISISR_RS_B(mfis_rtcore_num), MFISISR_ACK_INT) != 0U)
-    {
-        mfis_set_bits(MFISICR_RS_B(mfis_rtcore_num), MFISICR_ACK_INT_BIT);
-    }
-
-	if (mfis_read_bit(MFISISR_RS_B(mfis_rtcore_num), MFISISR_RCV_INT) != 0U)
-    {
-		mfis_set_bits(MFISICR_RS_B(mfis_rtcore_num), MFISICR_RCV_INT_BIT);
-		for (int i = 0; i < MAILBOX_MAX_CHANNELS; ++i) {
-			/* Continue to next channel if channel is not enabled */
-			if (!data->channel_enable) {
-				continue;
-			}
-
-			if (data->cb[i] && data->user_data[i]) {
-				data->cb[i](NULL, 0, data->user_data[i], NULL);
-			}
-		}
-
-    }
-#elif (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
-	MFIS_SCP_REG_MFISRSIICR(cfg->base, mfis_rtcore_num) = 
-									mfis_irq & MFIS_SCP_IRQ_REG_MASK;
-
-	for (int i = 0; i < MAILBOX_MAX_CHANNELS; ++i) {
-		/* Continue to next channel if channel is not enabled */
-		if (!data->channel_enable) {
-			continue;
-		}
-
-		if (data->cb[i] && data->user_data[i]) {
-			data->cb[i](NULL, 0, data->user_data[i], NULL);
-		}
-	}
-#endif
-}
+static struct mfis_channel mfis_mailbox_ch = {
+    .type = MFIS_TYPE_CR_SCP,
+    .cb_function = NULL,
+    .arg = &mfis_mailbox_cxt
+};
 
 static int mfis_mailbox_send(const struct scmi_dev *dev, uint32_t channel,
 							const struct mbox_msg *msg)
 {
-	const struct mfis_mailbox_config *cfg = dev->config;
-	uint32_t mfis_rtcore_num = CURRENT_CORE_IDX;
-	uint32_t mfis_msg = 0U;
-	uint32_t mfis_irq = MFIS_SCP_DISABLE_MFIS_WRITE_PROTECTION(0U) |
-						MFIS_SCP_IRQ_REG_INT(1U);
+    int ret = 0;
+	(void) dev;
 
-	if (channel >= MAILBOX_MAX_CHANNELS) {
-		return -EINVAL;
-	}
-	if (msg == NULL) {
-#if (BOARD == MDP_AIACC_HIL)
-		mfis_write32(MFISCHN_SIG_RS_B(mfis_rtcore_num), MFISCHN_SIG_SND_SIG_BIT);
-#elif (BOARD == X5H_IRONHIDE) || (BOARD == MDP_X5H_HIL)
-		MFIS_SCP_REG_MFISRSEMBR(cfg->base, mfis_rtcore_num) = mfis_msg;
-		MFIS_SCP_REG_MFISRSEICR(cfg->base, mfis_rtcore_num) =
-									mfis_irq & MFIS_SCP_IRQ_REG_MASK;
-#endif
-		return 0;
-	}
+    if (channel >= (uint32_t) MAILBOX_MAX_CHANNELS) {
+        ret = -EINVAL;
+    }
 
-	if (msg->size != MAILBOX_MBOX_SIZE) {
-		return -EMSGSIZE;
-	}
+    if ((ret == 0) && (msg == NULL)) {
+        ret = mfis_trigger_interrupt(&mfis_mailbox_ch, 0U);
+        goto out;
+    }
 
-	/* No code here */
-	return 0;
+    if ((ret == 0) && (msg->size != (size_t)MAILBOX_MBOX_SIZE)) {
+        ret = -EMSGSIZE;
+    }
+
+out:
+    return ret;
 }
 
 static int mfis_mailbox_register_callback(const struct scmi_dev *dev, uint32_t channel,
@@ -151,7 +74,7 @@ static int mfis_mailbox_register_callback(const struct scmi_dev *dev, uint32_t c
 {
 	struct mfis_mailbox_data *data = dev->data;
 
-	if (channel >= MAILBOX_MAX_CHANNELS) {
+	if (channel >= (uint32_t) MAILBOX_MAX_CHANNELS) {
 		return -EINVAL;
 	}
 
@@ -178,7 +101,7 @@ static int mfis_mailbox_set_enabled(const struct scmi_dev *dev, uint32_t channel
 {
 	struct mfis_mailbox_data *data = dev->data;
 
-	if (channel >= MAILBOX_MAX_CHANNELS) {
+	if (channel >= (uint32_t) MAILBOX_MAX_CHANNELS) {
 		return -EINVAL;
 	}
 
@@ -195,52 +118,16 @@ static const struct mbox_driver_api mfis_mailbox_driver_api = {
 	.set_enabled = mfis_mailbox_set_enabled,
 };
 
-static const struct mfis_mailbox_config config = {
-	.base = MFIS_SCP_BASE,
-};
+static const struct mfis_mailbox_config config;
 
 static struct mfis_mailbox_data data;
-
-Context_t mfis_mailbox_cxt = {
-	.ctx = (void *)&mfis_dev,
-};
 
 int mfis_mailbox_init(struct mbox_spec *spec)
 {
 	struct scmi_dev *dev = &mfis_dev;
-	uint32_t mfis_rtcore_num = CURRENT_CORE_IDX;
-	#if (BOARD == MDP_AIACC_HIL)
-	int irq_id;
-	if (mfis_rtcore_num == CLUSTER0_CORE0)
-	{
-		irq_id = SCP2RT0_IRQ_ID;
-	}
-	else if (mfis_rtcore_num == CLUSTER0_CORE1)
-	{
-		irq_id = SCP2RT1_IRQ_ID;
-	}
-	else
-	{
-		return -1;
-	}
-	 
-	mfis_set_bits(MFISIMR_RS_B(mfis_rtcore_num), MFISIMR_ACK_INT_BIT); // Enable ACK interrupt
-	while (mfis_read_bit(MFISCHN_ACK_ST_RS_B(mfis_rtcore_num), MFISCHN_ACK_ST_PND_ACK_BIT) != 0)
-    {};
-	mfis_set_bits(MFISIMR_RS_B(mfis_rtcore_num), MFISIMR_RCV_INT_BIT); // Enable receive interrupt
-	#else
-	int irq_id = CURRENT_CORE_IDX + SCP2CR_INT_BASE_ID;
-	if (!spec) {
-		return -EINVAL;
-	}
-	#endif
+    int ret = 0;
 
-	/* Set Handler for Irq */
-	Irq_SetupEntry(irq_id, (IrqHandlerFn)mfis_mailbox_isr, &mfis_mailbox_cxt);
-	/* Set priority for Irq */
-	Irq_SetPriority(irq_id, IPRIORITY(5));
-	/* Enable Irq */
-	Irq_Enable(irq_id);
+    ret = mfis_init(&mfis_mailbox_ch);
 
 	dev->api = (void*) &mfis_mailbox_driver_api;
 	dev->config = (void*) &config;
@@ -248,5 +135,5 @@ int mfis_mailbox_init(struct mbox_spec *spec)
 
 	spec->dev = dev;
 
-	return 0;
+	return ret;
 }

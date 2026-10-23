@@ -8,13 +8,14 @@
 #ifndef MFIS_H
 #define MFIS_H
 
-#include<stdint.h>
+#include <stdint.h>
 
 /* MFIS instance for each channel */
 typedef enum mfis_type
 {
     MFIS_TYPE_RECEVER = 0,
     MFIS_TYPE_SENDER = 1,
+    MFIS_TYPE_CR_SCP = 2
 } mfis_type_t;
 
 struct mfis_channel

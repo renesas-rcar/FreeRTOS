@@ -20,47 +20,5 @@
 /* Shared memory size */
 #define SCMI_SHMEM_SIZE         (256U)
 
-/* MFIS SCP Base Address */
-#define MFIS_SCP_BASE           (0x18840000U)
-
-/* MFIS SCP COMMON Base Address */
-#define MFIS_SCP_COMMON_BASE    (0x189E1000U)
-
-
-/* MFIS Write Protection Control Register */
-#define MFIS_SCP_REG_MFISWPCNTR(base) (*((volatile uint32_t *)((base) + 0x900U)))
-
-/*
- * MFIS CPU communication message register Realtime core[m](m=0-11)
- * to SCP core.
- */
-#define MFIS_SCP_REG_MFISRSEMBR(base, m) \
-    (*(volatile uint32_t *)(size_t)((base) + (0x1000U * (m)) + 0x44U + 0x20000U))
-
-/*
- * MFIS CPU communication control register Realtime core[m]
- * to SCP Core(m=0-11).
- */
-#define MFIS_SCP_REG_MFISRSEICR(base, m) \
-    (*(volatile uint32_t *)(size_t)((base) + (0x1000U * (m)) + 0x04U + 0x20000U))
-
-/* MFIS CPU communication control register SCP core
- * to Realtime core[m](m=0-11).
- */
-#define MFIS_SCP_REG_MFISRSIICR(base, m) \
-    (*(volatile uint32_t *)(size_t)((base) + (0x1000U * (m)) + 0x00U + 0x20000U))
-
-/* MFIS Register access key */
-#define MFIS_SCP_KEY_CODE           (0xACC00000U)
-
-/* MFIS IRQ register source bits for interrupts generated (15-1bit used) */
-#define MFIS_SCP_DISABLE_MFIS_WRITE_PROTECTION(val)    ((uint32_t)(0x00007FFFU & (val)) << 1)
-
-/* MFIS IRQ register internal interrupt request bit (0bit used) */
-#define MFIS_SCP_IRQ_REG_INT(n)         (0x00000001U & (n))
-
-/* MFIS IRQ register mask bits (31-16bit unused) */
-#define MFIS_SCP_IRQ_REG_MASK           (0x0000FFFFU)
-
 #endif /* RCAR_SCMI_PRIVATE_H */
 
