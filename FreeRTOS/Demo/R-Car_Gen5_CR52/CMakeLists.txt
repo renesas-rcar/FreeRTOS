@@ -312,9 +312,17 @@ if(ENABLE_OPENAMP)
         ${BSP_DIR}/drivers/virtio/platform_rcar.c
         ${BSP_DIR}/drivers/virtio/remoteproc_rcar.c
         ${BSP_DIR}/drivers/virtio/rsc_table.c
-        ${BSP_DIR}/drivers/virtio/r_virtio.c
+        ${BSP_DIR}/drivers/virtio/r_virtio.c      
         ${BSP_DIR}/drivers/virtio-iommu-backend/r_virtio_iommu_backend.c
         ${BSP_DIR}/drivers/virtio-iommu-frontend/r_virtio_iommu_frontend.c
+        # rcar_rpmsg (sample_apps/rcar_rpmsg), same OpenAMP / libmetal
+        ${BSP_DIR}/drivers/rcar-rpmsg/platform_rcar_rpmsg.c
+        ${BSP_DIR}/drivers/rcar-rpmsg/remoteproc_rcar_rpmsg.c
+        ${BSP_DIR}/drivers/rcar-rpmsg/rcar_dispatch.c
+        ${BSP_DIR}/drivers/rcar-rpmsg/rcar_rpmsg.c
+        ${BSP_DIR}/drivers/rcar-rpmsg/rcar_rpmsg_os_freertos.c
+        ${BSP_DIR}/drivers/rcar-rpmsg/rsc_table_rpmsg.c
+        ${BSP_DIR}/drivers/rcar-rpmsg/transport_ucie.c
     )
 endif()
 
@@ -379,6 +387,8 @@ if(ENABLE_OPENAMP)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/libraries/libmetal/build/lib/include>
         $<BUILD_INTERFACE:${BSP_DIR}/drivers/virtio>
         $<BUILD_INTERFACE:${BSP_DIR}/drivers/virtio-iommu-backend>
+        $<BUILD_INTERFACE:${BSP_DIR}/drivers/rcar-rpmsg>
+        $<BUILD_INTERFACE:${BSP_DIR}/include/rcar-rpmsg>
     )
 endif()
 
@@ -398,6 +408,7 @@ function(convert_bin_to_srec app_name)
                 --remove-section .resource_table
                 --remove-section .resource_table1
                 --remove-section .resource_table2
+                --remove-section .resource_table_ucie0
                 ${BIN_FILE} ${SREC_FILE}
         DEPENDS ${app_name}
         COMMENT "Converting ${BIN_FILE} to SREC format"
@@ -483,7 +494,9 @@ function(get_infor_sample_apps json_file to_app_list to_bin_list)
             endif()
 
             # Collect app folder name from json file
-            if(APP_DEPENDENCY STREQUAL "open_amp" AND ENABLE_OPENAMP)
+            # rcar_rpmsg apps build with OpenAMP too (ENABLE_OPENAMP)
+            if((APP_DEPENDENCY STREQUAL "open_amp" OR APP_DEPENDENCY STREQUAL "rcar_rpmsg")
+               AND ENABLE_OPENAMP)
                 list(APPEND APP_LIST "${APP_NAME}")
             endif()
 

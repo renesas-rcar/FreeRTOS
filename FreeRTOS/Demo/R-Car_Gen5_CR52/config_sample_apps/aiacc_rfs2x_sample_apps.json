@@ -234,6 +234,19 @@
             "status": "Skip"
         },
         {
+            "module": "RCAR RPMSG",
+            "name": "rcar_rpmsg",
+            "bin": [
+                "rcar_rpmsg_core0.elf",
+                "rcar_rpmsg_core1.elf",
+                "rcar_rpmsg_api_test_core0.elf",
+                "rcar_rpmsg_api_test_core1.elf",
+                "rcar_rpmsg_ucie_ep.elf"
+            ],
+            "dependency": "rcar_rpmsg",
+            "status": "Test"
+        },
+        {
             "module": "Sensor",
             "name": "sensor_app",
             "bin": [

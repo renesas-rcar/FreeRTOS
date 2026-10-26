@@ -8,7 +8,7 @@ MEMORY
    dram2_base_addr : ORIGIN = 0x4B000000, LENGTH = 0x100000
    dram3_base_addr : ORIGIN = 0x41000000, LENGTH = 0x1400000
 
-   remote_proc_rsc_table : ORIGIN = 0x96600000, LENGTH = 0x1000
+   remote_proc_rsc_table : ORIGIN = 0x96600000, LENGTH = 0x122000
    remote_proc_rsc_table_1 : ORIGIN = 0x96650000, LENGTH = 0x1000
    remote_proc_rsc_table_2 : ORIGIN = 0x966a0000, LENGTH = 0x1000
    remote_proc_rsc_table_aiacc0_0 : ORIGIN = 0x90000000, LENGTH = 0x1000

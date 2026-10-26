@@ -204,6 +204,19 @@
             "status": "Skip"
         },
         {
+            "module": "RCAR RPMSG",
+            "name": "rcar_rpmsg",
+            "bin": [
+                "rcar_rpmsg_core0.srec",
+                "rcar_rpmsg_core1.srec",
+                "rcar_rpmsg_api_test_core0.srec",
+                "rcar_rpmsg_api_test_core1.srec",
+                "rcar_rpmsg_ucie_ep.srec"
+            ],
+            "dependency": "rcar_rpmsg",
+            "status": "Test"
+        },
+        {
             "module": "Virtio IOMMU BE",
             "name": "virtio_iommu_backend_sample",
             "bin": [
