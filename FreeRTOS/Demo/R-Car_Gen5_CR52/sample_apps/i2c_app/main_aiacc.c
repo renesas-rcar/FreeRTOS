@@ -470,7 +470,7 @@ static void vPrintTestSummary( void )
  
     printf("TC6: Multi channel\r\n"
            "TC6 Result: %s\r\n",
-           any_failed ? "Passed" : "Failed");
+           any_failed ? "Failed" : "Passed");
 
 	if (any_failed)
 	{
