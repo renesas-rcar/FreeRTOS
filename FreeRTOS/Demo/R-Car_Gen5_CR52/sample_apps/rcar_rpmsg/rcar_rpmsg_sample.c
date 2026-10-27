@@ -182,7 +182,7 @@ static void task_be_smmu(void *pvParameters)
     (void)pvParameters;
     vTaskDelay(BE_STARTUP_DELAY_MS);
 
-    LogDebug(("TC%d: Message transmission and reception between Core 0 and Core 1 on "
+    LogAlways(("TC%d: Message transmission and reception between Core 0 and Core 1 on "
               TC_CHIP " using MFIS.\n", TC_MFIS));
     static rcar_rpmsg_channel_t s_be_smmu;
     rcar_rpmsg_open_cfg_t cfg = {
@@ -231,7 +231,7 @@ static void task_be_camera(void *pvParameters)
     (void)pvParameters;
     vTaskDelay(BE_STARTUP_DELAY_MS);
 
-    LogDebug(("TC%d: Message transmission and reception between Core 0 and Core 1 on "
+    LogAlways(("TC%d: Message transmission and reception between Core 0 and Core 1 on "
               TC_CHIP " using polling.\n", TC_POLL));
     static rcar_rpmsg_channel_t s_be_camera;
     rcar_rpmsg_open_cfg_t cfg = {

@@ -101,7 +101,7 @@ static void echo_fe_task(void *pvParameters)
     LogDebug(("[RC] task started, open in %ums\n", FE_STARTUP_DELAY_MS));
     vTaskDelay(pdMS_TO_TICKS(FE_STARTUP_DELAY_MS));
 
-    LogDebug(("TC%d: Message transmission and reception between the CR core on X5H "
+    LogAlways(("TC%d: Message transmission and reception between the CR core on X5H "
               "and the CR core on AIACC0 across UCIE.\n", TC_UCIE));
     /* Links up and waits for the EP; times out 10 s after link-up: retry. */
     static rcar_rpmsg_channel_t ch;
