@@ -72,7 +72,7 @@ static uint64_t *Allocate_Table(void)
 
 static void Assign_Entry_Table(uint64_t *entry, uint64_t *table)
 {
-    *entry = (uint64_t)table | ENTRY_TYPE_TABLE;
+    *entry = (uint64_t)(uint32_t)table | ENTRY_TYPE_TABLE;
 }
 
 static inline uint64_t *walk_to_next_level(uint64_t *table, uint16_t entry_idx, uint8_t *tbl_level)
