@@ -65,6 +65,7 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
     uintptr_t wwdt_base_addr = R_WWDT_PRV_GetRegbase(unit);
     int clock_id, clock_id_0, clock_id_1, ret;
     int reset_id, reset_id_0, reset_id_1;
+    bool clock_status;
 
     if ((uint32_t)unit >= WWDT_CH_NUM) {
         LogError(("Wrong Unit for Clock ID\n"));
@@ -78,36 +79,75 @@ void R_WWDT_Init(wwdt_unit_t unit, wwdt_wsize_t wsize, uint32_t timeout_msec, bo
         /* Other units are belonging RT hierachy, there are some common domain_id for WDT. */
         for (int i = 0; i < WWDT_ID_REQUIRED_NUM; i++) {
             clock_id = wwdt_clock_required_tbl[i];
-            ret = R_StateManager_ClockOn(clock_id);
+            ret = R_StateManager_ClockStatusGet(clock_id, &clock_status);
             if (ret != 0) {
-                LogError(("Failed to set clock id %d ON.\r\n", clock_id));
+                LogError(("Failed to set status clock id %d (%d).\r\n", clock_id, ret));
+            } else {
+                if (clock_status == true) {
+                    LogAlways(("clock id %d is ON", clock_id));
+                } else {
+                    LogAlways(("clock id %d is OFF", clock_id));
+                    ret = R_StateManager_ClockOn(clock_id);
+                    if (ret != 0) {
+                        LogError(("Failed to set clock id %d ON (%d).\r\n", clock_id, ret));
+                    } else {
+                        LogAlways(("Successed to set clock id %d ON.\r\n", clock_id));
+                    }
+                }
             }
+
             reset_id = wwdt_reset_required_tbl[i];
             ret = R_StateManager_Reset(reset_id);
             if (ret != 0) {
-                LogError(("Failed to reset domain id %d.\r\n", reset_id));
+                LogError(("Failed to reset domain id %d (%d).\r\n", reset_id, ret));
             }
         }
     }
     clock_id_0 = wwdt_clock_tbl[unit].clock_id_0;
     clock_id_1 = wwdt_clock_tbl[unit].clock_id_1;
-    ret = R_StateManager_ClockOn(clock_id_0);
+    ret = R_StateManager_ClockStatusGet(clock_id_0, &clock_status);
     if (ret != 0) {
-        LogError(("Failed to set clock id %d ON.\r\n", clock_id_0));
+        LogError(("Failed to set status clock id %d (%d).\r\n", clock_id_0, ret));
+    } else {
+        if (clock_status == true) {
+            LogAlways(("clock id %d is ON", clock_id_0));
+        } else {
+            LogAlways(("clock id %d is OFF", clock_id_0));
+            ret = R_StateManager_ClockOn(clock_id_0);
+            if (ret != 0) {
+                LogError(("Failed to set clock id %d ON (%d).\r\n", clock_id_0, ret));
+            } else {
+                LogAlways(("Successed to set clock id %d ON.\r\n", clock_id_0));
+            }
+        }
     }
-    ret = R_StateManager_ClockOn(clock_id_1);
+
+    ret = R_StateManager_ClockStatusGet(clock_id_1, &clock_status);
     if (ret != 0) {
-        LogError(("Failed to set clock id %d ON.\r\n", clock_id_1));
+        LogError(("Failed to set status clock id %d (%d).\r\n", clock_id_1, ret));
+    } else {
+        if (clock_status == true) {
+            LogAlways(("clock id %d is ON", clock_id_1));
+        } else {
+            LogAlways(("clock id %d is OFF", clock_id_1));
+            ret = R_StateManager_ClockOn(clock_id_1);
+            if (ret != 0) {
+                LogError(("Failed to set clock id %d ON (%d).\r\n", clock_id_1, ret));
+            } else {
+                LogAlways(("Successed to set clock id %d ON.\r\n", clock_id_1));
+            }
+        }
     }
+
     reset_id_0 = wwdt_reset_tbl[unit].reset_id_0;
     reset_id_1 = wwdt_reset_tbl[unit].reset_id_1;
     ret = R_StateManager_Reset(reset_id_0);
     if (ret != 0) {
-        LogError(("Failed to reset domain id %d.\r\n", reset_id_0));
+        LogError(("Failed to reset domain id %d (%d).\r\n", reset_id_0, ret));
     }
     ret = R_StateManager_Reset(reset_id_1);
     if (ret != 0) {
-        LogError(("Failed to reset domain id %d.\r\n", reset_id_1));
+        LogError(("Failed to reset domain id %d (%d).\r\n", reset_id_1, ret));
     }
 
     clk_rate = (wwdt_base_addr == 0xC1380000) ? CLK_LSIOSC : RCLK;
