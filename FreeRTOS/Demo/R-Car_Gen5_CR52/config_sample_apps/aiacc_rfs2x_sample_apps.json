@@ -63,7 +63,7 @@
                 "mfis_cr_cr_core1.elf"
             ],
             "dependency": "No",
-            "status": "Skip"
+            "status": "Test"
         },
         {
             "module": "Posix",
