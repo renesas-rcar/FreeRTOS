@@ -121,6 +121,9 @@
           "AIACC_RESET_DOMAIN_ID_HSCIF1",
           "AIACC_RESET_DOMAIN_ID_SCIF0",
           "AIACC_RESET_DOMAIN_ID_SCIF1"
+        ],
+        "cpu0": [
+          "AIACC_RESET_DOMAIN_ID_UCIE01"
         ]
       }
     }

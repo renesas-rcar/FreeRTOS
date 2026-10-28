@@ -531,7 +531,7 @@ static void pmAppExample(void)
     }
     PM_LOG("*******TC%d: SCMI System Reset end!*******\r\n",
             tc_number);
-#else if (SYSTEM_SHUTDOWN_TEST == 1)
+#elif (SYSTEM_SHUTDOWN_TEST == 1)
     PM_LOG("*******TC%d: SCMI System Shutdown starting!*******\r\n",
             ++tc_number);
     vTaskDelay(3000);
