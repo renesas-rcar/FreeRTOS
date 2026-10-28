@@ -21,7 +21,7 @@
 #include "serial/r_serial.h"
 
 #define CPUID (__get_MPIDR() & 0xFF)
-#define UARTID 1 //SCIF1
+#define UARTID UART_ID
 
 #define pmApp_TASK_PRIORITY ( tskIDLE_PRIORITY + 1 )
 #define PM_LOG(format, ...) \
