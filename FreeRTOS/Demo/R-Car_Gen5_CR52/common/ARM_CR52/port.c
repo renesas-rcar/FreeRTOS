@@ -64,6 +64,14 @@
     #error configMAX_API_CALL_INTERRUPT_PRIORITY must be less than or equal to configUNIQUE_INTERRUPT_PRIORITIES as the lower the numeric priority value the higher the logical interrupt priority
 #endif
 
+#ifndef configKERNEL_INTERRUPT_PRIORITY
+    #error configKERNEL_INTERRUPT_PRIORITY must be defined. Refer to http: /* www.freertos.org/Documentation/02-Kernel/03-Supported-devices/02-Customization#configkernel_interrupt_priority-configmax_syscall_interrupt_priority-and-configmax_api_call_interrupt_priority */
+#endif
+
+#if configKERNEL_INTERRUPT_PRIORITY < configMAX_API_CALL_INTERRUPT_PRIORITY
+    #error configKERNEL_INTERRUPT_PRIORITY must be greater than or equal to configMAX_API_CALL_INTERRUPT_PRIORITY as the lower the numeric priority value the higher the logical interrupt priority.
+#endif
+
 #if configUSE_PORT_OPTIMISED_TASK_SELECTION == 1
     /* Check the configuration. */
     #if ( configMAX_PRIORITIES > 32 )

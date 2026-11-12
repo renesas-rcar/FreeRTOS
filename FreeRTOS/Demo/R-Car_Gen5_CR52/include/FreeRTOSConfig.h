@@ -159,6 +159,9 @@ extern "C" {
 #ifndef configMAX_API_CALL_INTERRUPT_PRIORITY
 #define configMAX_API_CALL_INTERRUPT_PRIORITY (configMAX_SYSCALL_INTERRUPT_PRIORITY)
 #endif
+#ifndef configKERNEL_INTERRUPT_PRIORITY
+#define configKERNEL_INTERRUPT_PRIORITY     (24)
+#endif
 #ifndef configASSERT
 void assert_func(const char *file, int line, const char *func);
 #define configASSERT( x ) if (!(x)) {assert_func(__FILE__, __LINE__, __func__);}

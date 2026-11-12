@@ -27,7 +27,7 @@ void vConfigureTickInterrupt(void)
 
     Irq_SetupEntry(R_OS_BSP_GENERIC_ARM_TIMER_IRQNUM, (IrqHandlerFn)TickInterruptHandler, NULL);
 
-    Irq_SetPriority(R_OS_BSP_GENERIC_ARM_TIMER_IRQNUM, IPRIORITY(24));
+    Irq_SetPriority(R_OS_BSP_GENERIC_ARM_TIMER_IRQNUM, IPRIORITY(configKERNEL_INTERRUPT_PRIORITY));
 
     /* set timer expiration from current counter value */
     CNTP_CVAL_WRITE(CNTPCT_READ() + COUNT_PER_TICK);
