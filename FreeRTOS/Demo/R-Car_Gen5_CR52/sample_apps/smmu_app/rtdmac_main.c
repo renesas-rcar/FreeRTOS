@@ -181,15 +181,6 @@ static void prvDMACTask( void *pvParameters )
 
     R_SMMU_Map(&smmu_ctrl, cfg0.mSrcAddr, cfg0.mSrcAddr + SOURCE_OFFSET_MAPPING, 0x5006000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
 
-#if (BOARD == X5H_RFS2)
-    smmu_ctrl.stream_id = 0xC00;
-    R_SMMU_Attach(&smmu_ctrl);
-    R_SMMU_Map(&smmu_ctrl, 0x10000000, 0x10000000, 0x10000000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
-    R_SMMU_Map(&smmu_ctrl, cfg0.mSrcAddr, cfg0.mSrcAddr, DESTINATION_OFFSET + 0x1000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
-    R_SMMU_Map(&smmu_ctrl, cfg0.mSrcAddr + SOURCE_OFFSET_MAPPING, cfg0.mSrcAddr + SOURCE_OFFSET_MAPPING,DESTINATION_OFFSET + 0x1000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
-    R_SMMU_Map(&smmu_ctrl, 0xC0000000, 0xC0000000, 0x40000000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
-#endif
-
     printf("**********************************************\r\n");
 
     printf("* TC4: Enable SMMU *\r\n");
