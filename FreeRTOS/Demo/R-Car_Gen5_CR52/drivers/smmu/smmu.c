@@ -326,8 +326,6 @@ e_smmu_map_fault_code_t R_SMMU_Map(st_smmu_streamid_instance_ctrl_t *p_ctrl,
     
     __DSB();
 
-    R_SMMU_InvalidateTLB(p_ctrl->smmu_domain, p_ctrl->is_secure);
-
     return ret;
 }
 
@@ -369,7 +367,6 @@ void R_SMMU_Unmap(st_smmu_streamid_instance_ctrl_t *p_ctrl, uint64_t va, uint64_
 
     freeMemoryRegion((uint64_t*)(uintptr_t)(cd_tbl->ttb0_base << 4), va, pa, size);
     __DSB();
-    R_SMMU_InvalidateTLB(p_ctrl->smmu_domain, p_ctrl->is_secure);
 }
 
 /**

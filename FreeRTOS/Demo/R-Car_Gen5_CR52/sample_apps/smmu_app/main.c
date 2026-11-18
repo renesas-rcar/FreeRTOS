@@ -156,26 +156,26 @@ static void prvSMMUTask( void *pvParameters )
     }
     printf("**********************************************\r\n");
 
-    printf("* TC2: Invalidate TLB *\r\n");
-    ret = R_SMMU_InvalidateTLB(SMMU_PERW, is_secure);
+    printf("* TC2: Attach stream id. *\r\n");
+
+    ret = R_SMMU_Attach(&smmu_ctrl);
     if (ret == 0) {
         printf("TC2 Result: Passed\r\n");
     } else {
         printf("TC2 Result: Failed\r\n");
     }
-    printf("**********************************************\r\n");
-    
-    printf("* TC3: Attach stream id. *\r\n");
 
-    ret = R_SMMU_Attach(&smmu_ctrl);
+    R_SMMU_Map(&smmu_ctrl, cfg.mSrcAddr, cfg.mSrcAddr + SOURCE_OFFSET_MAPPING, data_size, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
+
+    printf("**********************************************\r\n");
+
+    printf("* TC3: Invalidate TLB *\r\n");
+    ret = R_SMMU_InvalidateTLB(SMMU_PERW, is_secure);
     if (ret == 0) {
         printf("TC3 Result: Passed\r\n");
     } else {
         printf("TC3 Result: Failed\r\n");
     }
-
-    R_SMMU_Map(&smmu_ctrl, cfg.mSrcAddr, cfg.mSrcAddr + SOURCE_OFFSET_MAPPING, data_size, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
-
     printf("**********************************************\r\n");
 
     printf("* TC4: Enable SMMU *\r\n");
@@ -235,6 +235,7 @@ static void prvSMMUTask( void *pvParameters )
     printf("* TC6: R_SMMU_Unmap. *\r\n");
     
     R_SMMU_Unmap(&smmu_ctrl, cfg.mSrcAddr, cfg.mSrcAddr + SOURCE_OFFSET_MAPPING, data_size);
+    R_SMMU_InvalidateTLB(SMMU_PERW, is_secure);
 
     R_SYSDMAC_RcarDmacStop(SYS_DMAC3, DMAC_CH1);
 
@@ -272,6 +273,8 @@ static void prvSMMUTask( void *pvParameters )
     printf("* TC7: R_SMMU_Map(Re-map after unmap for verification). *\r\n");
     
     R_SMMU_Map(&smmu_ctrl, cfg.mSrcAddr, cfg.mSrcAddr + SOURCE_OFFSET_MAPPING, data_size, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
+    R_SMMU_InvalidateTLB(SMMU_PERW, is_secure);
+
     R_SYSDMAC_RcarDmacStop(SYS_DMAC3, DMAC_CH1);
 
     *(volatile uint32_t *)pa_src_ptr = 0x123;

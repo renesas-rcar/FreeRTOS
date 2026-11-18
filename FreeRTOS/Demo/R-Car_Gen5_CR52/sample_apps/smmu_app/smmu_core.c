@@ -133,7 +133,6 @@ static void prvSMMU_RT_Task( void *pvParameters )
     printf("* SMMU-RT Cortex-R52 coreid: %d *\r\n", coreid);
 
     R_SMMU_Init(SMMU_RT, is_secure);
-    R_SMMU_InvalidateTLB(SMMU_RT, is_secure);
 
     for (uint8_t i = 0; i < sizeof(streamId[coreid])/sizeof(uint32_t); i ++) {
         smmu_ctrl.stream_id = streamId[coreid][i];
@@ -152,6 +151,7 @@ static void prvSMMU_RT_Task( void *pvParameters )
         R_SMMU_Map(&smmu_ctrl, 0x90000000, 0x90000000, 0x1000000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
         R_SMMU_Map(&smmu_ctrl, 0xB0000000, 0xB0000000, 0x1000000, ATTR_DEVICE_NGNRNE_EL1_RO_EL0_RO);
     }
+    R_SMMU_InvalidateTLB(SMMU_RT, is_secure);
 
     printf("**********************************************\r\n");
 
@@ -207,6 +207,8 @@ static void prvSMMU_RT_Task( void *pvParameters )
         smmu_ctrl.stream_id = streamId[coreid][i];
         R_SMMU_Map(&smmu_ctrl, 0x70000000, 0x8E200000, 0x00100000, ATTR_DEVICE_NGNRNE_EL1_RW_EL0_RW);
     }
+    R_SMMU_InvalidateTLB(SMMU_RT, is_secure);
+
     *(uint32_t *)0x90000000 = 0x1111;
     *(uint32_t *)0x70000000 = 0x2222;
     vTaskDelay(10);
