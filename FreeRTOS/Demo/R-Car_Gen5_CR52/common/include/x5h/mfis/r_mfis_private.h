@@ -10,7 +10,7 @@
 #define R_MFIS_PRIVATE_H
 
 /**
- * @defgroup 
+ * @defgroup
  * @{
  * @brief .
  *
@@ -20,6 +20,8 @@
 extern "C" {
 #endif
 
+#include "r_mfis_common_private.h"
+
 /* MFIS IRQ register mask bits (31-16bit unused) */
 #define MFIS_SCP_IRQ_REG_MASK           (0x0000FFFFU)
 
@@ -28,9 +30,6 @@ extern "C" {
  */
 #define MFIS_SCP_REG_MFISRSIICR(base, m) \
     (*(volatile uint32_t *)(size_t)((base) + ((size_t)0x1000U * (size_t)(m)) + (size_t)0x00U + (size_t)0x20000U))
-
-/* MFIS SCP Base Address */
-#define MFIS_SCP_BASE           (0x18840000U)
 
 /* MFIS IRQ register source bits for interrupts generated (15-1bit used) */
 #define MFIS_SCP_DISABLE_MFIS_WRITE_PROTECTION(val)    ((uint32_t)(0x00007FFFU & (uint32_t)(val)) << 1U)
@@ -51,6 +50,9 @@ extern "C" {
  */
 #define MFIS_SCP_REG_MFISRSEICR(base, m) \
     (*(volatile uint32_t *)((size_t)(base) + ((size_t)0x1000U * (size_t)(m)) + (size_t)0x04U + (size_t)0x20000U))
+
+/* MFIS SCP Base Address */
+#define MFIS_SCP_BASE           (0x18840000U)
 
 #define MFIS_SCP_COMMON_X5H_BASE    0x189E1000U
 #define MFIS_SCP_X5H_UNLOCK_WRITE   (MFIS_SCP_COMMON_X5H_BASE + 0x900U) // MFISWPCNTR_SCP
