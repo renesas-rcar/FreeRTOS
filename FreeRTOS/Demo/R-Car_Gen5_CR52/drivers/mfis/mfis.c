@@ -53,7 +53,7 @@ void mfis_interrupt_cb(void* data)
                         MFIS_SCP_IRQ_REG_INT(0U));
     uint32_t value;
 
-    if (ch->type == MFIS_TYPE_CR_SCP)
+    if (ch->type == MFIS_TYPE_OTHER)
     {
         /* Unlock MFIS register write protection */
         *(volatile uint32_t *)(MFIS_SCP_X5H_UNLOCK_WRITE) = 0xACC00001U;
@@ -99,7 +99,7 @@ int mfis_init(struct mfis_channel *ch)
     ch->int_source = 0U;
     ch->recv_message = 0U;
     
-    if (ch->type == MFIS_TYPE_CR_SCP)
+    if (ch->type == MFIS_TYPE_OTHER)
     {
         intid = CURRENT_CORE_IDX + SCP2CR_INT_BASE_ID;
         *(volatile uint32_t *)(MFIS_SCP_X5H_UNLOCK_WRITE) = 0xACC00001U;
@@ -125,7 +125,7 @@ int mfis_deinit(struct mfis_channel *ch)
 {
     uint32_t intid;
 
-    if (ch->type == MFIS_TYPE_CR_SCP)
+    if (ch->type == MFIS_TYPE_OTHER)
     {
         intid = CURRENT_CORE_IDX + SCP2CR_INT_BASE_ID;
         Irq_Disable((unsigned int)intid);
@@ -133,8 +133,8 @@ int mfis_deinit(struct mfis_channel *ch)
     }
     else
     {
-        Irq_Disable((unsigned int)INTID_R_S(ch->ch));
-        Irq_RemoveEntry((unsigned int)INTID_R_S(ch->ch));
+        Irq_Disable((unsigned int)MFIS_INTID(ch->ch, ch->type));
+        Irq_RemoveEntry((unsigned int)MFIS_INTID(ch->ch, ch->type));
     }
     
     return 0;
@@ -150,7 +150,7 @@ int mfis_trigger_interrupt(struct mfis_channel *ch, uint16_t int_number)
     uint32_t mfis_irq = (uint32_t) (MFIS_SCP_DISABLE_MFIS_WRITE_PROTECTION(0U) |
                     MFIS_SCP_IRQ_REG_INT(1U));
 
-    if (ch->type == MFIS_TYPE_CR_SCP)
+    if (ch->type == MFIS_TYPE_OTHER)
     {
         *(volatile uint32_t *)(MFIS_SCP_X5H_UNLOCK_WRITE) = 0xACC00001U;
         MFIS_SCP_REG_MFISRSEMBR(MFIS_SCP_BASE, mfis_rtcore_num) = mfis_msg;
