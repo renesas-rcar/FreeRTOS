@@ -41,7 +41,8 @@ struct mfis_mailbox_config {
 };
 
 static struct mfis_channel mfis_mailbox_ch = {
-    .type = MFIS_TYPE_CR_SCP,
+    .type = MFIS_TYPE_OTHER,
+    .core_pair = MFIS_CORE_PAIR_CR_SCP,
     .cb_function = NULL,
     .arg = &mfis_mailbox_cxt
 };
