@@ -37,10 +37,6 @@
 #define I2C_DMA_MIN_READ_BYTES                  (3U)
 #define I2C_DMA_MIN_WRITE_BYTES                 (2U)
 
-/* ==================== STATIC VARIABLES ==================== */
-static int clock_id;
-static int reset_id;
-
 /* ==================== STATIC FUNCTION PROTOTYPES ==================== */
 /* Helper functions */
 static int32_t  loc_WaitMsrEvent(r_i2c_Unit_t Unit, uint32_t EventMask, uint64_t event_timeout_counts);
@@ -297,7 +293,7 @@ static int RCar_I2C_Init(i2c_instance_ctrl_t * p_instance_ctrl)
         return -1;
     }
 
-    clock_id = i2c_clock_domain_id[Unit];
+    uint32_t clock_id = i2c_clock_domain_id[Unit];
 
     ret = R_StateManager_ClockOn(clock_id);
     if (ret != 0U)
@@ -778,6 +774,7 @@ static int RCar_I2C_Close(i2c_instance_ctrl_t *p_instance_ctrl)
 {
     r_i2c_Unit_t Unit = p_instance_ctrl->p_cfg->channel;
     uintptr_t i2c_base_addr = R_I2C_PRV_GetRegbase(Unit);
+    uint32_t clock_id = i2c_clock_domain_id[Unit];
     int ret = 0;
 
     if (p_instance_ctrl->p_cfg->dma_single == true)
@@ -1211,7 +1208,7 @@ static int32_t rcar_i2c_reset_unit(r_i2c_Unit_t Unit)
         return -1;
     }
 
-    reset_id = i2c_reset_domain_id[Unit];
+    uint32_t reset_id = i2c_reset_domain_id[Unit];
 
     ret = R_StateManager_Reset(reset_id);
     if (ret != 0)
