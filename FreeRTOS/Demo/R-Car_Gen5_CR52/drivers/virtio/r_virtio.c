@@ -82,6 +82,7 @@ st_virtio_instance_ctrl_t * R_VIRTIO_BE_Create(e_mfis_channel_t mfis_ch)
         mfis_inst->int_source = 0U;
         mfis_inst->recv_message = 0U;
         mfis_inst->cb_function = NULL;
+        mfis_inst->core_pair = MFIS_CORE_PAIR_CR_CR;
         rproc_priv->p_mfis_ch = mfis_inst;
         rproc_priv->type = VIRTIO_BACK_END;
         ret = platform_init(rproc_priv, &(result->platform));
@@ -139,6 +140,7 @@ st_virtio_instance_ctrl_t * R_VIRTIO_FE_Create(e_mfis_channel_t mfis_ch, st_rsc_
         mfis_inst->int_source = 0U;
         mfis_inst->recv_message = 0U;
         mfis_inst->cb_function = NULL;
+        mfis_inst->core_pair = MFIS_CORE_PAIR_CR_CR;
         rproc_priv->p_mfis_ch = mfis_inst;
         rproc_priv->type = VIRTIO_FRONT_END;
         

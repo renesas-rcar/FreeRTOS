@@ -29,7 +29,8 @@ static struct mfis_channel mfis_inst =
     .ch = 0,
     .int_source = 0,
     .recv_message = 0,
-    .cb_function = NULL
+    .cb_function = NULL,
+    .core_pair = MFIS_CORE_PAIR_CR_CA
 };
 struct remoteproc_priv priv;
 /* RPMsg virtio shared buffer pool */
