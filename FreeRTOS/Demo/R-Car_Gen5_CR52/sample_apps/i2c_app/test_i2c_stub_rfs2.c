@@ -22,7 +22,7 @@
 #include "rcar_utils.h"
 
 #define I2C_STUB0_SLAVE_ADDR            (0x3F)
-#define I2C_STUB0_BASE                  (0x3C001000)
+#define I2C_STUB0_BASE                  (0x0C582E000)
 #define I2C_STUB0_RXTX_REG              (I2C_STUB0_BASE + 0x24)
 
 #define I2C_APP_SIZE (configMINIMAL_STACK_SIZE * 2)
@@ -90,7 +90,7 @@ static void prvI2CTask( void *pvParameters )
     i2c_master_cfg_t        g_i2c_device_cfg_1 =
     {
         .channel       = 1,
-        .rate          = I2C_MASTER_RATE_FAST,
+        .rate          = I2C_MASTER_RATE_STANDARD,
         .slave         = I2C_STUB0_SLAVE_ADDR,
         .addr_mode     = I2C_MASTER_ADDR_MODE_7BIT,
         .p_callback    = NULL,     // Callback
@@ -143,7 +143,7 @@ static void prvI2CTask( void *pvParameters )
     i2c_master_cfg_t        g_i2c_device_cfg_2 =
     {
         .channel       = 2,
-        .rate          = I2C_MASTER_RATE_FAST,
+        .rate          = I2C_MASTER_RATE_STANDARD,
         .slave         = I2C_STUB0_SLAVE_ADDR,
         .addr_mode     = I2C_MASTER_ADDR_MODE_7BIT,
         .p_callback    = NULL,     // Callback
